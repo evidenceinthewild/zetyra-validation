@@ -187,11 +187,10 @@ def validate_continuous(client, scenarios: list) -> pd.DataFrame:
         # Get reference result
         reference = reference_sample_size_continuous(**scenario)
 
-        # Calculate deviation
+        # Calculate deviation (guard against zero effect size)
         n_deviation = abs(zetyra["n_total"] - reference["n_total"]) / reference["n_total"]
-        d_deviation = abs(zetyra["effect_size"] - reference["effect_size"]) / abs(
-            reference["effect_size"]
-        )
+        ref_d = abs(reference["effect_size"])
+        d_deviation = abs(zetyra["effect_size"] - reference["effect_size"]) / ref_d if ref_d > 1e-10 else 0.0
 
         results.append({
             "scenario": str(scenario),
@@ -218,11 +217,10 @@ def validate_binary(client, scenarios: list) -> pd.DataFrame:
         # Get reference result
         reference = reference_sample_size_binary(**scenario)
 
-        # Calculate deviation
+        # Calculate deviation (guard against zero effect size)
         n_deviation = abs(zetyra["n_total"] - reference["n_total"]) / reference["n_total"]
-        h_deviation = abs(zetyra["effect_size_h"] - reference["effect_size_h"]) / abs(
-            reference["effect_size_h"]
-        )
+        ref_h = abs(reference["effect_size_h"])
+        h_deviation = abs(zetyra["effect_size_h"] - reference["effect_size_h"]) / ref_h if ref_h > 1e-10 else 0.0
 
         results.append({
             "scenario": str(scenario),

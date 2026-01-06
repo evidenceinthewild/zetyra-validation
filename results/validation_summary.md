@@ -1,18 +1,18 @@
 # Zetyra Validation Results
 
-**Validation Date:** 2026-01-05 16:31:39
-**API URL:** http://localhost:8080/api/v1/validation
+**Validation Date:** 2026-01-05 18:27:48
+**API URL:** https://zetyra-backend-394439308230.us-central1.run.app/api/v1/validation
 
 ## Summary
 
 | Calculator | Status | Tests Passed |
 |------------|--------|--------------|
-| Sample Size | ✅ PASS | 10 |
+| Sample Size | ✅ PASS | 20 |
 | CUPED | ✅ PASS | 15 |
 | Group Sequential Design | ✅ PASS | 19 |
 | Bayesian | ✅ PASS | 10 |
 
-**Total Tests: 54**
+**Total Tests: 64**
 **Overall Status: ✅ ALL PASSED**
 
 ## Detailed Results
@@ -37,6 +37,26 @@
                      {'p1': 0.5, 'p2': 0.6, 'alpha': 0.01, 'power': 0.8}      1154         1154              0.0  0.201358     0.201358         0.000039  True
       {'p1': 0.1, 'p2': 0.15, 'alpha': 0.05, 'power': 0.8, 'ratio': 2.0}      1577         1577              0.0  0.151898     0.151898         0.000183  True
 {'p1': 0.3, 'p2': 0.4, 'alpha': 0.025, 'power': 0.9, 'two_sided': False}       954          954              0.0  0.210159     0.210159         0.000036  True
+```
+
+#### Survival Outcomes
+```
+                  scenario  zetyra_events  reference_events  events_deviation_pct  zetyra_n  reference_n  n_deviation_pct  pass
+ HR=0.7, α=0.05, power=0.8            247               247                   0.0       362          362              0.0  True
+HR=0.75, α=0.05, power=0.8            380               380                   0.0       458          458              0.0  True
+ HR=0.8, α=0.05, power=0.9            845               845                   0.0      1278         1278              0.0  True
+HR=0.65, α=0.01, power=0.8            252               252                   0.0       330          330              0.0  True
+ HR=0.7, α=0.05, power=0.8            278               278                   0.0       420          420              0.0  True
+```
+
+#### Survival Properties
+```
+                                      property                                expected     actual  pass
+     Larger effect (smaller HR) → fewer events         events(HR=0.6) < events(HR=0.9) 121 < 2829  True
+                    Higher power → more events events(power=0.90) > events(power=0.80)  331 > 247  True
+                     Lower alpha → more events         events(α=0.01) > events(α=0.05)  368 > 247  True
+    HR=1 returns error (undefined sample size)                          HTTP 400 error   HTTP 400  True
+Schoenfeld formula: HR=0.7, α=0.05, power=0.80                             ~248 events 247 events  True
 ```
 
 ### CUPED Calculator

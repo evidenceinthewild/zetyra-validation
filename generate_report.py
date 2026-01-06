@@ -145,10 +145,14 @@ def generate_report(base_url: str = None):
 
 
 if __name__ == '__main__':
+    import os
     base_url = sys.argv[1] if len(sys.argv) > 1 else None
 
     print('Generating validation report...')
     report, all_pass, total_tests = generate_report(base_url)
+
+    # Ensure results directory exists
+    os.makedirs('results', exist_ok=True)
 
     with open('results/validation_summary.md', 'w') as f:
         f.write(report)

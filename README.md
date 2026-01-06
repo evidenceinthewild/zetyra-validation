@@ -100,10 +100,8 @@ zetyra-validation/
 │   ├── validate_bayesian.py
 │   └── zetyra_client.py
 ├── R/
-│   ├── validate_all.R
-│   ├── validate_sample_size.R
-│   ├── validate_gsd.R
-│   └── generate_benchmarks.R
+│   ├── validate_all.R              # Full R validation suite
+│   └── generate_benchmarks.R       # Generate reference values from pwr, gsDesign
 ├── results/                        # Generated (gitignored)
 │   ├── validation_output.txt
 │   └── validation_summary.md
