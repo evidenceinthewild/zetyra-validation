@@ -88,7 +88,7 @@ validate_sample_size <- function() {
 
   if (!pass) all_pass <- FALSE
 
-  # Test 2: Binary - compare with arcsine formula
+  # Test 2: Binary - compare with pooled-variance z-test
   cat("  Testing binary outcomes (two-proportion z-test)...\n")
 
   zetyra_bin <- zetyra_post("/sample-size/binary", list(

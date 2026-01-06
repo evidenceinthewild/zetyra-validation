@@ -30,12 +30,19 @@ where:
 
 ### Binary Outcomes (Two-Proportion Z-Test)
 
-**Reference:** R `pwr::pwr.2p.test`
+**Reference:** Pooled-variance z-test (Chow et al., Lachin)
 
-**Formula:** Uses arcsine transformation for effect size:
+**Formula:** Uses pooled variance under H0 and separate variances under H1:
+```
+n₁ = ((z_α × √((1+1/r) × p̄(1-p̄)) + z_β × √(p₁(1-p₁) + p₂(1-p₂)/r)) / |p₂-p₁|)²
+```
+
+Effect size reported as Cohen's h:
 ```
 h = 2 × arcsin(√p₂) - 2 × arcsin(√p₁)
 ```
+
+Note: This differs from pwr::pwr.2p.test which uses arcsine transformation throughout.
 
 **Validation tolerance:** ≤1% relative difference in sample size
 
@@ -73,10 +80,11 @@ where `d` = required events, `r` = allocation ratio
 
 ### Spending Functions
 
-**O'Brien-Fleming:**
+**O'Brien-Fleming (one-sided):**
 ```
-α*(t) = 2 - 2Φ(z_{α/2} / √t)
+α*(t) = 2 - 2Φ(z_α / √t)
 ```
+where z_α is the one-sided critical value (e.g., z_{0.025} = 1.96).
 
 **Pocock:**
 ```
