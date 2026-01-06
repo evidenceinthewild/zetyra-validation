@@ -18,11 +18,12 @@ BOUNDARY_TOLERANCE = 0.05  # Absolute difference in Z-scores
 
 def reference_obrien_fleming_spending(t: float, alpha: float = 0.025) -> float:
     """
-    O'Brien-Fleming alpha spending function.
+    O'Brien-Fleming alpha spending function (one-sided).
 
-    α*(t) = 2 - 2Φ(z_{α/2} / √t)
+    α*(t) = 2 - 2Φ(z_α / √t)
 
-    where Φ is the standard normal CDF.
+    where Φ is the standard normal CDF and z_α is the one-sided critical value.
+    Note: For two-sided tests, use alpha/2 as the input alpha.
     """
     if t <= 0:
         return 0.0
@@ -66,6 +67,13 @@ def validate_spending_functions(client) -> pd.DataFrame:
     for i, (t, spent) in enumerate(zip(info_fracs, alpha_spent)):
         expected = reference_obrien_fleming_spending(t, 0.025)
         deviation = abs(spent - expected)
+        # Final look should exactly equal alpha, intermediate looks should match spending function
+        is_final = i == len(info_fracs) - 1
+        if is_final:
+            # At final look, cumulative alpha must equal total alpha
+            passes = abs(spent - 0.025) < 0.0001
+        else:
+            passes = deviation < 0.001
         results.append({
             "function": "O'Brien-Fleming",
             "look": i + 1,
@@ -73,7 +81,7 @@ def validate_spending_functions(client) -> pd.DataFrame:
             "zetyra_alpha": round(spent, 6),
             "reference_alpha": round(expected, 6),
             "deviation": round(deviation, 6),
-            "pass": deviation < 0.001 or i == len(info_fracs) - 1,  # Final should equal alpha
+            "pass": passes,
         })
 
     # Test Pocock spending
@@ -91,6 +99,13 @@ def validate_spending_functions(client) -> pd.DataFrame:
     for i, (t, spent) in enumerate(zip(info_fracs, alpha_spent)):
         expected = reference_pocock_spending(t, 0.025)
         deviation = abs(spent - expected)
+        # Final look should exactly equal alpha, intermediate looks should match spending function
+        is_final = i == len(info_fracs) - 1
+        if is_final:
+            # At final look, cumulative alpha must equal total alpha
+            passes = abs(spent - 0.025) < 0.0001
+        else:
+            passes = deviation < 0.001
         results.append({
             "function": "Pocock",
             "look": i + 1,
@@ -98,7 +113,7 @@ def validate_spending_functions(client) -> pd.DataFrame:
             "zetyra_alpha": round(spent, 6),
             "reference_alpha": round(expected, 6),
             "deviation": round(deviation, 6),
-            "pass": deviation < 0.001 or i == len(info_fracs) - 1,
+            "pass": passes,
         })
 
     return pd.DataFrame(results)

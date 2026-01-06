@@ -12,7 +12,7 @@ from dataclasses import dataclass
 
 
 # Default to production API; override for local testing
-DEFAULT_BASE_URL = "https://api.zetyra.com/api/v1/validation"
+DEFAULT_BASE_URL = "https://zetyra-backend-394439308230.us-central1.run.app/api/v1/validation"
 
 
 @dataclass

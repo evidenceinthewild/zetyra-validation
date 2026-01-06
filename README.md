@@ -33,7 +33,7 @@ source("R/validate_all.R")
 
 ## API Endpoints
 
-Zetyra provides public validation endpoints at `https://api.zetyra.com/api/v1/validation/`:
+Zetyra provides public validation endpoints at `https://zetyra-backend-394439308230.us-central1.run.app/api/v1/validation/`:
 
 | Endpoint | Description |
 |----------|-------------|
@@ -104,8 +104,8 @@ zetyra-validation/
 │   ├── validate_sample_size.R
 │   ├── validate_gsd.R
 │   └── generate_benchmarks.R
-├── results/
-│   ├── validation_report.csv
+├── results/                        # Generated (gitignored)
+│   ├── validation_output.txt
 │   └── validation_summary.md
 └── docs/
     ├── methodology.md               # Validation formulas and methods

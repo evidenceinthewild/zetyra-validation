@@ -107,17 +107,23 @@ def reference_sample_size_survival(
     alpha: float = 0.05,
     power: float = 0.80,
     allocation_ratio: float = 1.0,
+    median_control: float = 12.0,
+    accrual_time: float = 24.0,
+    follow_up_time: float = 12.0,
+    dropout_rate: float = 0.0,
 ) -> dict:
     """
-    Calculate required events using Schoenfeld formula.
+    Calculate required events and sample size using Schoenfeld formula.
 
     This is the reference implementation for survival validation.
     Matches R survival/gsDesign methodology.
 
-    The Schoenfeld formula:
+    The Schoenfeld formula (two-sided):
     d = ((z_alpha + z_beta) / log(HR))^2 * (1 + r)^2 / r
 
     where d = events, r = allocation ratio
+
+    Sample size is then calculated from events / P(event).
     """
     log_hr = math.log(hazard_ratio)
     z_alpha = stats.norm.ppf(1 - alpha / 2)  # Two-sided
@@ -127,12 +133,41 @@ def reference_sample_size_survival(
 
     # Schoenfeld formula for required events
     events = ((z_alpha + z_beta) / log_hr) ** 2 * (1 + r) ** 2 / r
+    events_int = int(np.ceil(events))
+
+    # Estimate probability of event using exponential survival
+    lambda_control = np.log(2) / median_control
+    lambda_treatment = lambda_control * hazard_ratio
+
+    # Average follow-up time for uniform accrual
+    avg_follow_up = follow_up_time + accrual_time / 2
+
+    def prob_event(lambda_val, avg_fu, dropout_rate):
+        """Probability of observing event accounting for dropout."""
+        p_event = 1 - np.exp(-lambda_val * avg_fu)
+        p_no_dropout = (1 - dropout_rate) ** (avg_fu / 12)  # Annual dropout
+        return p_event * p_no_dropout
+
+    p_event_ctrl = prob_event(lambda_control, avg_follow_up, dropout_rate)
+    p_event_trt = prob_event(lambda_treatment, avg_follow_up, dropout_rate)
+
+    # Weighted average event probability
+    p_event_avg = (p_event_ctrl + r * p_event_trt) / (1 + r)
+
+    # Total sample size = events / p_event
+    n_total = events_int / p_event_avg
+    n1 = n_total / (1 + r)
+    n2 = r * n1
 
     return {
-        "events_required": int(np.ceil(events)),
+        "events_required": events_int,
+        "n1": int(np.ceil(n1)),
+        "n2": int(np.ceil(n2)),
+        "n_total": int(np.ceil(n1)) + int(np.ceil(n2)),
         "log_hr": log_hr,
         "z_alpha": z_alpha,
         "z_beta": z_beta,
+        "p_event_avg": p_event_avg,
     }
 
 
@@ -206,12 +241,16 @@ def validate_survival(client, scenarios: list) -> pd.DataFrame:
         # Get Zetyra result
         zetyra = client.sample_size_survival(**scenario)
 
-        # Get reference result (only use params relevant to event calculation)
+        # Get reference result with all params for full validation
         reference = reference_sample_size_survival(
             hazard_ratio=scenario["hazard_ratio"],
             alpha=scenario.get("alpha", 0.05),
             power=scenario.get("power", 0.80),
             allocation_ratio=scenario.get("allocation_ratio", 1.0),
+            median_control=scenario["median_control"],
+            accrual_time=scenario["accrual_time"],
+            follow_up_time=scenario["follow_up_time"],
+            dropout_rate=scenario.get("dropout_rate", 0.0),
         )
 
         # Calculate deviation for events (primary validation)
@@ -225,14 +264,21 @@ def validate_survival(client, scenarios: list) -> pd.DataFrame:
             abs(zetyra["log_hr"] - reference["log_hr"]) / abs(reference["log_hr"])
         )
 
+        # Sample size validation (secondary - depends on event probability estimate)
+        n_total_deviation = (
+            abs(zetyra["n_total"] - reference["n_total"])
+            / reference["n_total"]
+        )
+
         results.append({
             "scenario": f"HR={scenario['hazard_ratio']}, α={scenario.get('alpha', 0.05)}, power={scenario.get('power', 0.80)}",
             "zetyra_events": zetyra["events_required"],
             "reference_events": reference["events_required"],
             "events_deviation_pct": events_deviation * 100,
-            "zetyra_log_hr": round(zetyra["log_hr"], 4),
-            "reference_log_hr": round(reference["log_hr"], 4),
-            "pass": events_deviation <= SURVIVAL_TOLERANCE and log_hr_deviation <= TOLERANCE,
+            "zetyra_n": zetyra["n_total"],
+            "reference_n": reference["n_total"],
+            "n_deviation_pct": n_total_deviation * 100,
+            "pass": events_deviation <= SURVIVAL_TOLERANCE and log_hr_deviation <= TOLERANCE and n_total_deviation <= SURVIVAL_TOLERANCE,
         })
 
     return pd.DataFrame(results)
