@@ -26,10 +26,15 @@ def generate_report(base_url: str = None):
     report_lines.append('| Calculator | Status | Tests Passed |')
     report_lines.append('|------------|--------|--------------|')
 
-    # Sample Size
+    # Sample Size (includes continuous, binary, survival)
     ss_results = validate_ss(base_url)
     ss_pass = ss_results['all_pass']
-    ss_tests = len(ss_results['continuous']) + len(ss_results['binary'])
+    ss_tests = (
+        len(ss_results['continuous'])
+        + len(ss_results['binary'])
+        + len(ss_results['survival'])
+        + len(ss_results['survival_properties'])
+    )
     report_lines.append(f"| Sample Size | {'✅ PASS' if ss_pass else '❌ FAIL'} | {ss_tests} |")
 
     # CUPED
@@ -72,6 +77,16 @@ def generate_report(base_url: str = None):
     report_lines.append('#### Binary Outcomes')
     report_lines.append('```')
     report_lines.append(ss_results['binary'].to_string(index=False))
+    report_lines.append('```')
+    report_lines.append('')
+    report_lines.append('#### Survival Outcomes')
+    report_lines.append('```')
+    report_lines.append(ss_results['survival'].to_string(index=False))
+    report_lines.append('```')
+    report_lines.append('')
+    report_lines.append('#### Survival Properties')
+    report_lines.append('```')
+    report_lines.append(ss_results['survival_properties'].to_string(index=False))
     report_lines.append('```')
     report_lines.append('')
 

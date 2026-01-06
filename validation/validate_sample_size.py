@@ -4,9 +4,11 @@ Validate Zetyra Sample Size Calculators
 Compares Zetyra results against:
 - R pwr package (pwr.t.test, pwr.2p.test)
 - scipy.stats formulas
+- Schoenfeld formula for survival
 - Published benchmarks
 """
 
+import math
 import pandas as pd
 import numpy as np
 from scipy import stats
@@ -14,6 +16,8 @@ from zetyra_client import get_client
 
 # Tolerance for validation (1% relative difference)
 TOLERANCE = 0.01
+# Slightly higher tolerance for survival due to event probability estimation
+SURVIVAL_TOLERANCE = 0.02
 
 
 def reference_sample_size_continuous(
@@ -98,6 +102,40 @@ def reference_sample_size_binary(
     }
 
 
+def reference_sample_size_survival(
+    hazard_ratio: float,
+    alpha: float = 0.05,
+    power: float = 0.80,
+    allocation_ratio: float = 1.0,
+) -> dict:
+    """
+    Calculate required events using Schoenfeld formula.
+
+    This is the reference implementation for survival validation.
+    Matches R survival/gsDesign methodology.
+
+    The Schoenfeld formula:
+    d = ((z_alpha + z_beta) / log(HR))^2 * (1 + r)^2 / r
+
+    where d = events, r = allocation ratio
+    """
+    log_hr = math.log(hazard_ratio)
+    z_alpha = stats.norm.ppf(1 - alpha / 2)  # Two-sided
+    z_beta = stats.norm.ppf(power)
+
+    r = allocation_ratio
+
+    # Schoenfeld formula for required events
+    events = ((z_alpha + z_beta) / log_hr) ** 2 * (1 + r) ** 2 / r
+
+    return {
+        "events_required": int(np.ceil(events)),
+        "log_hr": log_hr,
+        "z_alpha": z_alpha,
+        "z_beta": z_beta,
+    }
+
+
 def validate_continuous(client, scenarios: list) -> pd.DataFrame:
     """Validate continuous sample size against reference."""
     results = []
@@ -160,6 +198,127 @@ def validate_binary(client, scenarios: list) -> pd.DataFrame:
     return pd.DataFrame(results)
 
 
+def validate_survival(client, scenarios: list) -> pd.DataFrame:
+    """Validate survival sample size against Schoenfeld formula."""
+    results = []
+
+    for scenario in scenarios:
+        # Get Zetyra result
+        zetyra = client.sample_size_survival(**scenario)
+
+        # Get reference result (only use params relevant to event calculation)
+        reference = reference_sample_size_survival(
+            hazard_ratio=scenario["hazard_ratio"],
+            alpha=scenario.get("alpha", 0.05),
+            power=scenario.get("power", 0.80),
+            allocation_ratio=scenario.get("allocation_ratio", 1.0),
+        )
+
+        # Calculate deviation for events (primary validation)
+        events_deviation = (
+            abs(zetyra["events_required"] - reference["events_required"])
+            / reference["events_required"]
+        )
+
+        # Log HR should match exactly
+        log_hr_deviation = (
+            abs(zetyra["log_hr"] - reference["log_hr"]) / abs(reference["log_hr"])
+        )
+
+        results.append({
+            "scenario": f"HR={scenario['hazard_ratio']}, α={scenario.get('alpha', 0.05)}, power={scenario.get('power', 0.80)}",
+            "zetyra_events": zetyra["events_required"],
+            "reference_events": reference["events_required"],
+            "events_deviation_pct": events_deviation * 100,
+            "zetyra_log_hr": round(zetyra["log_hr"], 4),
+            "reference_log_hr": round(reference["log_hr"], 4),
+            "pass": events_deviation <= SURVIVAL_TOLERANCE and log_hr_deviation <= TOLERANCE,
+        })
+
+    return pd.DataFrame(results)
+
+
+def validate_survival_properties(client) -> pd.DataFrame:
+    """Validate mathematical properties of survival calculator."""
+    results = []
+
+    # Property 1: Smaller HR requires fewer events
+    small_hr = client.sample_size_survival(
+        hazard_ratio=0.6, median_control=12, accrual_time=24, follow_up_time=12
+    )
+    large_hr = client.sample_size_survival(
+        hazard_ratio=0.9, median_control=12, accrual_time=24, follow_up_time=12
+    )
+    prop1_pass = small_hr["events_required"] < large_hr["events_required"]
+    results.append({
+        "property": "Larger effect (smaller HR) → fewer events",
+        "expected": "events(HR=0.6) < events(HR=0.9)",
+        "actual": f"{small_hr['events_required']} < {large_hr['events_required']}",
+        "pass": prop1_pass,
+    })
+
+    # Property 2: Higher power requires more events
+    power_80 = client.sample_size_survival(
+        hazard_ratio=0.7, median_control=12, accrual_time=24, follow_up_time=12, power=0.80
+    )
+    power_90 = client.sample_size_survival(
+        hazard_ratio=0.7, median_control=12, accrual_time=24, follow_up_time=12, power=0.90
+    )
+    prop2_pass = power_90["events_required"] > power_80["events_required"]
+    results.append({
+        "property": "Higher power → more events",
+        "expected": "events(power=0.90) > events(power=0.80)",
+        "actual": f"{power_90['events_required']} > {power_80['events_required']}",
+        "pass": prop2_pass,
+    })
+
+    # Property 3: Lower alpha requires more events
+    alpha_05 = client.sample_size_survival(
+        hazard_ratio=0.7, median_control=12, accrual_time=24, follow_up_time=12, alpha=0.05
+    )
+    alpha_01 = client.sample_size_survival(
+        hazard_ratio=0.7, median_control=12, accrual_time=24, follow_up_time=12, alpha=0.01
+    )
+    prop3_pass = alpha_01["events_required"] > alpha_05["events_required"]
+    results.append({
+        "property": "Lower alpha → more events",
+        "expected": "events(α=0.01) > events(α=0.05)",
+        "actual": f"{alpha_01['events_required']} > {alpha_05['events_required']}",
+        "pass": prop3_pass,
+    })
+
+    # Property 4: HR=1 should return error (no treatment effect)
+    hr_one = client.sample_size_survival(
+        hazard_ratio=1.0, median_control=12, accrual_time=24, follow_up_time=12,
+        allow_errors=True
+    )
+    # API should return 400 error for HR=1
+    prop4_pass = hr_one.get("error") == 400 or "error" in str(hr_one).lower()
+    results.append({
+        "property": "HR=1 returns error (undefined sample size)",
+        "expected": "HTTP 400 error",
+        "actual": f"HTTP {hr_one.get('error')}" if hr_one.get("error") else "No error",
+        "pass": prop4_pass,
+    })
+
+    # Property 5: Schoenfeld formula accuracy (known values)
+    # For HR=0.7, alpha=0.05, power=0.80, r=1: events ≈ 248
+    known = client.sample_size_survival(
+        hazard_ratio=0.7, median_control=12, accrual_time=24, follow_up_time=12,
+        alpha=0.05, power=0.80, allocation_ratio=1.0
+    )
+    expected_events = 248  # From manual Schoenfeld calculation
+    prop5_pass = abs(known["events_required"] - expected_events) <= 2  # Allow ±2 for rounding
+    results.append({
+        "property": "Schoenfeld formula: HR=0.7, α=0.05, power=0.80",
+        "expected": f"~{expected_events} events",
+        "actual": f"{known['events_required']} events",
+        "pass": prop5_pass,
+    })
+
+    return pd.DataFrame(results)
+
+
 def run_validation(base_url: str = None) -> dict:
     """Run full sample size validation."""
     client = get_client(base_url)
@@ -182,13 +341,33 @@ def run_validation(base_url: str = None) -> dict:
         {"p1": 0.30, "p2": 0.40, "alpha": 0.025, "power": 0.90, "two_sided": False},
     ]
 
+    # Survival scenarios
+    survival_scenarios = [
+        {"hazard_ratio": 0.7, "median_control": 12, "accrual_time": 24, "follow_up_time": 12},
+        {"hazard_ratio": 0.75, "median_control": 10, "accrual_time": 24, "follow_up_time": 18, "alpha": 0.05, "power": 0.80},
+        {"hazard_ratio": 0.8, "median_control": 24, "accrual_time": 36, "follow_up_time": 24, "alpha": 0.05, "power": 0.90},
+        {"hazard_ratio": 0.65, "median_control": 8, "accrual_time": 18, "follow_up_time": 12, "alpha": 0.01, "power": 0.80},
+        {"hazard_ratio": 0.7, "median_control": 12, "accrual_time": 24, "follow_up_time": 12, "allocation_ratio": 2.0},
+    ]
+
     continuous_results = validate_continuous(client, continuous_scenarios)
     binary_results = validate_binary(client, binary_scenarios)
+    survival_results = validate_survival(client, survival_scenarios)
+    survival_properties = validate_survival_properties(client)
+
+    all_pass = (
+        continuous_results["pass"].all()
+        and binary_results["pass"].all()
+        and survival_results["pass"].all()
+        and survival_properties["pass"].all()
+    )
 
     return {
         "continuous": continuous_results,
         "binary": binary_results,
-        "all_pass": continuous_results["pass"].all() and binary_results["pass"].all(),
+        "survival": survival_results,
+        "survival_properties": survival_properties,
+        "all_pass": all_pass,
     }
 
 
@@ -211,6 +390,14 @@ if __name__ == "__main__":
     print("\nBinary Outcomes (Two-Proportion Z-Test)")
     print("-" * 70)
     print(results["binary"].to_string(index=False))
+
+    print("\nSurvival Outcomes (Log-Rank Test)")
+    print("-" * 70)
+    print(results["survival"].to_string(index=False))
+
+    print("\nSurvival Properties")
+    print("-" * 70)
+    print(results["survival_properties"].to_string(index=False))
 
     print("\n" + "=" * 70)
     if results["all_pass"]:

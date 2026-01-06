@@ -22,10 +22,12 @@ class ZetyraClient:
     base_url: str = DEFAULT_BASE_URL
     timeout: int = 30
 
-    def _post(self, endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    def _post(self, endpoint: str, data: Dict[str, Any], allow_errors: bool = False) -> Dict[str, Any]:
         """Make POST request to validation endpoint."""
         url = f"{self.base_url}{endpoint}"
         response = requests.post(url, json=data, timeout=self.timeout)
+        if allow_errors and response.status_code >= 400:
+            return {"error": response.status_code, "detail": response.text}
         response.raise_for_status()
         return response.json()
 
@@ -110,6 +112,7 @@ class ZetyraClient:
         power: float = 0.80,
         dropout_rate: float = 0.0,
         allocation_ratio: float = 1.0,
+        allow_errors: bool = False,
     ) -> Dict[str, Any]:
         """
         Calculate sample size for survival outcomes (log-rank test).
@@ -125,6 +128,7 @@ class ZetyraClient:
             power: Statistical power (default: 0.80)
             dropout_rate: Annual dropout rate (default: 0.0)
             allocation_ratio: Allocation ratio (default: 1.0)
+            allow_errors: Return error dict instead of raising (default: False)
 
         Returns:
             dict with events_required, n1, n2, n_total, log_hr, z_alpha, z_beta, inputs
@@ -138,7 +142,7 @@ class ZetyraClient:
             "power": power,
             "dropout_rate": dropout_rate,
             "allocation_ratio": allocation_ratio,
-        })
+        }, allow_errors=allow_errors)
 
     # =========================================================================
     # CUPED Calculator
