@@ -1,0 +1,30 @@
+Using custom API URL: http://localhost:8080/api/v1/validation
+======================================================================
+ZETYRA FULL VALIDATION SUITE
+Timestamp: 2026-01-05T16:30:21.026645
+======================================================================
+
+[1/4] Validating Sample Size Calculators...
+      Sample Size: ✅ PASS
+
+[2/4] Validating CUPED Calculator...
+      CUPED: ✅ PASS
+
+[3/4] Validating Group Sequential Design...
+      GSD: ✅ PASS
+
+[4/4] Validating Bayesian Predictive Power...
+      Bayesian: ✅ PASS
+
+======================================================================
+VALIDATION SUMMARY
+======================================================================
+ Calculator Status Error
+Sample Size   PASS      
+      Cuped   PASS      
+        Gsd   PASS      
+   Bayesian   PASS      
+
+======================================================================
+✅ ALL VALIDATIONS PASSED
+======================================================================

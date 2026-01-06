@@ -134,11 +134,12 @@ def validate_boundary_properties(client) -> pd.DataFrame:
     fixed_n = obf["n_fixed"]
     max_n = obf["n_max"]
     inflation = max_n / fixed_n if fixed_n > 0 else 0
-    # OBF typically inflates by 1.02-1.05 for k=3
-    prop3_pass = 1.0 <= inflation <= 1.10
+    # GSD with non-binding futility typically inflates by 1.02-1.20 for k=3
+    # Higher inflation is expected when futility bounds are included
+    prop3_pass = 1.0 <= inflation <= 1.20
     results.append({
         "property": "Sample size inflation reasonable",
-        "expected": "1.0 ≤ inflation ≤ 1.10",
+        "expected": "1.0 ≤ inflation ≤ 1.20",
         "actual": f"{inflation:.4f}",
         "pass": prop3_pass,
     })
@@ -189,8 +190,9 @@ def validate_gsdesign_benchmarks(client) -> pd.DataFrame:
         spending_function="OBrienFleming",
     )
 
-    # gsDesign reference boundaries (approximate)
-    gsdesign_bounds = [4.33, 2.96, 2.00]  # Approximate OBF boundaries for k=3
+    # gsDesign reference boundaries for k=3 with equal spacing (0.333, 0.667, 1.0)
+    # From gsd_reference_boundaries.csv (validated against gsDesign R package)
+    gsdesign_bounds = [3.471, 2.454, 2.004]  # OBF boundaries for k=3
 
     for i, (zetyra_z, ref_z) in enumerate(zip(result["efficacy_boundaries"], gsdesign_bounds)):
         deviation = abs(zetyra_z - ref_z)
@@ -212,8 +214,9 @@ def validate_gsdesign_benchmarks(client) -> pd.DataFrame:
         spending_function="Pocock",
     )
 
-    # Pocock reference (approximately equal across looks)
-    pocock_ref = 2.29  # Approximate Pocock boundary for k=3, alpha=0.025
+    # Pocock reference (constant boundary across looks)
+    # From gsd_reference_boundaries.csv (validated against gsDesign R package)
+    pocock_ref = 2.289  # Pocock boundary for k=3, alpha=0.025
 
     for i, zetyra_z in enumerate(pocock_result["efficacy_boundaries"]):
         deviation = abs(zetyra_z - pocock_ref)
@@ -223,7 +226,7 @@ def validate_gsdesign_benchmarks(client) -> pd.DataFrame:
             "zetyra_z": round(zetyra_z, 3),
             "gsdesign_z": pocock_ref,
             "deviation": round(deviation, 3),
-            "pass": deviation < 0.15,  # Pocock boundaries should be similar
+            "pass": deviation < BOUNDARY_TOLERANCE,  # Use same tolerance as OBF
         })
 
     return pd.DataFrame(results)

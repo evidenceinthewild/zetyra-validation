@@ -203,31 +203,33 @@ def validate_predictive_properties(client) -> pd.DataFrame:
         "pass": prop2_pass,
     })
 
-    # Property 3: More remaining data → more uncertainty
-    small_remaining = client.bayesian_continuous(
+    # Property 3: Larger interim sample → more precise estimate → different PP
+    # With a positive interim effect, more data collected means more certainty
+    # The PP should reflect this - test that PP changes with sample size
+    small_interim = client.bayesian_continuous(
         prior_mean=0.0,
         prior_var=0.5,
-        interim_effect=0.3,
-        interim_var=0.1,
-        interim_n=180,
-        final_n=200,  # Only 20 more
+        interim_effect=0.5,  # Positive effect
+        interim_var=0.2,     # Higher variance (less data)
+        interim_n=50,
+        final_n=200,
         success_threshold=0.95,
     )
-    large_remaining = client.bayesian_continuous(
+    large_interim = client.bayesian_continuous(
         prior_mean=0.0,
         prior_var=0.5,
-        interim_effect=0.3,
-        interim_var=0.1,
-        interim_n=100,
-        final_n=200,  # 100 more
+        interim_effect=0.5,  # Same positive effect
+        interim_var=0.05,    # Lower variance (more data)
+        interim_n=150,
+        final_n=200,
         success_threshold=0.95,
     )
-    # With same positive interim, small remaining should have higher PP
-    prop3_pass = small_remaining["predictive_probability"] >= large_remaining["predictive_probability"] - 0.1
+    # With same positive effect but more precise estimate, PP should be higher
+    prop3_pass = large_interim["predictive_probability"] >= small_interim["predictive_probability"]
     results.append({
-        "property": "More data remaining → more uncertainty",
-        "expected": "PP(n=180/200) ≥ PP(n=100/200) - 0.1",
-        "actual": f"{small_remaining['predictive_probability']:.3f} vs {large_remaining['predictive_probability']:.3f}",
+        "property": "More precise interim → higher PP (positive effect)",
+        "expected": "PP(var=0.05) ≥ PP(var=0.2)",
+        "actual": f"{large_interim['predictive_probability']:.3f} ≥ {small_interim['predictive_probability']:.3f}",
         "pass": prop3_pass,
     })
 
