@@ -21,7 +21,7 @@ library(jsonlite)
 # =============================================================================
 
 args <- commandArgs(trailingOnly = TRUE)
-BASE_URL <- if (length(args) > 0) args[1] else "https://api.zetyra.com/api/v1/validation"
+BASE_URL <- if (length(args) > 0) args[1] else "https://zetyra-backend-394439308230.us-central1.run.app/api/v1/validation"
 
 cat("=" , rep("=", 68), "\n", sep = "")
 cat("ZETYRA R VALIDATION SUITE\n")

@@ -12,11 +12,11 @@ This repository provides transparent validation of Zetyra's regulatory-grade sta
 | Calculator | Validation Status | Reference |
 |------------|-------------------|-----------|
 | Sample Size (Continuous) | ✅ Validated | pwr::pwr.t.test |
-| Sample Size (Binary) | ✅ Validated | pwr::pwr.2p.test |
-| Sample Size (Survival) | ✅ Validated | gsDesign::nSurv |
-| CUPED Variance Reduction | ✅ Validated | Manual derivation |
+| Sample Size (Binary) | ✅ Validated | Pooled-variance z-test (Chow et al.) |
+| Sample Size (Survival) | ✅ Validated | Schoenfeld formula (gsDesign::nSurv) |
+| CUPED Variance Reduction | ✅ Validated | Analytical derivation |
 | Group Sequential Design | ✅ Validated | gsDesign, rpact |
-| Bayesian Predictive Power | ✅ Validated | Manual derivation |
+| Bayesian Predictive Power | ✅ Validated | Conjugate posterior formulas |
 
 ## Quick Start
 

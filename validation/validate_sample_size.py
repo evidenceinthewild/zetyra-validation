@@ -65,9 +65,14 @@ def reference_sample_size_binary(
     two_sided: bool = True,
 ) -> dict:
     """
-    Calculate sample size for binary outcomes using arcsine formula.
+    Calculate sample size for binary outcomes using pooled-variance z-test.
 
-    Matches R pwr::pwr.2p.test methodology.
+    Uses the standard formula with pooled variance under H0 and separate
+    variances under H1. Also computes Cohen's h for effect size reporting.
+
+    Note: This differs slightly from pwr::pwr.2p.test which uses arcsine
+    transformation throughout. The pooled-variance approach is standard
+    in clinical trial design (Chow et al., Lachin).
     """
     # Cohen's h effect size
     h = 2 * np.arcsin(np.sqrt(p2)) - 2 * np.arcsin(np.sqrt(p1))

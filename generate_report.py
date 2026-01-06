@@ -19,7 +19,7 @@ def generate_report(base_url: str = None):
     report_lines.append('# Zetyra Validation Results')
     report_lines.append('')
     report_lines.append(f'**Validation Date:** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
-    report_lines.append(f'**API URL:** {base_url or "https://api.zetyra.com/api/v1/validation"}')
+    report_lines.append(f'**API URL:** {base_url or "https://zetyra-backend-394439308230.us-central1.run.app/api/v1/validation"}')
     report_lines.append('')
     report_lines.append('## Summary')
     report_lines.append('')
