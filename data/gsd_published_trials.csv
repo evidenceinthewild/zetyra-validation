@@ -1,0 +1,4 @@
+trial_name,year,therapeutic_area,endpoint,n,looks,alpha,beta,spending_function,info_fractions,z_boundaries,citation,outcome,notes
+HPTN_083,2021,HIV_Prevention,HIV_infection,4566,4,0.025,0.20,OBrienFleming,"0.25,0.50,0.75,1.00","4.333,2.963,2.359,1.993",NEJM 385:595-608,Stopped_early_look1,HR=0.34 66% risk reduction
+REMATCH,2001,Heart_Failure,All_cause_mortality,129,4,0.05,0.10,OBrienFleming,"0.25,0.50,0.75,1.00","","NEJM 345:1435-1443",Completed,LVAD vs medical management
+HeartMate_II,2009,Heart_Failure,2year_survival,200,3,0.05,0.20,OBrienFleming,"0.27,0.67,1.00","",NEJM 361:2241-2251,Completed,Continuous vs pulsatile flow

@@ -57,11 +57,21 @@ Each calculator is validated against established R packages:
 - **survival** - Survival analysis
 
 ### 2. Published Clinical Trials
-We validate CUPED/ANCOVA variance reduction against **18 published trials** with explicit correlation values:
+We validate against parameters from published Phase III trials:
+
+**CUPED/ANCOVA** - 18 trials with explicit correlation values:
 - **Walters et al. (2019)** - Systematic review of 20 RCTs, mean r = 0.50
 - **TADS Depression Trial** - 32% variance reduction demonstrated
-- **SELF Shoulder Pain Trial** - Used r = 0.50 for sample size calculation
 - See [docs/published_trials_ancova.md](docs/published_trials_ancova.md) for full compilation
+
+**GSD** - Trials with published boundaries:
+- **HPTN 083 (2021)** - HIV prevention, O'Brien-Fleming 4-look design
+- **REMATCH (2001)** - Heart failure LVAD, O'Brien-Fleming boundaries
+- See [docs/gsd_bayesian_validation.md](docs/gsd_bayesian_validation.md) for details
+
+**Bayesian** - Methodology papers with analytical solutions:
+- **Lee & Liu (2008)** - Beta-binomial predictive probability
+- **Spiegelhalter et al. (1986)** - Normal-Normal conjugate models
 
 ### 3. Commercial Software Benchmarks
 Results compared to:
@@ -77,8 +87,11 @@ zetyra-validation/
 ├── data/
 │   ├── sample_size_benchmarks.csv   # pwr package reference values
 │   ├── gsd_benchmarks.csv           # gsDesign package reference values
+│   ├── gsd_reference_boundaries.csv # Z-boundaries for 2-5 look designs
+│   ├── gsd_published_trials.csv     # HPTN 083, REMATCH trial parameters
 │   ├── cuped_benchmarks.csv         # Analytical formula reference values
-│   └── published_trials_cuped.csv   # 18 published trials with correlations
+│   ├── published_trials_cuped.csv   # 18 published trials with correlations
+│   └── bayesian_test_cases.csv      # Beta-binomial and Normal-Normal cases
 ├── validation/
 │   ├── validate_all.py
 │   ├── validate_sample_size.py
@@ -96,7 +109,8 @@ zetyra-validation/
 │   └── validation_summary.md
 └── docs/
     ├── methodology.md               # Validation formulas and methods
-    └── published_trials_ancova.md   # 18 trials with ANCOVA correlations
+    ├── published_trials_ancova.md   # 18 trials with ANCOVA correlations
+    └── gsd_bayesian_validation.md   # GSD trials and Bayesian test cases
 ```
 
 ## Results Summary

@@ -1,0 +1,11 @@
+test_id,outcome_type,prior_type,prior_params,observed_data,future_n,threshold,analytical_pp,source,notes
+BB_1,binary,beta,"1,1","8/20",20,12,0.367,Lee_Liu_2008,Uniform prior Phase II design
+BB_2,binary,beta,"0.5,0.5","10/30",30,22,0.298,analytical,Jeffreys prior
+BB_3,binary,beta,"2,8","5/15",35,15,0.421,analytical,Informative skeptical prior
+BB_4,binary,beta,"1,1","15/30",20,22,0.512,analytical,Higher observed rate
+BB_5,binary,beta,"1,1","20/40",40,35,0.287,analytical,Larger interim sample
+NN_1,continuous,normal,"0,1","0.3,0.1",100,0.196,0.52,Spiegelhalter_1986,Normal-Normal conjugate
+NN_2,continuous,normal,"0,0.5","0.4,0.05",100,0.196,0.74,analytical,Tighter prior
+NN_3,continuous,normal,"0.5,1","0.3,0.1",100,0.196,0.61,analytical,Optimistic prior
+NN_4,continuous,normal,"0,1","0.1,0.1",100,0.196,0.28,analytical,Weaker observed effect
+NN_5,continuous,normal,"0,1","0.5,0.1",100,0.196,0.82,analytical,Strong observed effect
