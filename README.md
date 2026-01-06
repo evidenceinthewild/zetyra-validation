@@ -142,10 +142,10 @@ MIT License - See [LICENSE](LICENSE)
 
 If you use Zetyra in your research, please cite:
 ```
-@software{zetyra2025,
+@software{zetyra2026,
   title = {Zetyra: Regulatory-Grade Statistical Design Platform},
   author = {Evidence in the Wild},
-  year = {2025},
+  year = {2026},
   url = {https://zetyra.com}
 }
 ```
