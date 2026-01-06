@@ -1,0 +1,26 @@
+trial_name,year,therapeutic_area,endpoint,n,correlation,variance_reduction_pct,citation,notes
+Walters_20_RCTs,2019,Multiple,PROMs,7173,0.50,25,Trials 20:566,Systematic review mean
+TADS_FLX,2004,Depression,CDRS-R,109,,32,JAMA 292:807-820,Adolescent depression
+MCI_Trial,2005,Cognitive_impairment,CDR-SB,512,,4,NEJM 352:2379-2388,Weak baseline correlation
+SELF_Trial,2016,Shoulder_pain,SPADI_Total,85,0.50,25,Clin Rehab 30:686-696,Used r=0.50 for sample size
+SELF_Trial,2016,Shoulder_pain,SPADI_Disability,85,0.49,24,Clin Rehab 30:686-696,
+SELF_Trial,2016,Shoulder_pain,SPADI_Pain,85,0.36,13,Clin Rehab 30:686-696,
+PoNDER_Trial,2009,Postnatal_depression,EPDS,2659,0.44,19,BMJ 338:a3045,Largest in Walters review
+PoNDER_Trial,2009,Postnatal_depression,CORE_OM_Total,2659,0.55,30,BMJ 338:a3045,
+COPD_Rehabilitation,2010,COPD,SF36_Physical,238,0.68,46,HTA 14:1-v,Highest for this trial
+COPD_Rehabilitation,2010,COPD,SF36_Role_Physical,238,0.37,14,HTA 14:1-v,Lowest for this trial
+COPD_Rehabilitation,2010,COPD,EQ5D,238,0.55,30,HTA 14:1-v,
+AIM_High_Melanoma,2006,Oncology,EORTC_QLQ_C30,444,0.46,21,Br J Cancer 94:492-498,Mean across 60 correlations
+Lifestyle_Matters,2017,Geriatrics,PHQ9,288,0.66,44,Age Ageing 46:627-634,Highest correlation trial
+STEPWISE,2018,Schizophrenia,Multiple,412,0.53,28,HTA 22:1-160,
+Back_Pain_Acupuncture,2005,Low_back_pain,SF36_Physical,239,0.62,38,HTA 9:1-109,
+Back_Pain_Acupuncture,2005,Low_back_pain,SF36_Role_Physical,239,0.20,4,HTA 9:1-109,
+Back_Pain_Acupuncture,2005,Low_back_pain,Mean_SF36,239,0.44,19,HTA 9:1-109,
+Knee_Replacement,2005,Osteoarthritis,WOMAC_Physical,151,0.46,21,J Eval Clin Pract 11:283-292,
+Knee_Replacement,2005,Osteoarthritis,WOMAC_Pain,151,0.26,7,J Eval Clin Pract 11:283-292,
+Knee_Replacement,2005,Osteoarthritis,SF36_Physical,151,0.65,42,J Eval Clin Pract 11:283-292,
+GMC_Diabetes,2016,Type2_diabetes,LDL_C,195,0.50,25,BMJ Open 6:e013096,
+GLP1RA_Diabetes,2016,Type2_diabetes,HbA1c,257,0.81,66,PLoS ONE 11:e0152428,Very high pre-baseline correlation
+PEDIG_Amblyopia,2010,Amblyopia,Visual_acuity,170,0.20,4,Ophthalmology PMC2864338,Low correlation expected
+SCORE_CRVO,2009,Retinal_vein,VA_OCT,Variable,-0.27,7,Ophthalmology PMC2851408,Negative correlation
+Kleinhenz_Acupuncture,1999,Shoulder_pain,Pain_scale,52,,36,Acta Anaesthesiol Scand,b=0.71 regression slope

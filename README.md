@@ -56,11 +56,12 @@ Each calculator is validated against established R packages:
 - **rpact** - Regulatory-approved clinical trial design
 - **survival** - Survival analysis
 
-### 2. Published Trials
-We validate against parameters from published Phase III trials:
-- BEACON CRC (2019) - Survival endpoint
-- KEYNOTE-189 (2018) - GSD with interim analysis
-- Adaptive platform trials from COVID-19
+### 2. Published Clinical Trials
+We validate CUPED/ANCOVA variance reduction against **18 published trials** with explicit correlation values:
+- **Walters et al. (2019)** - Systematic review of 20 RCTs, mean r = 0.50
+- **TADS Depression Trial** - 32% variance reduction demonstrated
+- **SELF Shoulder Pain Trial** - Used r = 0.50 for sample size calculation
+- See [docs/published_trials_ancova.md](docs/published_trials_ancova.md) for full compilation
 
 ### 3. Commercial Software Benchmarks
 Results compared to:
@@ -74,9 +75,10 @@ Results compared to:
 zetyra-validation/
 ├── README.md
 ├── data/
-│   ├── sample_size_benchmarks.csv
-│   ├── gsd_benchmarks.csv
-│   └── published_trials.csv
+│   ├── sample_size_benchmarks.csv   # pwr package reference values
+│   ├── gsd_benchmarks.csv           # gsDesign package reference values
+│   ├── cuped_benchmarks.csv         # Analytical formula reference values
+│   └── published_trials_cuped.csv   # 18 published trials with correlations
 ├── validation/
 │   ├── validate_all.py
 │   ├── validate_sample_size.py
@@ -93,7 +95,8 @@ zetyra-validation/
 │   ├── validation_report.csv
 │   └── validation_summary.md
 └── docs/
-    └── methodology.md
+    ├── methodology.md               # Validation formulas and methods
+    └── published_trials_ancova.md   # 18 trials with ANCOVA correlations
 ```
 
 ## Results Summary
