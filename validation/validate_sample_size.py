@@ -2,9 +2,9 @@
 Validate Zetyra Sample Size Calculators
 
 Compares Zetyra results against:
-- R pwr package (pwr.t.test, pwr.2p.test)
-- scipy.stats formulas
-- Schoenfeld formula for survival
+- R pwr package (pwr.t.test) for continuous outcomes
+- Pooled-variance z-test (Chow et al.) for binary outcomes
+- Schoenfeld formula for survival (gsDesign::nSurv)
 - Published benchmarks
 """
 

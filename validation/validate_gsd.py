@@ -2,11 +2,12 @@
 Validate Zetyra Group Sequential Design Calculator
 
 Compares Zetyra GSD results against:
-- R gsDesign package
-- rpact package
+- R gsDesign package (8 benchmark designs: OF_2 through OF_5, Pocock_2 through Pocock_4)
+- Published clinical trials (HPTN 083, HeartMate II)
 - Analytical spending function formulas
 """
 
+import os
 import pandas as pd
 import numpy as np
 from scipy import stats
@@ -14,6 +15,9 @@ from zetyra_client import get_client
 
 # Tolerance for Z-score boundaries
 BOUNDARY_TOLERANCE = 0.05  # Absolute difference in Z-scores
+
+# Path to reference data
+DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
 
 def reference_obrien_fleming_spending(t: float, alpha: float = 0.025) -> float:
@@ -188,61 +192,142 @@ def validate_boundary_properties(client) -> pd.DataFrame:
 
 def validate_gsdesign_benchmarks(client) -> pd.DataFrame:
     """
-    Validate against published gsDesign benchmarks.
+    Validate against all gsDesign benchmarks from CSV.
 
-    These values are from gsDesign R package documentation and
-    Jennison & Turnbull (2000).
+    Tests 8 design configurations (OF_2 through OF_5, Pocock_2 through Pocock_4)
+    with 24 total boundary comparisons against gsDesign R package.
     """
     results = []
 
-    # Benchmark 1: gsDesign example (3 equally spaced, OBF, alpha=0.025)
-    # Expected boundaries from gsDesign::gsDesign(k=3, test.type=1, alpha=0.025, beta=0.1)
-    result = client.gsd(
+    # Load reference boundaries from CSV
+    csv_path = os.path.join(DATA_DIR, "gsd_reference_boundaries.csv")
+    ref_df = pd.read_csv(csv_path)
+
+    # Group by design to test each configuration
+    designs = ref_df.groupby("design")
+
+    for design_name, design_df in designs:
+        # Extract parameters from first row
+        first_row = design_df.iloc[0]
+        k = int(first_row["looks"])
+        alpha = float(first_row["alpha"])
+        spending_fn = first_row["spending_function"]
+
+        # Call Zetyra API
+        zetyra_result = client.gsd(
+            effect_size=0.3,
+            alpha=alpha,
+            power=0.80,  # beta=0.20 means power=0.80
+            k=k,
+            spending_function=spending_fn,
+        )
+
+        # Compare each boundary
+        for _, row in design_df.iterrows():
+            look = int(row["look"])
+            ref_z = float(row["z_boundary"])
+
+            # Get Zetyra boundary for this look (0-indexed)
+            zetyra_z = zetyra_result["efficacy_boundaries"][look - 1]
+            deviation = abs(zetyra_z - ref_z)
+
+            results.append({
+                "design": design_name,
+                "look": look,
+                "zetyra_z": round(zetyra_z, 3),
+                "gsdesign_z": ref_z,
+                "deviation": round(deviation, 3),
+                "pass": deviation < BOUNDARY_TOLERANCE,
+            })
+
+    return pd.DataFrame(results)
+
+
+def validate_published_trials(client) -> pd.DataFrame:
+    """
+    Validate against published clinical trials with explicit GSD parameters.
+
+    Tests:
+    - HPTN 083-style (2021): 4-look O'Brien-Fleming design (gsDesign reference)
+    - HeartMate II (2009): 3-look with unequal info fractions (27%, 67%, 100%)
+
+    Note: We use gsDesign R package reference values rather than exact published
+    boundaries since published trials may use different software implementations.
+    """
+    results = []
+
+    # HPTN 083-style: HIV Prevention Trial design parameters
+    # 4-look O'Brien-Fleming, alpha=0.025, one-sided
+    # gsDesign reference: gsDesign(k=4, alpha=0.025, test.type=1, sfu='OF')
+    # gsDesign Z-boundaries: [4.049, 2.863, 2.337, 2.024]
+    hptn_boundaries = [4.049, 2.863, 2.337, 2.024]  # gsDesign reference values
+    hptn_info_fracs = [0.25, 0.50, 0.75, 1.00]
+
+    hptn_result = client.gsd(
         effect_size=0.3,
         alpha=0.025,
-        power=0.90,
-        k=3,
+        power=0.80,
+        k=4,
+        timing=hptn_info_fracs,
         spending_function="OBrienFleming",
     )
 
-    # gsDesign reference boundaries for k=3 with equal spacing (0.333, 0.667, 1.0)
-    # From gsd_reference_boundaries.csv (validated against gsDesign R package)
-    gsdesign_bounds = [3.471, 2.454, 2.004]  # OBF boundaries for k=3
-
-    for i, (zetyra_z, ref_z) in enumerate(zip(result["efficacy_boundaries"], gsdesign_bounds)):
+    for i, (zetyra_z, ref_z) in enumerate(zip(hptn_result["efficacy_boundaries"], hptn_boundaries)):
         deviation = abs(zetyra_z - ref_z)
         results.append({
-            "benchmark": "gsDesign k=3 OBF",
+            "trial": "HPTN 083-style",
             "look": i + 1,
+            "info_frac": hptn_info_fracs[i],
             "zetyra_z": round(zetyra_z, 3),
             "gsdesign_z": ref_z,
             "deviation": round(deviation, 3),
             "pass": deviation < BOUNDARY_TOLERANCE,
         })
 
-    # Benchmark 2: Pocock boundaries (should be approximately equal)
-    pocock_result = client.gsd(
+    # HeartMate II: LVAD Trial (NEJM 2009)
+    # 3-look O'Brien-Fleming with unequal info fractions: 27%, 67%, 100%
+    # This tests the alpha-spending function with non-standard timing
+    heartmate_info_fracs = [0.27, 0.67, 1.00]
+
+    heartmate_result = client.gsd(
         effect_size=0.3,
-        alpha=0.025,
-        power=0.90,
+        alpha=0.025,  # One-sided (original was two-sided 0.05)
+        power=0.80,
         k=3,
-        spending_function="Pocock",
+        timing=heartmate_info_fracs,
+        spending_function="OBrienFleming",
     )
 
-    # Pocock reference (constant boundary across looks)
-    # From gsd_reference_boundaries.csv (validated against gsDesign R package)
-    pocock_ref = 2.289  # Pocock boundary for k=3, alpha=0.025
+    # Verify boundaries follow expected O'Brien-Fleming pattern with unequal spacing
+    # Property: First boundary should be highest, decreasing toward final
+    boundaries = heartmate_result["efficacy_boundaries"]
+    monotonic_decreasing = all(boundaries[i] >= boundaries[i+1] for i in range(len(boundaries)-1))
 
-    for i, zetyra_z in enumerate(pocock_result["efficacy_boundaries"]):
-        deviation = abs(zetyra_z - pocock_ref)
-        results.append({
-            "benchmark": "gsDesign k=3 Pocock",
-            "look": i + 1,
-            "zetyra_z": round(zetyra_z, 3),
-            "gsdesign_z": pocock_ref,
-            "deviation": round(deviation, 3),
-            "pass": deviation < BOUNDARY_TOLERANCE,  # Use same tolerance as OBF
-        })
+    results.append({
+        "trial": "HeartMate II",
+        "look": "all",
+        "info_frac": str(heartmate_info_fracs),
+        "zetyra_z": str([round(z, 3) for z in boundaries]),
+        "published_z": "Monotonic decreasing",
+        "deviation": 0.0 if monotonic_decreasing else 1.0,
+        "pass": monotonic_decreasing,
+    })
+
+    # Check that info fractions match requested values
+    returned_fracs = heartmate_result["information_fractions"]
+    fracs_match = all(
+        abs(returned_fracs[i] - heartmate_info_fracs[i]) < 0.01
+        for i in range(len(heartmate_info_fracs))
+    )
+    results.append({
+        "trial": "HeartMate II",
+        "look": "info_fracs",
+        "info_frac": str(heartmate_info_fracs),
+        "zetyra_z": str([round(f, 2) for f in returned_fracs]),
+        "published_z": "Match requested",
+        "deviation": 0.0 if fracs_match else 1.0,
+        "pass": fracs_match,
+    })
 
     return pd.DataFrame(results)
 
@@ -254,15 +339,18 @@ def run_validation(base_url: str = None) -> dict:
     spending_results = validate_spending_functions(client)
     property_results = validate_boundary_properties(client)
     benchmark_results = validate_gsdesign_benchmarks(client)
+    published_results = validate_published_trials(client)
 
     return {
         "spending": spending_results,
         "properties": property_results,
         "benchmarks": benchmark_results,
+        "published_trials": published_results,
         "all_pass": (
             spending_results["pass"].all()
             and property_results["pass"].all()
             and benchmark_results["pass"].all()
+            and published_results["pass"].all()
         ),
     }
 
@@ -278,19 +366,38 @@ if __name__ == "__main__":
 
     results = run_validation(base_url)
 
-    print("\nSpending Function Validation")
+    print("\nSpending Function Validation (8 tests)")
     print("-" * 70)
     print(results["spending"].to_string(index=False))
 
-    print("\nBoundary Properties")
+    print("\nBoundary Properties (5 tests)")
     print("-" * 70)
     print(results["properties"].to_string(index=False))
 
-    print("\ngsDesign Benchmarks")
+    print("\ngsDesign Benchmarks (24 boundary comparisons across 8 designs)")
     print("-" * 70)
     print(results["benchmarks"].to_string(index=False))
 
+    print("\nPublished Trial Validation (HPTN 083-style, HeartMate II)")
+    print("-" * 70)
+    print(results["published_trials"].to_string(index=False))
+
+    # Summary statistics
+    total_tests = (
+        len(results["spending"])
+        + len(results["properties"])
+        + len(results["benchmarks"])
+        + len(results["published_trials"])
+    )
+    passed_tests = (
+        results["spending"]["pass"].sum()
+        + results["properties"]["pass"].sum()
+        + results["benchmarks"]["pass"].sum()
+        + results["published_trials"]["pass"].sum()
+    )
+
     print("\n" + "=" * 70)
+    print(f"SUMMARY: {passed_tests}/{total_tests} tests passed")
     if results["all_pass"]:
         print("✅ ALL VALIDATIONS PASSED")
     else:
