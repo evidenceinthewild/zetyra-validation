@@ -1,15 +1,21 @@
 # Zetyra Validation Suite
 
+![Tests](https://img.shields.io/badge/tests-51%20passed-success)
+![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian-blue)
+![Accuracy](https://img.shields.io/badge/max%20deviation-0.0046%20z--score-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
 Independent validation of Zetyra statistical calculators against reference implementations and published benchmarks.
 
 ## Summary of Results
 
 | Calculator | Tests | Status | Reference |
 |------------|-------|--------|-----------|
-| GSD | 42 | ✅ Pass | gsDesign R package |
-| CUPED | 15 | ✅ Pass | Analytical formulas |
-| Bayesian | 26 | ✅ Pass | Conjugate priors |
-| Sample Size | 10 | ✅ Pass | pwr R package |
+| GSD | 30 | ✅ Pass | gsDesign R package |
+| CUPED | 12 | ✅ Pass | Analytical formulas |
+| Bayesian | 9 | ✅ Pass | Conjugate priors |
+
+[See detailed results →](docs/validation_results_summary.md)
 
 ## Repository Structure
 
@@ -66,6 +72,24 @@ python test_beta_binomial.py
 python test_normal_conjugate.py
 ```
 
+### Example Output
+
+```bash
+$ cd gsd && python test_hptn083.py
+
+======================================================================
+HPTN 083 TRIAL REPLICATION
+======================================================================
+   trial  look  info_frac  zetyra_z  reference_z  deviation  pass
+HPTN 083     1       0.25    4.0444        4.049     0.0046  True
+HPTN 083     2       0.50    2.8598        2.863     0.0032  True
+HPTN 083     3       0.75    2.3351        2.337     0.0019  True
+HPTN 083     4       1.00    2.0222        2.024     0.0018  True
+
+======================================================================
+✅ ALL VALIDATIONS PASSED
+```
+
 ## Validation Details
 
 ### Group Sequential Design (GSD)
@@ -113,6 +137,32 @@ Endpoints:
 - `POST /gsd`
 - `POST /bayesian/continuous`
 - `POST /bayesian/binary`
+
+## Troubleshooting
+
+### API Connection Issues
+
+If tests fail with connection errors:
+
+```bash
+# Check if API is accessible
+curl https://zetyra-backend-394439308230.us-central1.run.app/api/v1/validation/health
+```
+
+### R Package Installation Fails
+
+```r
+# Install from CRAN mirror
+install.packages("gsDesign", repos="https://cloud.r-project.org")
+```
+
+### Python Import Errors
+
+```bash
+# Ensure you're in project root
+pip install -r requirements.txt
+export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+```
 
 ## References
 
