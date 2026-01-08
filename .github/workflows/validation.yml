@@ -7,8 +7,9 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  python-tests:
     runs-on: ubuntu-latest
+    name: Python Validation Tests
 
     steps:
       - uses: actions/checkout@v4
@@ -18,30 +19,16 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Set up R
-        uses: r-lib/actions/setup-r@v2
-        with:
-          r-version: '4.3'
-
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Install R packages
-        run: |
-          Rscript -e 'install.packages(c("gsDesign", "httr", "jsonlite"), repos="https://cloud.r-project.org")'
 
       - name: Run GSD Python tests
         run: |
           cd gsd
           python test_hptn083.py
           python test_heartmate.py
-
-      - name: Run GSD R benchmark
-        run: |
-          cd gsd
-          Rscript test_gsdesign_benchmark.R
 
       - name: Run CUPED tests
         run: |
@@ -53,3 +40,28 @@ jobs:
           cd bayesian
           python test_beta_binomial.py
           python test_normal_conjugate.py
+
+  r-tests:
+    runs-on: ubuntu-latest
+    name: R Validation Tests (gsDesign)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3'
+
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::gsDesign
+            any::httr
+            any::jsonlite
+
+      - name: Run GSD R benchmark
+        run: |
+          cd gsd
+          Rscript test_gsdesign_benchmark.R
