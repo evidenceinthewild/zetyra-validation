@@ -1,0 +1,5 @@
+trial,look,info_frac,zetyra_z,reference_z,deviation,pass
+HPTN 083,1,0.25,4.0444,4.049,0.0046,True
+HPTN 083,2,0.5,2.8598,2.863,0.0032,True
+HPTN 083,3,0.75,2.3351,2.337,0.0019,True
+HPTN 083,4,1.0,2.0222,2.024,0.0018,True
