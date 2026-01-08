@@ -133,7 +133,7 @@ for (config in test_configs) {
 # Save Results
 # =============================================================================
 
-output_dir <- file.path(dirname(sys.frame(1)$ofile), "results")
+output_dir <- "results"
 if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 
 write.csv(results, file.path(output_dir, "gsd_validation_results.csv"), row.names = FALSE)

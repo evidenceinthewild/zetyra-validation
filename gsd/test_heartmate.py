@@ -16,7 +16,7 @@ import os
 # Add parent directory for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from validation.zetyra_client import get_client
+from common.zetyra_client import get_client
 import pandas as pd
 
 

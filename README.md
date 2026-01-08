@@ -17,25 +17,22 @@ Independent validation of Zetyra statistical calculators against reference imple
 zetyra-validation/
 ├── README.md
 ├── LICENSE
+├── requirements.txt
+├── common/                          # Shared utilities
+│   ├── __init__.py
+│   └── zetyra_client.py             # API client
 ├── gsd/
-│   ├── test_gsdesign_benchmark.R    # 24 gsDesign comparisons
+│   ├── test_gsdesign_benchmark.R    # 23 gsDesign comparisons
 │   ├── test_hptn083.py              # HPTN 083 replication
 │   ├── test_heartmate.py            # HeartMate II replication
 │   └── results/
-│       └── gsd_validation_results.csv
 ├── cuped/
 │   ├── test_analytical.py           # Variance reduction formula
 │   └── results/
-│       └── cuped_validation_results.csv
-├── bayesian/
-│   ├── test_beta_binomial.py        # Beta-Binomial conjugate
-│   ├── test_normal_conjugate.py     # Normal-Normal conjugate
-│   └── results/
-│       └── bayesian_validation_results.csv
-└── validation/                      # Shared utilities
-    ├── zetyra_client.py             # API client
-    ├── validate_all.py              # Run all validations
-    └── ...
+└── bayesian/
+    ├── test_beta_binomial.py        # Beta-Binomial conjugate
+    ├── test_normal_conjugate.py     # Normal-Normal conjugate
+    └── results/
 ```
 
 ## Running Validations
@@ -50,32 +47,23 @@ pip install -r requirements.txt
 install.packages(c("gsDesign", "httr", "jsonlite"))
 ```
 
-### Run All Tests
+### Run Tests
 
 ```bash
-# Python validation suite
-cd validation
-python validate_all.py
-
-# R GSD benchmarks
+# GSD (from gsd/ directory)
 cd gsd
+python test_hptn083.py
+python test_heartmate.py
 Rscript test_gsdesign_benchmark.R
-```
 
-### Run Individual Tests
+# CUPED (from cuped/ directory)
+cd cuped
+python test_analytical.py
 
-```bash
-# GSD
-python gsd/test_hptn083.py
-python gsd/test_heartmate.py
-Rscript gsd/test_gsdesign_benchmark.R
-
-# CUPED
-python cuped/test_analytical.py
-
-# Bayesian
-python bayesian/test_beta_binomial.py
-python bayesian/test_normal_conjugate.py
+# Bayesian (from bayesian/ directory)
+cd bayesian
+python test_beta_binomial.py
+python test_normal_conjugate.py
 ```
 
 ## Validation Details
