@@ -19,12 +19,18 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.pytest_cache/
 
 # Virtual environments
 .venv/
 venv/
 ENV/
 env/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
 
 # IDE
 .idea/
