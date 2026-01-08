@@ -53,13 +53,18 @@ jobs:
         with:
           r-version: '4.3'
 
-      - name: Install R dependencies
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          packages: |
-            any::gsDesign
-            any::httr
-            any::jsonlite
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev
+
+      - name: Install R packages
+        run: |
+          Rscript -e 'install.packages(c("gsDesign", "httr", "jsonlite"), repos="https://cloud.r-project.org", dependencies=TRUE)'
+
+      - name: Verify R packages
+        run: |
+          Rscript -e 'library(gsDesign); library(httr); library(jsonlite); cat("All packages loaded successfully\n")'
 
       - name: Run GSD R benchmark
         run: |
