@@ -1,5 +1,6 @@
 # Zetyra Validation Suite
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18253308.svg)](https://doi.org/10.5281/zenodo.18253308)
 ![Tests](https://img.shields.io/badge/tests-51%20passed-success)
 ![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian-blue)
 ![Accuracy](https://img.shields.io/badge/max%20deviation-0.0046%20z--score-brightgreen)
