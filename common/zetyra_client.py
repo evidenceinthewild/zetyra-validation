@@ -25,6 +25,11 @@ class ZetyraClient:
             response.raise_for_status()
         return response.json()
 
+    def _post_raw(self, endpoint: str, data: dict):
+        """Make POST request and return raw requests.Response (no raise_for_status)."""
+        url = f"{self.base_url}/api/v1/validation{endpoint}"
+        return self.session.post(url, json=data)
+
     def sample_size_continuous(self, **kwargs) -> dict:
         """Calculate sample size for continuous outcomes."""
         return self._post("/sample-size/continuous", kwargs)
@@ -52,6 +57,26 @@ class ZetyraClient:
     def bayesian_binary(self, **kwargs) -> dict:
         """Calculate Bayesian predictive power for binary outcomes."""
         return self._post("/bayesian/binary", kwargs)
+
+    def prior_elicitation(self, **kwargs) -> dict:
+        """Calculate Bayesian prior elicitation."""
+        return self._post("/bayesian/prior-elicitation", kwargs)
+
+    def bayesian_borrowing(self, **kwargs) -> dict:
+        """Calculate Bayesian historical borrowing prior."""
+        return self._post("/bayesian/borrowing", kwargs)
+
+    def bayesian_sample_size_single_arm(self, **kwargs) -> dict:
+        """Calculate Bayesian sample size (single-arm binary)."""
+        return self._post("/bayesian/sample-size-single-arm", kwargs)
+
+    def bayesian_two_arm(self, **kwargs) -> dict:
+        """Calculate Bayesian two-arm sample size."""
+        return self._post("/bayesian/two-arm", kwargs)
+
+    def bayesian_sequential(self, **kwargs) -> dict:
+        """Calculate Bayesian sequential design boundaries."""
+        return self._post("/bayesian/sequential", kwargs)
 
 
 def get_client(base_url: str = None) -> ZetyraClient:

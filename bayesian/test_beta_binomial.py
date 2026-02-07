@@ -2,6 +2,12 @@
 """
 Validate Beta-Binomial conjugate posterior and predictive probability
 
+Tests:
+1. Exact posterior validation (conjugate formula)
+2. Predictive probability directional properties
+3. Schema contracts
+4. Boundary-condition scenarios
+
 References:
 - Lee & Liu (2008) "Predictive probability in clinical trials"
 - Gelman et al. (2013) "Bayesian Data Analysis"
@@ -14,12 +20,8 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from common.zetyra_client import get_client
+from common.assertions import assert_schema
 import pandas as pd
-import numpy as np
-from scipy import stats
-from scipy.special import comb, betaln
-
-PP_TOLERANCE = 0.04  # 4% for predictive probability (MC variability)
 
 
 def reference_posterior_binary(
@@ -40,41 +42,15 @@ def reference_posterior_binary(
     }
 
 
-def analytical_beta_binomial_pp(
-    prior_alpha: float,
-    prior_beta: float,
-    observed_successes: int,
-    observed_n: int,
-    future_n: int,
-    threshold: int,
-) -> float:
-    """
-    Calculate analytical predictive probability for beta-binomial model.
-
-    PP = P(X_future ≥ threshold | X_observed)
-    X_future ~ BetaBinomial(future_n, post_α, post_β)
-    """
-    post_alpha = prior_alpha + observed_successes
-    post_beta = prior_beta + (observed_n - observed_successes)
-
-    pp = 0.0
-    for k in range(threshold, future_n + 1):
-        log_prob = (
-            np.log(comb(future_n, k, exact=True))
-            + betaln(post_alpha + k, post_beta + future_n - k)
-            - betaln(post_alpha, post_beta)
-        )
-        pp += np.exp(log_prob)
-
-    return pp
-
-
 def validate_posterior_binary(client, scenarios: list) -> pd.DataFrame:
     """Validate binary posterior calculations."""
     results = []
 
     for scenario in scenarios:
         zetyra = client.bayesian_binary(**scenario)
+
+        # Schema check
+        schema_errors = assert_schema(zetyra, "bayesian_binary")
 
         ref_control = reference_posterior_binary(
             prior_alpha=scenario["prior_alpha"],
@@ -98,37 +74,114 @@ def validate_posterior_binary(client, scenarios: list) -> pd.DataFrame:
             "scenario": f"C={scenario['control_successes']}/{scenario['control_n']}, T={scenario['treatment_successes']}/{scenario['treatment_n']}",
             "control_posterior": f"Beta({zetyra['posterior_control_alpha']}, {zetyra['posterior_control_beta']})",
             "treatment_posterior": f"Beta({zetyra['posterior_treatment_alpha']}, {zetyra['posterior_treatment_beta']})",
-            "pass": ctrl_alpha_match and ctrl_beta_match and trt_alpha_match and trt_beta_match,
+            "pass": ctrl_alpha_match and ctrl_beta_match and trt_alpha_match and trt_beta_match and len(schema_errors) == 0,
         })
 
     return pd.DataFrame(results)
 
 
-def validate_analytical_pp(client) -> pd.DataFrame:
-    """Validate predictive probability against analytical solutions."""
+def validate_pp_properties(client) -> pd.DataFrame:
+    """Validate predictive probability directional properties via API."""
     results = []
 
-    # Test cases from Lee & Liu (2008)
-    test_cases = [
-        {"prior_alpha": 1, "prior_beta": 1, "obs_succ": 8, "obs_n": 20, "future_n": 20, "threshold": 12},
-        {"prior_alpha": 0.5, "prior_beta": 0.5, "obs_succ": 10, "obs_n": 30, "future_n": 30, "threshold": 15},
-        {"prior_alpha": 1, "prior_beta": 1, "obs_succ": 15, "obs_n": 30, "future_n": 30, "threshold": 15},
-    ]
+    # Property 1: Strong treatment effect -> high PP
+    strong = client.bayesian_binary(
+        prior_alpha=1, prior_beta=1,
+        control_successes=25, control_n=100,
+        treatment_successes=50, treatment_n=100,
+        final_n=200,
+    )
+    schema_errors = assert_schema(strong, "bayesian_binary")
+    results.append({
+        "property": "Strong effect (25% vs 50%) -> high PP",
+        "pp": round(strong["predictive_probability"], 3),
+        "pass": strong["predictive_probability"] > 0.7 and len(schema_errors) == 0,
+    })
 
-    for tc in test_cases:
-        analytical_pp = analytical_beta_binomial_pp(
-            tc["prior_alpha"], tc["prior_beta"],
-            tc["obs_succ"], tc["obs_n"],
-            tc["future_n"], tc["threshold"]
-        )
+    # Property 2: No treatment effect -> low PP
+    null = client.bayesian_binary(
+        prior_alpha=1, prior_beta=1,
+        control_successes=30, control_n=100,
+        treatment_successes=30, treatment_n=100,
+        final_n=200,
+    )
+    schema_errors_null = assert_schema(null, "bayesian_binary")
+    results.append({
+        "property": "No effect (30% vs 30%) -> low PP",
+        "pp": round(null["predictive_probability"], 3),
+        "pass": null["predictive_probability"] < 0.3 and len(schema_errors_null) == 0,
+    })
 
-        results.append({
-            "prior": f"Beta({tc['prior_alpha']}, {tc['prior_beta']})",
-            "observed": f"{tc['obs_succ']}/{tc['obs_n']}",
-            "need": f"{tc['threshold']}/{tc['future_n']}",
-            "analytical_pp": round(analytical_pp, 3),
-            "pass": True,  # Self-validation of analytical formula
-        })
+    # Property 3: More interim data with effect -> higher PP
+    early = client.bayesian_binary(
+        prior_alpha=1, prior_beta=1,
+        control_successes=10, control_n=30,
+        treatment_successes=18, treatment_n=30,
+        final_n=200,
+    )
+    late = client.bayesian_binary(
+        prior_alpha=1, prior_beta=1,
+        control_successes=30, control_n=100,
+        treatment_successes=50, treatment_n=100,
+        final_n=200,
+    )
+    schema_errors_early = assert_schema(early, "bayesian_binary")
+    schema_errors_late = assert_schema(late, "bayesian_binary")
+    results.append({
+        "property": "More data with effect -> higher PP",
+        "pp_early": round(early["predictive_probability"], 3),
+        "pp_late": round(late["predictive_probability"], 3),
+        "pass": late["predictive_probability"] >= early["predictive_probability"] and len(schema_errors_early) == 0 and len(schema_errors_late) == 0,
+    })
+
+    return pd.DataFrame(results)
+
+
+def validate_boundary_cases(client) -> pd.DataFrame:
+    """Boundary-condition scenarios for beta-binomial."""
+    results = []
+
+    # Jeffreys prior (0.5, 0.5)
+    z = client.bayesian_binary(
+        prior_alpha=0.5, prior_beta=0.5,
+        control_successes=20, control_n=50,
+        treatment_successes=30, treatment_n=50,
+        final_n=100,
+    )
+    schema_ok = len(assert_schema(z, "bayesian_binary")) == 0
+    results.append({
+        "test": "Boundary: Jeffreys prior (0.5, 0.5)",
+        "pp": round(z["predictive_probability"], 3),
+        "pass": schema_ok and 0 <= z["predictive_probability"] <= 1,
+    })
+
+    # Strong informative prior
+    z = client.bayesian_binary(
+        prior_alpha=50, prior_beta=50,
+        control_successes=20, control_n=50,
+        treatment_successes=30, treatment_n=50,
+        final_n=100,
+    )
+    schema_ok = len(assert_schema(z, "bayesian_binary")) == 0
+    results.append({
+        "test": "Boundary: strong prior (50, 50)",
+        "pp": round(z["predictive_probability"], 3),
+        "pass": schema_ok and 0 <= z["predictive_probability"] <= 1,
+    })
+
+    # Zero successes in control
+    z = client.bayesian_binary(
+        prior_alpha=1, prior_beta=1,
+        control_successes=0, control_n=20,
+        treatment_successes=10, treatment_n=20,
+        final_n=50,
+    )
+    schema_ok = len(assert_schema(z, "bayesian_binary")) == 0
+    results.append({
+        "test": "Boundary: zero control successes",
+        "pp": round(z["predictive_probability"], 3),
+        "pass": schema_ok and z["predictive_probability"] > 0.5,  # Strong effect
+    })
 
     return pd.DataFrame(results)
 
@@ -141,35 +194,45 @@ def main():
     print("BETA-BINOMIAL VALIDATION")
     print("=" * 70)
 
+    all_frames = []
+
     scenarios = [
         {"prior_alpha": 1, "prior_beta": 1, "control_successes": 30, "control_n": 100, "treatment_successes": 45, "treatment_n": 100, "final_n": 200},
         {"prior_alpha": 0.5, "prior_beta": 0.5, "control_successes": 25, "control_n": 100, "treatment_successes": 35, "treatment_n": 100, "final_n": 200},
         {"prior_alpha": 2, "prior_beta": 8, "control_successes": 15, "control_n": 75, "treatment_successes": 25, "treatment_n": 75, "final_n": 150},
     ]
 
-    print("\nPosterior Validation")
+    print("\n1. Posterior Validation")
     print("-" * 70)
     posterior_results = validate_posterior_binary(client, scenarios)
     print(posterior_results.to_string(index=False))
+    all_frames.append(posterior_results)
 
-    print("\nAnalytical Predictive Probability")
+    print("\n2. Predictive Probability Properties")
     print("-" * 70)
-    pp_results = validate_analytical_pp(client)
+    pp_results = validate_pp_properties(client)
     print(pp_results.to_string(index=False))
+    all_frames.append(pp_results)
+
+    print("\n3. Boundary Cases")
+    print("-" * 70)
+    boundary_results = validate_boundary_cases(client)
+    print(boundary_results.to_string(index=False))
+    all_frames.append(boundary_results)
 
     # Save results
     os.makedirs("results", exist_ok=True)
-    all_results = pd.concat([posterior_results, pp_results], ignore_index=True)
+    all_results = pd.concat(all_frames, ignore_index=True)
     all_results.to_csv("results/bayesian_validation_results.csv", index=False)
 
-    all_pass = posterior_results["pass"].all() and pp_results["pass"].all()
+    all_pass = all(df["pass"].all() for df in all_frames)
 
     print("\n" + "=" * 70)
     if all_pass:
-        print("✅ ALL VALIDATIONS PASSED")
+        print("ALL VALIDATIONS PASSED")
         sys.exit(0)
     else:
-        print("❌ SOME VALIDATIONS FAILED")
+        print("SOME VALIDATIONS FAILED")
         sys.exit(1)
 
 
