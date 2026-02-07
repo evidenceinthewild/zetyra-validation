@@ -138,7 +138,7 @@ def test_cochrans_q_and_i_squared():
     pooled = sum(w * r for w, r in zip(weights, rates)) / total_w
     Q = sum(w * (r - pooled) ** 2 for w, r in zip(weights, rates))
 
-    ok = abs(Q) < 1e-10 and pooled == 0.4
+    ok = abs(Q) < 1e-10 and abs(pooled - 0.4) < 1e-10
     results.append({
         "test": "Identical studies: Q=0, I^2=0",
         "Q": round(Q, 10),

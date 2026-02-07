@@ -20,7 +20,7 @@ class ZetyraClient:
     def _post(self, endpoint: str, data: dict, allow_errors: bool = False) -> dict:
         """Make POST request to API endpoint."""
         url = f"{self.base_url}/api/v1/validation{endpoint}"
-        response = self.session.post(url, json=data)
+        response = self.session.post(url, json=data, timeout=120)
         if not allow_errors:
             response.raise_for_status()
         return response.json()
@@ -28,7 +28,7 @@ class ZetyraClient:
     def _post_raw(self, endpoint: str, data: dict):
         """Make POST request and return raw requests.Response (no raise_for_status)."""
         url = f"{self.base_url}/api/v1/validation{endpoint}"
-        return self.session.post(url, json=data)
+        return self.session.post(url, json=data, timeout=120)
 
     def sample_size_continuous(self, **kwargs) -> dict:
         """Calculate sample size for continuous outcomes."""

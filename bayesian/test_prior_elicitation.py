@@ -225,6 +225,9 @@ def validate_quantile_oracle(client) -> pd.DataFrame:
         )
         ref = reference_quantile_matching(s["quantiles"], s["values"])
 
+        # Schema check
+        schema_errors = assert_schema(zetyra, "prior_elicitation")
+
         # Both should produce similar α,β (within 0.5 since optimization landscape is flat)
         alpha_close = abs(zetyra["alpha"] - ref["alpha"]) < 0.5
         beta_close = abs(zetyra["beta"] - ref["beta"]) < 0.5
@@ -240,7 +243,7 @@ def validate_quantile_oracle(client) -> pd.DataFrame:
             "ref_alpha": round(ref["alpha"], 3),
             "zetyra_beta": round(zetyra["beta"], 3),
             "ref_beta": round(ref["beta"], 3),
-            "pass": (alpha_close and beta_close) or q_close,
+            "pass": ((alpha_close and beta_close) or q_close) and len(schema_errors) == 0,
         })
 
     return pd.DataFrame(results)

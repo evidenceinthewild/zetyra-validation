@@ -307,7 +307,9 @@ def validate_invariants(client) -> pd.DataFrame:
         "test": "Invariant: higher target power → larger n",
         "n_low_power": low_power["recommended_n"],
         "n_high_power": high_power["recommended_n"],
-        "pass": high_power["recommended_n"] >= low_power["recommended_n"] and len(schema_lp) == 0 and len(schema_hp) == 0,
+        "pass": high_power["recommended_n"] >= low_power["recommended_n"]
+                and low_power["constraints_met"] and high_power["constraints_met"]
+                and len(schema_lp) == 0 and len(schema_hp) == 0,
     })
 
     # Invariant 2: Larger effect (alt further from null) → smaller n
@@ -325,7 +327,9 @@ def validate_invariants(client) -> pd.DataFrame:
         "test": "Invariant: larger effect → smaller n",
         "n_small_effect": small_effect["recommended_n"],
         "n_large_effect": large_effect["recommended_n"],
-        "pass": large_effect["recommended_n"] <= small_effect["recommended_n"] and len(schema_se) == 0 and len(schema_le) == 0,
+        "pass": large_effect["recommended_n"] <= small_effect["recommended_n"]
+                and small_effect["constraints_met"] and large_effect["constraints_met"]
+                and len(schema_se) == 0 and len(schema_le) == 0,
     })
 
     return pd.DataFrame(results)

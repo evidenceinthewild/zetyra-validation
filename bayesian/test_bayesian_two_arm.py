@@ -152,20 +152,23 @@ def validate_properties(client) -> pd.DataFrame:
         "test": "Property: larger effect → smaller n",
         "small_effect_n": small_effect["recommended_n_per_arm"],
         "large_effect_n": large_effect["recommended_n_per_arm"],
-        "pass": larger_effect_smaller_n and len(schema_se) == 0 and len(schema_le) == 0,
+        "pass": larger_effect_smaller_n
+                and small_effect["constraints_met"] and large_effect["constraints_met"]
+                and len(schema_se) == 0 and len(schema_le) == 0,
     })
 
     # Property: Higher decision threshold → larger n (stricter evidence bar)
+    # Use moderate thresholds (0.95 vs 0.975) that both produce feasible designs
     low_threshold = client.bayesian_two_arm(
-        control_rate=0.30, treatment_rate=0.50,
-        decision_threshold=0.90, target_power=0.80, target_type1_error=0.05,
-        n_simulations=3000, n_min=20, n_max=300, n_step=20,
+        control_rate=0.30, treatment_rate=0.45,
+        decision_threshold=0.95, target_power=0.80, target_type1_error=0.05,
+        n_simulations=3000, n_min=50, n_max=800, n_step=25,
         seed=77,
     )
     high_threshold = client.bayesian_two_arm(
-        control_rate=0.30, treatment_rate=0.50,
-        decision_threshold=0.99, target_power=0.80, target_type1_error=0.05,
-        n_simulations=3000, n_min=20, n_max=300, n_step=20,
+        control_rate=0.30, treatment_rate=0.45,
+        decision_threshold=0.975, target_power=0.80, target_type1_error=0.05,
+        n_simulations=3000, n_min=50, n_max=800, n_step=25,
         seed=77,
     )
     schema_lt = assert_schema(low_threshold, "bayesian_two_arm")
@@ -175,7 +178,9 @@ def validate_properties(client) -> pd.DataFrame:
         "test": "Property: higher threshold → larger n",
         "low_thresh_n": low_threshold["recommended_n_per_arm"],
         "high_thresh_n": high_threshold["recommended_n_per_arm"],
-        "pass": higher_needs_more and len(schema_lt) == 0 and len(schema_ht) == 0,
+        "pass": higher_needs_more
+                and low_threshold["constraints_met"] and high_threshold["constraints_met"]
+                and len(schema_lt) == 0 and len(schema_ht) == 0,
     })
 
     return pd.DataFrame(results)
@@ -274,13 +279,16 @@ def validate_symmetry(client) -> pd.DataFrame:
         n_simulations=2000, n_min=20, n_max=200, n_step=20,
         seed=42,
     )
+    schema_r1 = assert_schema(r1, "bayesian_two_arm")
+    schema_r2 = assert_schema(r2, "bayesian_two_arm")
     results.append({
         "test": "Symmetry: null, same seed → identical results",
         "n1": r1["recommended_n_per_arm"], "n2": r2["recommended_n_per_arm"],
         "type1_1": round(r1["type1_error"], 4),
         "type1_2": round(r2["type1_error"], 4),
         "pass": (r1["recommended_n_per_arm"] == r2["recommended_n_per_arm"]
-                 and r1["type1_error"] == r2["type1_error"]),
+                 and r1["type1_error"] == r2["type1_error"]
+                 and len(schema_r1) == 0 and len(schema_r2) == 0),
     })
 
     # Test 2: Mirror symmetry around 0.5 — rates (0.30, 0.50) and (0.50, 0.70)
@@ -298,12 +306,14 @@ def validate_symmetry(client) -> pd.DataFrame:
         seed=99,
     )
     # Same Δ and symmetric variance around 0.5 — n should be close
+    schema_fwd = assert_schema(forward, "bayesian_two_arm")
+    schema_mir = assert_schema(mirrored, "bayesian_two_arm")
     n_close = abs(forward["recommended_n_per_arm"] - mirrored["recommended_n_per_arm"]) <= 40
     results.append({
         "test": "Symmetry: mirror around 0.5 → similar n",
         "forward_n": forward["recommended_n_per_arm"],
         "mirrored_n": mirrored["recommended_n_per_arm"],
-        "pass": n_close,
+        "pass": n_close and len(schema_fwd) == 0 and len(schema_mir) == 0,
     })
 
     # Test 3: Same Δ=0.20 at asymmetric base rates (0.10, 0.30) —
@@ -314,12 +324,13 @@ def validate_symmetry(client) -> pd.DataFrame:
         n_simulations=3000, n_min=20, n_max=300, n_step=20,
         seed=99,
     )
+    schema_asym = assert_schema(asymmetric, "bayesian_two_arm")
     n_close_asym = abs(forward["recommended_n_per_arm"] - asymmetric["recommended_n_per_arm"]) <= 60
     results.append({
         "test": "Symmetry: same Δ, different base rates → similar n",
         "forward_n": forward["recommended_n_per_arm"],
         "asymmetric_n": asymmetric["recommended_n_per_arm"],
-        "pass": n_close_asym,
+        "pass": n_close_asym and len(schema_fwd) == 0 and len(schema_asym) == 0,
     })
 
     return pd.DataFrame(results)

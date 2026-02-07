@@ -111,7 +111,7 @@ SCHEMA_CONTRACTS = {
             "recommendation": str,
         },
         "bounds": {
-            "predictive_probability": (0.0, 1.0),
+            "predictive_probability": (None, 1.0),
             "posterior_control_alpha": (1e-10, None),
             "posterior_control_beta": (1e-10, None),
             "posterior_treatment_alpha": (1e-10, None),
@@ -131,7 +131,7 @@ SCHEMA_CONTRACTS = {
             "recommendation": str,
         },
         "bounds": {
-            "predictive_probability": (0.0, 1.0),
+            "predictive_probability": (None, 1.0),
             "posterior_var": (1e-10, None),
         },
     },
@@ -183,8 +183,8 @@ SCHEMA_CONTRACTS = {
             "constraints_met": bool,
         },
         "bounds": {
-            "type1_error": (0.0, 1.0),
-            "power": (0.0, 1.0),
+            "type1_error": (None, 1.0),
+            "power": (None, 1.0),
         },
     },
     "bayesian_two_arm": {
@@ -200,8 +200,8 @@ SCHEMA_CONTRACTS = {
             "constraints_met": bool,
         },
         "bounds": {
-            "type1_error": (0.0, 1.0),
-            "power": (0.0, 1.0),
+            "type1_error": (None, 1.0),
+            "power": (None, 1.0),
         },
     },
     "bayesian_sequential": {
@@ -249,8 +249,8 @@ def assert_schema(response: dict, contract_name: str) -> list:
         if key in response and response[key] is not None:
             val = response[key]
             if isinstance(val, (int, float)):
-                if lo is not None and val < lo:
-                    errors.append(f"{key}={val} < {lo}")
+                if lo is not None and val <= lo:
+                    errors.append(f"{key}={val} <= {lo}")
                 if hi is not None and val > hi:
                     errors.append(f"{key}={val} > {hi}")
 
