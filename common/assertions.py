@@ -111,7 +111,7 @@ SCHEMA_CONTRACTS = {
             "recommendation": str,
         },
         "bounds": {
-            "predictive_probability": (None, 1.0),
+            "predictive_probability": (0.0, 1.0, False),
             "posterior_control_alpha": (1e-10, None),
             "posterior_control_beta": (1e-10, None),
             "posterior_treatment_alpha": (1e-10, None),
@@ -131,7 +131,7 @@ SCHEMA_CONTRACTS = {
             "recommendation": str,
         },
         "bounds": {
-            "predictive_probability": (None, 1.0),
+            "predictive_probability": (0.0, 1.0, False),
             "posterior_var": (1e-10, None),
         },
     },
@@ -183,8 +183,8 @@ SCHEMA_CONTRACTS = {
             "constraints_met": bool,
         },
         "bounds": {
-            "type1_error": (None, 1.0),
-            "power": (None, 1.0),
+            "type1_error": (0.0, 1.0, False),
+            "power": (0.0, 1.0, False),
         },
     },
     "bayesian_two_arm": {
@@ -200,8 +200,8 @@ SCHEMA_CONTRACTS = {
             "constraints_met": bool,
         },
         "bounds": {
-            "type1_error": (None, 1.0),
-            "power": (None, 1.0),
+            "type1_error": (0.0, 1.0, False),
+            "power": (0.0, 1.0, False),
         },
     },
     "bayesian_sequential": {
@@ -244,13 +244,21 @@ def assert_schema(response: dict, contract_name: str) -> list:
                     f"{key}: expected {expected_type}, got {type(response[key]).__name__}"
                 )
 
-    # Check bounds
-    for key, (lo, hi) in contract.get("bounds", {}).items():
+    # Check bounds — tuples are (lo, hi) or (lo, hi, strict_lower)
+    # strict_lower=True  (default): val <= lo  is an error  (excludes boundary)
+    # strict_lower=False:           val < lo   is an error  (includes boundary)
+    for key, bound in contract.get("bounds", {}).items():
         if key in response and response[key] is not None:
             val = response[key]
             if isinstance(val, (int, float)):
-                if lo is not None and val <= lo:
-                    errors.append(f"{key}={val} <= {lo}")
+                lo = bound[0]
+                hi = bound[1]
+                strict = bound[2] if len(bound) > 2 else True
+                if lo is not None:
+                    if strict and val <= lo:
+                        errors.append(f"{key}={val} <= {lo}")
+                    elif not strict and val < lo:
+                        errors.append(f"{key}={val} < {lo}")
                 if hi is not None and val > hi:
                     errors.append(f"{key}={val} > {hi}")
 

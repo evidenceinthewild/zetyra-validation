@@ -5,7 +5,6 @@ Provides a simple interface to call Zetyra's public validation endpoints.
 """
 
 import requests
-from typing import Optional
 
 DEFAULT_BASE_URL = "https://zetyra-backend-394439308230.us-central1.run.app"
 
