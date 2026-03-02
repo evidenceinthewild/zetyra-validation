@@ -1,7 +1,7 @@
 # Zetyra Validation Suite
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18253308.svg)](https://doi.org/10.5281/zenodo.18253308)
-![Tests](https://img.shields.io/badge/tests-321%20passed-success)
+![Tests](https://img.shields.io/badge/tests-368%20passed-success)
 ![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20Survival-blue)
 ![Accuracy](https://img.shields.io/badge/max%20deviation-0.0046%20z--score-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -24,12 +24,14 @@ Independent validation of Zetyra statistical calculators against reference imple
 | Bayesian Sample Size | 26 | ✅ Pass | Binomial CI, MC search (binary + continuous) |
 | Bayesian Two-Arm | 24 | ✅ Pass | Binomial CI, MC search (binary + continuous) |
 | Bayesian Sequential | 20 | ✅ Pass | Zhou & Ji (2024) |
+| Bayesian Sequential Table 3 | 27 | ✅ Pass | Zhou & Ji (2024) Table 3 + companion R code |
 | Bayesian Sequential Survival | 24 | ✅ Pass | Zhou & Ji (2024) + Schoenfeld |
 | SSR Blinded | 20 | ✅ Pass | Conditional power formulas |
 | SSR Unblinded | 21 | ✅ Pass | Zone classification, CP thresholds |
+| SSR rpact/gsDesign Benchmark | 20 | ✅ Pass | rpact, gsDesign R packages |
 | Offline References | 23 | ✅ Pass | Pure math (no API) |
 
-**Total: 321 tests across 19 scripts, all passing.**
+**Total: 368 tests across 21 scripts, all passing.**
 
 ## Repository Structure
 
@@ -61,13 +63,15 @@ zetyra-validation/
 │   ├── test_bayesian_sample_size.py     # Single-arm MC sample size search
 │   ├── test_bayesian_two_arm.py         # Two-arm MC sample size search
 │   ├── test_bayesian_sequential.py      # Posterior probability boundaries
+│   ├── test_zhou_ji_table3.py          # Zhou & Ji (2024) Table 3 cross-validation
 │   ├── test_bayesian_sequential_survival.py  # Sequential survival boundaries
 │   ├── test_bayesian_survival.py        # Bayesian predictive power (survival)
 │   ├── test_offline_references.py       # Pure-math tests (no API)
 │   └── results/
 └── ssr/
     ├── test_ssr_blinded.py              # Blinded sample size re-estimation
-    └── test_ssr_unblinded.py            # Unblinded SSR with zone classification
+    ├── test_ssr_unblinded.py            # Unblinded SSR with zone classification
+    └── test_ssr_rpact_benchmark.R       # SSR cross-validation against rpact/gsDesign
 ```
 
 ## What's Validated
@@ -114,6 +118,14 @@ Three calculators now support time-to-event outcomes via the Schoenfeld variance
 
 - **Blinded SSR** — variance/rate re-estimation at interim with conditional power, supports continuous, binary, and survival endpoints
 - **Unblinded SSR** — four-zone classification (futility, unfavorable, promising, favorable) based on conditional power thresholds, with sample size inflation caps
+- **rpact/gsDesign cross-validation** — sample size formulas, conditional power, zone classification, and inverse-normal combination test weights verified against R's rpact (v4.3) and gsDesign packages
+
+### Bayesian Sequential Cross-Validation
+
+Zhou & Ji (2024) Table 3 provides exact numerical boundary values for two prior configurations (conservative and vague). The cross-validation:
+- Reproduces all 10 Table 3 boundary values within ±0.02
+- Verifies Type I error = 0.05 via multivariate normal Monte Carlo integration
+- Runs 15 additional scenarios with varied priors and data variances
 
 ### Offline References
 
@@ -133,8 +145,8 @@ Three calculators now support time-to-event outcomes via the Schoenfeld variance
 # Python
 pip install -r requirements.txt
 
-# R (for GSD validation only)
-install.packages(c("gsDesign", "httr", "jsonlite"))
+# R (for GSD and SSR benchmark validations)
+install.packages(c("gsDesign", "rpact", "httr", "jsonlite"))
 ```
 
 ### Run Tests
@@ -148,9 +160,11 @@ done
 # Offline tests (no server needed)
 python bayesian/test_offline_references.py
 
-# R-based GSD benchmark (optional)
-cd gsd
-Rscript test_gsdesign_benchmark.R
+# R-based GSD benchmark
+cd gsd && Rscript test_gsdesign_benchmark.R
+
+# R-based SSR benchmark
+cd ssr && Rscript test_ssr_rpact_benchmark.R
 ```
 
 ### Example Output
@@ -270,6 +284,8 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 8. **SSR**: Cui, Hung & Wang (1999) *Modification of sample size in group sequential clinical trials*
 9. **PACIFIC**: Antonia et al. (2018) NEJM 379:2342-2350 *Overall Survival with Durvalumab*
 10. **MONALEESA-7**: Im et al. (2019) NEJM 381:307-316 *Overall Survival with Ribociclib*
+11. **rpact**: Wassmer & Pahlke (2025) *rpact: Confirmatory Adaptive Clinical Trial Design and Analysis* (R package v4.3)
+12. **Mehta & Pocock**: Mehta & Pocock (2011) *Adaptive increase in sample size when interim results are promising*
 
 ## License
 
