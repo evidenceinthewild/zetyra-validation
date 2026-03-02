@@ -1,7 +1,7 @@
 # Zetyra Validation Suite
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18253308.svg)](https://doi.org/10.5281/zenodo.18253308)
-![Tests](https://img.shields.io/badge/tests-293%20passed-success)
+![Tests](https://img.shields.io/badge/tests-321%20passed-success)
 ![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20Survival-blue)
 ![Accuracy](https://img.shields.io/badge/max%20deviation-0.0046%20z--score-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -13,6 +13,8 @@ Independent validation of Zetyra statistical calculators against reference imple
 | Calculator | Tests | Status | Reference |
 |------------|-------|--------|-----------|
 | GSD | 30 | ✅ Pass | gsDesign R package |
+| GSD PACIFIC OS | 13 | ✅ Pass | Antonia et al. (2018) NEJM, Lan-DeMets OBF |
+| GSD MONALEESA-7 OS | 15 | ✅ Pass | Im et al. (2019) NEJM, Lan-DeMets OBF |
 | GSD Survival/TTE | 15 | ✅ Pass | Schoenfeld (1983), gsDesign |
 | CUPED | 12 | ✅ Pass | Analytical formulas |
 | Bayesian Predictive Power | 17 | ✅ Pass | Conjugate priors |
@@ -27,7 +29,7 @@ Independent validation of Zetyra statistical calculators against reference imple
 | SSR Unblinded | 21 | ✅ Pass | Zone classification, CP thresholds |
 | Offline References | 23 | ✅ Pass | Pure math (no API) |
 
-**Total: 293 tests across 17 scripts, all passing.**
+**Total: 321 tests across 19 scripts, all passing.**
 
 ## Repository Structure
 
@@ -44,6 +46,8 @@ zetyra-validation/
 │   ├── test_gsdesign_benchmark.R        # 23 gsDesign comparisons
 │   ├── test_hptn083.py                  # HPTN 083 replication
 │   ├── test_heartmate.py                # HeartMate II replication
+│   ├── test_pacific.py                  # PACIFIC OS replication (NSCLC)
+│   ├── test_monaleesa7.py               # MONALEESA-7 OS replication (breast cancer)
 │   ├── test_gsd_survival.py             # GSD survival/TTE boundaries
 │   └── results/
 ├── cuped/
@@ -87,6 +91,16 @@ Each of the 6 Bayesian calculators has a dedicated test suite covering:
 - Vague-prior convergence to frequentist z-test sample size
 - Monotonicity invariants (larger effect → smaller n, larger variance → larger n)
 - Input guards for missing continuous fields
+
+### Real-World Trial Replications
+
+Five published clinical trials are replicated against Zetyra's calculators:
+
+- **HPTN 083** (HIV prevention) — 4-look O'Brien-Fleming GSD, z-score boundaries matched to gsDesign within 0.005
+- **HeartMate II** (LVAD) — 3-look OBF with unequal info fractions, structural properties verified
+- **PACIFIC** (durvalumab, Stage III NSCLC OS) — 3-look Lan-DeMets OBF survival GSD, published boundary p=0.00274 reproduced exactly via spending function; trial crossing at 299 events verified
+- **MONALEESA-7** (ribociclib, HR+ breast cancer OS) — 3-look Lan-DeMets OBF survival GSD, published boundaries p<0.00016 (look 1) and p<0.01018 (look 2) reproduced; crossing at look 2 (p=0.00973) verified
+- **REBYOTA / PUNCH CD2+CD3** (*C. difficile*) — Bayesian borrowing, prior elicitation, two-arm sample size with real Phase 2b/3 data
 
 ### Survival/TTE Endpoints
 
@@ -254,6 +268,8 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 6. **Prior Elicitation**: Morita, Thall & Müller (2008) *Determining ESS of a parametric prior*
 7. **Survival**: Schoenfeld (1983) *Sample-size formula for the proportional-hazards regression model*
 8. **SSR**: Cui, Hung & Wang (1999) *Modification of sample size in group sequential clinical trials*
+9. **PACIFIC**: Antonia et al. (2018) NEJM 379:2342-2350 *Overall Survival with Durvalumab*
+10. **MONALEESA-7**: Im et al. (2019) NEJM 381:307-316 *Overall Survival with Ribociclib*
 
 ## License
 
