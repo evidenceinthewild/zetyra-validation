@@ -1,8 +1,8 @@
 # Zetyra Validation Suite
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18253308.svg)](https://doi.org/10.5281/zenodo.18253308)
-![Tests](https://img.shields.io/badge/tests-169%20passed-success)
-![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20Toolkit-blue)
+![Tests](https://img.shields.io/badge/tests-293%20passed-success)
+![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20Survival-blue)
 ![Accuracy](https://img.shields.io/badge/max%20deviation-0.0046%20z--score-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
@@ -13,18 +13,21 @@ Independent validation of Zetyra statistical calculators against reference imple
 | Calculator | Tests | Status | Reference |
 |------------|-------|--------|-----------|
 | GSD | 30 | ✅ Pass | gsDesign R package |
+| GSD Survival/TTE | 15 | ✅ Pass | Schoenfeld (1983), gsDesign |
 | CUPED | 12 | ✅ Pass | Analytical formulas |
 | Bayesian Predictive Power | 17 | ✅ Pass | Conjugate priors |
+| Bayesian Survival | 21 | ✅ Pass | Normal-Normal conjugate on log(HR) |
 | Prior Elicitation | 22 | ✅ Pass | ESS formula, scipy.optimize |
 | Bayesian Borrowing | 18 | ✅ Pass | Power prior, Cochran's Q |
-| Bayesian Sample Size | 14 | ✅ Pass | Binomial CI, MC search |
-| Bayesian Two-Arm | 13 | ✅ Pass | Binomial CI, MC search |
+| Bayesian Sample Size | 26 | ✅ Pass | Binomial CI, MC search (binary + continuous) |
+| Bayesian Two-Arm | 24 | ✅ Pass | Binomial CI, MC search (binary + continuous) |
 | Bayesian Sequential | 20 | ✅ Pass | Zhou & Ji (2024) |
+| Bayesian Sequential Survival | 24 | ✅ Pass | Zhou & Ji (2024) + Schoenfeld |
+| SSR Blinded | 20 | ✅ Pass | Conditional power formulas |
+| SSR Unblinded | 21 | ✅ Pass | Zone classification, CP thresholds |
 | Offline References | 23 | ✅ Pass | Pure math (no API) |
 
-**Total: 169 tests across 12 scripts, all passing.**
-
-[See detailed results →](docs/validation_results_summary.md)
+**Total: 293 tests across 17 scripts, all passing.**
 
 ## Repository Structure
 
@@ -35,33 +38,39 @@ zetyra-validation/
 ├── requirements.txt
 ├── common/                              # Shared utilities
 │   ├── __init__.py
-│   ├── zetyra_client.py                 # API client (12 endpoints)
+│   ├── zetyra_client.py                 # API client (20 endpoints)
 │   └── assertions.py                    # Binomial CI, schema contracts
 ├── gsd/
 │   ├── test_gsdesign_benchmark.R        # 23 gsDesign comparisons
 │   ├── test_hptn083.py                  # HPTN 083 replication
 │   ├── test_heartmate.py                # HeartMate II replication
+│   ├── test_gsd_survival.py             # GSD survival/TTE boundaries
 │   └── results/
 ├── cuped/
 │   ├── test_analytical.py               # Variance reduction formula
 │   └── results/
-└── bayesian/
-    ├── test_beta_binomial.py            # Beta-Binomial conjugate PP
-    ├── test_normal_conjugate.py         # Normal-Normal conjugate PP
-    ├── test_prior_elicitation.py        # ESS, historical, quantile matching
-    ├── test_bayesian_borrowing.py       # Power prior, MAP, heterogeneity
-    ├── test_bayesian_sample_size.py     # Single-arm MC sample size search
-    ├── test_bayesian_two_arm.py         # Two-arm MC sample size search
-    ├── test_bayesian_sequential.py      # Posterior probability boundaries
-    ├── test_offline_references.py       # Pure-math tests (no API)
-    └── results/
+├── bayesian/
+│   ├── test_beta_binomial.py            # Beta-Binomial conjugate PP
+│   ├── test_normal_conjugate.py         # Normal-Normal conjugate PP
+│   ├── test_prior_elicitation.py        # ESS, historical, quantile matching
+│   ├── test_bayesian_borrowing.py       # Power prior, MAP, heterogeneity
+│   ├── test_bayesian_sample_size.py     # Single-arm MC sample size search
+│   ├── test_bayesian_two_arm.py         # Two-arm MC sample size search
+│   ├── test_bayesian_sequential.py      # Posterior probability boundaries
+│   ├── test_bayesian_sequential_survival.py  # Sequential survival boundaries
+│   ├── test_bayesian_survival.py        # Bayesian predictive power (survival)
+│   ├── test_offline_references.py       # Pure-math tests (no API)
+│   └── results/
+└── ssr/
+    ├── test_ssr_blinded.py              # Blinded sample size re-estimation
+    └── test_ssr_unblinded.py            # Unblinded SSR with zone classification
 ```
 
 ## What's Validated
 
-### Bayesian Toolkit (v1.1)
+### Bayesian Toolkit (v1.2)
 
-Each of the 6 Bayesian calculators has a dedicated test suite covering:
+Each of the 8 Bayesian calculators has a dedicated test suite covering:
 
 - **Analytical correctness** — conjugate posteriors, boundary formulas, ESS derivations compared against closed-form references
 - **Monte Carlo calibration** — type I error and power checked with Clopper-Pearson binomial CIs (scales with simulation count)
@@ -71,6 +80,26 @@ Each of the 6 Bayesian calculators has a dedicated test suite covering:
 - **Invariants** — higher power → larger n, larger effect → smaller n, higher discount → higher ESS
 - **Seed reproducibility** — identical seeds produce identical MC results
 - **Symmetry** — null hypothesis gives same type I regardless of label swap
+
+**Continuous endpoints (v1.2):** Bayesian Sample Size (single-arm) and Two-Arm now support Normal-Normal conjugate models alongside the original Beta-Binomial. Continuous-specific tests cover:
+- Analytical posterior correctness (closed-form Normal-Normal conjugate update)
+- MC calibration of type I error and power with Clopper-Pearson CIs
+- Vague-prior convergence to frequentist z-test sample size
+- Monotonicity invariants (larger effect → smaller n, larger variance → larger n)
+- Input guards for missing continuous fields
+
+### Survival/TTE Endpoints
+
+Three calculators now support time-to-event outcomes via the Schoenfeld variance mapping `Var(log HR) = 4/d`:
+
+- **GSD Survival** — event-driven group sequential boundaries with O'Brien-Fleming / Pocock spending, sample size from event probability, allocation ratio support
+- **Bayesian Sequential Survival** — posterior probability boundaries mapped from the Normal-Normal conjugate framework (`data_variance=4`, `n_k = events/2`)
+- **Bayesian Predictive Power (Survival)** — interim HR → posterior on log(HR) scale → predictive probability of final success, with HR-scale credible intervals
+
+### Sample Size Re-estimation (SSR)
+
+- **Blinded SSR** — variance/rate re-estimation at interim with conditional power, supports continuous, binary, and survival endpoints
+- **Unblinded SSR** — four-zone classification (futility, unfavorable, promising, favorable) based on conditional power thresholds, with sample size inflation caps
 
 ### Offline References
 
@@ -97,22 +126,17 @@ install.packages(c("gsDesign", "httr", "jsonlite"))
 ### Run Tests
 
 ```bash
-# All Bayesian tests (against local server)
-cd bayesian
-for f in test_*.py; do python "$f" http://localhost:8000; done
+# All Python tests (against local server)
+for f in bayesian/test_*.py gsd/test_*.py cuped/test_*.py ssr/test_*.py; do
+  python "$f" http://localhost:8000
+done
 
 # Offline tests (no server needed)
-python test_offline_references.py
+python bayesian/test_offline_references.py
 
-# GSD
+# R-based GSD benchmark (optional)
 cd gsd
-python test_hptn083.py
-python test_heartmate.py
 Rscript test_gsdesign_benchmark.R
-
-# CUPED
-cd cuped
-python test_analytical.py
 ```
 
 ### Example Output
@@ -127,15 +151,21 @@ BAYESIAN TWO-ARM VALIDATION
 1. Two-Arm MC Validation (Binomial CI)
 ----------------------------------------------------------------------
                                                  test  rec_n_per_arm  type1  type1_ub  power  power_lb  pass
-      Superiority: ctrl=0.30, treat=0.50, flat priors             80 0.0390    0.0515 0.8105    0.7869  True
-PUNCH CD3 rates: ctrl=0.624, treat=0.712, flat priors            350 0.0445    0.0578 0.8060    0.7823  True
-     Large effect: ctrl=0.20, treat=0.50, flat priors             60 0.0500    0.0639 0.9755    0.9651  True
+      Superiority: ctrl=0.30, treat=0.50, flat priors             80 0.0500    0.0639 0.8355    0.8131  True
+PUNCH CD3 rates: ctrl=0.624, treat=0.712, flat priors            400 0.0490    0.0628 0.8345    0.8121  True
+     Large effect: ctrl=0.20, treat=0.50, flat priors             40 0.0415    0.0544 0.8850    0.8654  True
 
-2. Directional Properties
+...
+
+======================================================================
+CONTINUOUS ENDPOINT TESTS
+======================================================================
+
+6. Continuous Two-Arm MC Validation
 ----------------------------------------------------------------------
-                                 test  small_effect_n  large_effect_n  pass
-  Property: larger effect → smaller n           280.0            40.0  True
-Property: higher threshold → larger n           125.0           175.0  True
+                                              test  rec_n_per_arm  type1  type1_ub  power  power_lb  pass
+     Continuous: Moderate: δ=0.5, σ²=1, flat prior             50 0.0433    0.0538 0.8007    0.7812  True
+Continuous: Small effect: δ=0.3, σ²=2, vague prior            360 0.0473    0.0582 0.8943    0.8791  True
 
 ...
 
@@ -157,13 +187,18 @@ Endpoints:
 - `POST /sample-size/survival`
 - `POST /cuped`
 - `POST /gsd`
+- `POST /gsd/survival`
 - `POST /bayesian/continuous`
 - `POST /bayesian/binary`
+- `POST /bayesian/survival`
 - `POST /bayesian/prior-elicitation`
 - `POST /bayesian/borrowing`
 - `POST /bayesian/sample-size-single-arm`
 - `POST /bayesian/two-arm`
 - `POST /bayesian/sequential`
+- `POST /bayesian/sequential/survival`
+- `POST /ssr/blinded`
+- `POST /ssr/unblinded`
 
 ## Assertion Helpers
 
@@ -217,6 +252,8 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 4. **gsDesign**: Anderson (2022) *gsDesign R package*
 5. **Bayesian Sequential**: Zhou & Ji (2024) *Bayesian sequential monitoring*
 6. **Prior Elicitation**: Morita, Thall & Müller (2008) *Determining ESS of a parametric prior*
+7. **Survival**: Schoenfeld (1983) *Sample-size formula for the proportional-hazards regression model*
+8. **SSR**: Cui, Hung & Wang (1999) *Modification of sample size in group sequential clinical trials*
 
 ## License
 

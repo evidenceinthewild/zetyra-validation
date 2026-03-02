@@ -134,6 +134,12 @@ SCHEMA_CONTRACTS = {
             "predictive_probability": (0.0, 1.0, False),
             "posterior_var": (1e-10, None),
         },
+        "enums": {
+            "recommendation": ["stop_for_efficacy", "continue", "stop_for_futility"],
+        },
+        "ordering": [
+            ("credible_interval_lower", "credible_interval_upper"),
+        ],
     },
     "prior_elicitation": {
         "required": ["alpha", "beta", "mean", "variance", "ess", "quantiles", "inputs"],
@@ -187,6 +193,30 @@ SCHEMA_CONTRACTS = {
             "power": (0.0, 1.0, False),
         },
     },
+    "bayesian_sample_size_single_arm_continuous": {
+        "required": [
+            "recommended_n", "type1_error", "power", "constraints_met",
+            "endpoint_type", "posterior_at_alt_mean", "posterior_at_alt_variance",
+            "inputs",
+        ],
+        "types": {
+            "recommended_n": int,
+            "type1_error": (int, float),
+            "power": (int, float),
+            "constraints_met": bool,
+            "endpoint_type": str,
+            "posterior_at_alt_mean": (int, float),
+            "posterior_at_alt_variance": (int, float),
+        },
+        "bounds": {
+            "type1_error": (0.0, 1.0, False),
+            "power": (0.0, 1.0, False),
+            "posterior_at_alt_variance": (0.0, None, False),
+        },
+        "enums": {
+            "endpoint_type": ["continuous"],
+        },
+    },
     "bayesian_two_arm": {
         "required": [
             "recommended_n_per_arm", "n_total", "type1_error", "power",
@@ -204,6 +234,31 @@ SCHEMA_CONTRACTS = {
             "power": (0.0, 1.0, False),
         },
     },
+    "bayesian_two_arm_continuous": {
+        "required": [
+            "recommended_n_per_arm", "n_total", "type1_error", "power",
+            "constraints_met", "endpoint_type", "posterior_at_alt_mean",
+            "posterior_at_alt_variance", "inputs",
+        ],
+        "types": {
+            "recommended_n_per_arm": int,
+            "n_total": int,
+            "type1_error": (int, float),
+            "power": (int, float),
+            "constraints_met": bool,
+            "endpoint_type": str,
+            "posterior_at_alt_mean": (int, float),
+            "posterior_at_alt_variance": (int, float),
+        },
+        "bounds": {
+            "type1_error": (0.0, 1.0, False),
+            "power": (0.0, 1.0, False),
+            "posterior_at_alt_variance": (0.0, None, False),
+        },
+        "enums": {
+            "endpoint_type": ["continuous"],
+        },
+    },
     "bayesian_sequential": {
         "required": [
             "endpoint_type", "efficacy_boundaries", "futility_boundaries",
@@ -215,6 +270,114 @@ SCHEMA_CONTRACTS = {
             "futility_boundaries": list,
             "n_looks": int,
         },
+        "enums": {
+            "endpoint_type": ["continuous", "survival"],
+        },
+    },
+    "gsd_survival": {
+        "required": [
+            "max_events", "fixed_events", "n_total", "n_control", "n_treatment",
+            "inflation_factor", "efficacy_boundaries", "futility_boundaries",
+            "information_fractions", "alpha_spent", "event_probability", "inputs",
+        ],
+        "types": {
+            "max_events": int,
+            "fixed_events": int,
+            "n_total": int,
+            "n_control": int,
+            "n_treatment": int,
+            "inflation_factor": (int, float),
+            "efficacy_boundaries": list,
+            "futility_boundaries": list,
+            "event_probability": (int, float),
+        },
+        "bounds": {
+            "max_events": (0, None),
+            "fixed_events": (0, None),
+            "n_total": (0, None),
+            "event_probability": (0.0, 1.0, False),
+        },
+    },
+    "ssr_blinded": {
+        "required": [
+            "initial_n_total", "initial_n_per_arm", "interim_n",
+            "blinded_variance_estimate", "recalculated_n_total",
+            "recalculated_n_per_arm", "inflation_factor",
+            "sample_size_increase", "n_capped", "conditional_power", "inputs",
+        ],
+        "types": {
+            "initial_n_total": int,
+            "initial_n_per_arm": int,
+            "interim_n": int,
+            "blinded_variance_estimate": (int, float),
+            "recalculated_n_total": int,
+            "recalculated_n_per_arm": int,
+            "inflation_factor": (int, float),
+            "sample_size_increase": int,
+            "n_capped": bool,
+            "conditional_power": (int, float),
+        },
+        "bounds": {
+            "initial_n_total": (0, None),
+            "conditional_power": (0.0, 1.0, False),
+            "inflation_factor": (0.0, None, False),
+        },
+    },
+    "ssr_unblinded": {
+        "required": [
+            "initial_n_total", "initial_n_per_arm", "interim_n",
+            "conditional_power", "zone", "recalculated_n_total",
+            "recalculated_n_per_arm", "inflation_factor",
+            "sample_size_increase", "n_capped", "inputs",
+        ],
+        "types": {
+            "initial_n_total": int,
+            "initial_n_per_arm": int,
+            "interim_n": int,
+            "conditional_power": (int, float),
+            "zone": str,
+            "recalculated_n_total": int,
+            "recalculated_n_per_arm": int,
+            "inflation_factor": (int, float),
+            "sample_size_increase": int,
+            "n_capped": bool,
+        },
+        "bounds": {
+            "initial_n_total": (0, None),
+            "conditional_power": (0.0, 1.0, False),
+            "inflation_factor": (0.0, None, False),
+        },
+        "enums": {
+            "zone": ["futility", "unfavorable", "promising", "favorable"],
+        },
+    },
+    "bayesian_survival": {
+        "required": [
+            "predictive_probability", "posterior_log_hr_mean",
+            "posterior_log_hr_variance", "hr_posterior_mean",
+            "credible_interval_lower", "credible_interval_upper",
+            "recommendation", "inputs",
+        ],
+        "types": {
+            "predictive_probability": (int, float),
+            "posterior_log_hr_mean": (int, float),
+            "posterior_log_hr_variance": (int, float),
+            "hr_posterior_mean": (int, float),
+            "recommendation": str,
+        },
+        "bounds": {
+            "predictive_probability": (0.0, 1.0, False),
+            "posterior_log_hr_variance": (1e-10, None),
+            "hr_posterior_mean": (1e-10, None),
+            "credible_interval_lower": (0.0, None, False),  # HR scale: must be positive
+            "credible_interval_upper": (0.0, None, False),
+        },
+        "enums": {
+            "recommendation": ["stop_for_efficacy", "continue", "stop_for_futility"],
+        },
+        "ordering": [
+            ("credible_interval_lower", "credible_interval_upper"),
+        ],
     },
 }
 
@@ -261,5 +424,21 @@ def assert_schema(response: dict, contract_name: str) -> list:
                         errors.append(f"{key}={val} < {lo}")
                 if hi is not None and val > hi:
                     errors.append(f"{key}={val} > {hi}")
+
+    # Check enum constraints — {key: [allowed_values]}
+    for key, allowed in contract.get("enums", {}).items():
+        if key in response and response[key] is not None:
+            if response[key] not in allowed:
+                errors.append(f"{key}={response[key]!r} not in {allowed}")
+
+    # Check ordering constraints — list of (key_lo, key_hi) tuples
+    for key_lo, key_hi in contract.get("ordering", []):
+        if key_lo in response and key_hi in response:
+            lo_val = response[key_lo]
+            hi_val = response[key_hi]
+            if lo_val is not None and hi_val is not None:
+                if isinstance(lo_val, (int, float)) and isinstance(hi_val, (int, float)):
+                    if lo_val >= hi_val:
+                        errors.append(f"{key_lo}={lo_val} >= {key_hi}={hi_val}")
 
     return errors

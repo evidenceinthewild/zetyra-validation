@@ -19,7 +19,7 @@ class ZetyraClient:
     def _post(self, endpoint: str, data: dict, allow_errors: bool = False) -> dict:
         """Make POST request to API endpoint."""
         url = f"{self.base_url}/api/v1/validation{endpoint}"
-        response = self.session.post(url, json=data, timeout=120)
+        response = self.session.post(url, json=data, timeout=300)
         if not allow_errors:
             response.raise_for_status()
         return response.json()
@@ -27,7 +27,7 @@ class ZetyraClient:
     def _post_raw(self, endpoint: str, data: dict):
         """Make POST request and return raw requests.Response (no raise_for_status)."""
         url = f"{self.base_url}/api/v1/validation{endpoint}"
-        return self.session.post(url, json=data, timeout=120)
+        return self.session.post(url, json=data, timeout=300)
 
     def sample_size_continuous(self, **kwargs) -> dict:
         """Calculate sample size for continuous outcomes."""
@@ -76,6 +76,50 @@ class ZetyraClient:
     def bayesian_sequential(self, **kwargs) -> dict:
         """Calculate Bayesian sequential design boundaries."""
         return self._post("/bayesian/sequential", kwargs)
+
+    def bayesian_sequential_raw(self, **kwargs):
+        """Bayesian sequential — return raw Response for error testing."""
+        return self._post_raw("/bayesian/sequential", kwargs)
+
+    def gsd_survival(self, **kwargs) -> dict:
+        """Calculate GSD boundaries for survival/TTE endpoints."""
+        return self._post("/gsd/survival", kwargs)
+
+    def bayesian_sequential_survival(self, **kwargs) -> dict:
+        """Calculate Bayesian sequential boundaries for survival endpoints."""
+        return self._post("/bayesian/sequential/survival", kwargs)
+
+    def bayesian_sequential_survival_raw(self, **kwargs):
+        """Bayesian sequential survival — return raw Response for error testing."""
+        return self._post_raw("/bayesian/sequential/survival", kwargs)
+
+    def bayesian_survival(self, **kwargs) -> dict:
+        """Calculate Bayesian predictive power for survival outcomes."""
+        return self._post("/bayesian/survival", kwargs)
+
+    def ssr_blinded(self, **kwargs) -> dict:
+        """Calculate blinded sample size re-estimation."""
+        return self._post("/ssr/blinded", kwargs, allow_errors=kwargs.pop("allow_errors", False))
+
+    def ssr_blinded_raw(self, **kwargs):
+        """SSR blinded — return raw Response for error testing."""
+        return self._post_raw("/ssr/blinded", kwargs)
+
+    def ssr_unblinded(self, **kwargs) -> dict:
+        """Calculate unblinded sample size re-estimation."""
+        return self._post("/ssr/unblinded", kwargs, allow_errors=kwargs.pop("allow_errors", False))
+
+    def ssr_unblinded_raw(self, **kwargs):
+        """SSR unblinded — return raw Response for error testing."""
+        return self._post_raw("/ssr/unblinded", kwargs)
+
+    def gsd_survival_raw(self, **kwargs):
+        """GSD survival — return raw Response for error testing."""
+        return self._post_raw("/gsd/survival", kwargs)
+
+    def bayesian_survival_raw(self, **kwargs):
+        """Bayesian survival — return raw Response for error testing."""
+        return self._post_raw("/bayesian/survival", kwargs)
 
 
 def get_client(base_url: str = None) -> ZetyraClient:
