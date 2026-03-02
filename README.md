@@ -70,7 +70,7 @@ zetyra-validation/
 
 ### Bayesian Toolkit (v1.2)
 
-Each of the 8 Bayesian calculators has a dedicated test suite covering:
+Each of the 6 Bayesian calculators has a dedicated test suite covering:
 
 - **Analytical correctness** — conjugate posteriors, boundary formulas, ESS derivations compared against closed-form references
 - **Monte Carlo calibration** — type I error and power checked with Clopper-Pearson binomial CIs (scales with simulation count)
