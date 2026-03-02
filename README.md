@@ -1,7 +1,7 @@
 # Zetyra Validation Suite
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18253308.svg)](https://doi.org/10.5281/zenodo.18253308)
-![Tests](https://img.shields.io/badge/tests-368%20passed-success)
+![Tests](https://img.shields.io/badge/tests-490%20passed-success)
 ![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20Survival-blue)
 ![Accuracy](https://img.shields.io/badge/max%20deviation-0.0046%20z--score-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -16,9 +16,12 @@ Independent validation of Zetyra statistical calculators against reference imple
 | GSD PACIFIC OS | 13 | ✅ Pass | Antonia et al. (2018) NEJM, Lan-DeMets OBF |
 | GSD MONALEESA-7 OS | 15 | ✅ Pass | Im et al. (2019) NEJM, Lan-DeMets OBF |
 | GSD Survival/TTE | 15 | ✅ Pass | Schoenfeld (1983), gsDesign |
+| GSD Survival gsDesign Benchmark | 36 | ✅ Pass | gsDesign R package (boundaries, alpha spending) |
 | CUPED | 12 | ✅ Pass | Analytical formulas |
+| CUPED Simulation Benchmark | 37 | ✅ Pass | MC simulation, Deng et al. (2013) |
 | Bayesian Predictive Power | 17 | ✅ Pass | Conjugate priors |
 | Bayesian Survival | 21 | ✅ Pass | Normal-Normal conjugate on log(HR) |
+| Bayesian Survival Benchmark | 25 | ✅ Pass | Textbook posteriors, MC PP cross-validation |
 | Prior Elicitation | 22 | ✅ Pass | ESS formula, scipy.optimize |
 | Bayesian Borrowing | 18 | ✅ Pass | Power prior, Cochran's Q |
 | Bayesian Sample Size | 26 | ✅ Pass | Binomial CI, MC search (binary + continuous) |
@@ -26,12 +29,13 @@ Independent validation of Zetyra statistical calculators against reference imple
 | Bayesian Sequential | 20 | ✅ Pass | Zhou & Ji (2024) |
 | Bayesian Sequential Table 3 | 27 | ✅ Pass | Zhou & Ji (2024) Table 3 + companion R code |
 | Bayesian Sequential Survival | 24 | ✅ Pass | Zhou & Ji (2024) + Schoenfeld |
+| Bayesian Sequential Survival Benchmark | 24 | ✅ Pass | Zhou & Ji formula + Type I error + convergence |
 | SSR Blinded | 20 | ✅ Pass | Conditional power formulas |
 | SSR Unblinded | 21 | ✅ Pass | Zone classification, CP thresholds |
 | SSR rpact/gsDesign Benchmark | 20 | ✅ Pass | rpact, gsDesign R packages |
 | Offline References | 23 | ✅ Pass | Pure math (no API) |
 
-**Total: 368 tests across 21 scripts, all passing.**
+**Total: 490 tests across 25 scripts, all passing.**
 
 ## Repository Structure
 
@@ -51,9 +55,11 @@ zetyra-validation/
 │   ├── test_pacific.py                  # PACIFIC OS replication (NSCLC)
 │   ├── test_monaleesa7.py               # MONALEESA-7 OS replication (breast cancer)
 │   ├── test_gsd_survival.py             # GSD survival/TTE boundaries
+│   ├── test_gsd_survival_benchmark.R    # GSD survival vs gsDesign R package
 │   └── results/
 ├── cuped/
 │   ├── test_analytical.py               # Variance reduction formula
+│   ├── test_simulation_benchmark.py     # MC simulation + Deng et al. (2013)
 │   └── results/
 ├── bayesian/
 │   ├── test_beta_binomial.py            # Beta-Binomial conjugate PP
@@ -65,7 +71,9 @@ zetyra-validation/
 │   ├── test_bayesian_sequential.py      # Posterior probability boundaries
 │   ├── test_zhou_ji_table3.py          # Zhou & Ji (2024) Table 3 cross-validation
 │   ├── test_bayesian_sequential_survival.py  # Sequential survival boundaries
+│   ├── test_bayesian_sequential_survival_benchmark.py  # Survival Zhou & Ji cross-validation
 │   ├── test_bayesian_survival.py        # Bayesian predictive power (survival)
+│   ├── test_bayesian_survival_benchmark.py  # Survival PP textbook + MC benchmarks
 │   ├── test_offline_references.py       # Pure-math tests (no API)
 │   └── results/
 └── ssr/
@@ -106,13 +114,24 @@ Five published clinical trials are replicated against Zetyra's calculators:
 - **MONALEESA-7** (ribociclib, HR+ breast cancer OS) — 3-look Lan-DeMets OBF survival GSD, published boundaries p<0.00016 (look 1) and p<0.01018 (look 2) reproduced; crossing at look 2 (p=0.00973) verified
 - **REBYOTA / PUNCH CD2+CD3** (*C. difficile*) — Bayesian borrowing, prior elicitation, two-arm sample size with real Phase 2b/3 data
 
+### CUPED Simulation Benchmark
+
+Beyond the analytical formula checks, the CUPED calculator is validated with:
+- **Monte Carlo variance reduction** — 100k correlated (X, Y) samples verify VRF = 1 − ρ² empirically
+- **MC power verification** — 10k simulated experiments confirm n_adjusted achieves target 80% power
+- **Deng et al. (2013) reduction ratio** — n_adjusted / n_original = 1 − ρ² verified across 16 parameter combinations
+- **Extreme correlations** — ρ = 0.01 (no reduction) and ρ = 0.99 (98% reduction)
+
 ### Survival/TTE Endpoints
 
 Three calculators now support time-to-event outcomes via the Schoenfeld variance mapping `Var(log HR) = 4/d`:
 
 - **GSD Survival** — event-driven group sequential boundaries with O'Brien-Fleming / Pocock spending, sample size from event probability, allocation ratio support
+- **GSD Survival gsDesign Benchmark** — z-score boundaries, cumulative alpha spending, and Schoenfeld event counts cross-validated against gsDesign R package across 5 spending configurations (OBF k=3,4,5; Pocock k=3,4)
 - **Bayesian Sequential Survival** — posterior probability boundaries mapped from the Normal-Normal conjugate framework (`data_variance=4`, `n_k = events/2`)
+- **Bayesian Sequential Survival Benchmark** — Zhou & Ji boundary formula verified across 4 event schedules, Type I error controlled via MC multivariate normal, vague-prior convergence to Φ⁻¹(γ), futility boundaries verified
 - **Bayesian Predictive Power (Survival)** — interim HR → posterior on log(HR) scale → predictive probability of final success, with HR-scale credible intervals
+- **Bayesian Survival PP Benchmark** — 5 textbook posterior examples, independent MC predictive probability cross-validation, frequentist convergence (vague prior PP ≈ conditional power), known-outcome edge cases
 
 ### Sample Size Re-estimation (SSR)
 
@@ -160,8 +179,9 @@ done
 # Offline tests (no server needed)
 python bayesian/test_offline_references.py
 
-# R-based GSD benchmark
+# R-based GSD benchmarks
 cd gsd && Rscript test_gsdesign_benchmark.R
+cd gsd && Rscript test_gsd_survival_benchmark.R
 
 # R-based SSR benchmark
 cd ssr && Rscript test_ssr_rpact_benchmark.R
@@ -286,6 +306,7 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 10. **MONALEESA-7**: Im et al. (2019) NEJM 381:307-316 *Overall Survival with Ribociclib*
 11. **rpact**: Wassmer & Pahlke (2025) *rpact: Confirmatory Adaptive Clinical Trial Design and Analysis* (R package v4.3)
 12. **Mehta & Pocock**: Mehta & Pocock (2011) *Adaptive increase in sample size when interim results are promising*
+13. **Bayesian PP**: Spiegelhalter, Abrams & Myles (2004) *Bayesian Approaches to Clinical Trials*
 
 ## License
 
