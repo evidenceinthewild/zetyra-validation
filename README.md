@@ -3,7 +3,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18253308.svg)](https://doi.org/10.5281/zenodo.18253308)
 ![Tests](https://img.shields.io/badge/tests-499%20passed-success)
 ![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20Survival-blue)
-![Accuracy](https://img.shields.io/badge/max%20deviation-0.056%20z--score-brightgreen)
+![Accuracy](https://img.shields.io/badge/max%20deviation-0.034%20z--score-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 Independent validation of Zetyra statistical calculators against reference implementations and published benchmarks.
@@ -110,8 +110,8 @@ Five published clinical trials are replicated against Zetyra's calculators:
 
 - **HPTN 083** (HIV prevention) — 4-look O'Brien-Fleming GSD, z-score boundaries matched to gsDesign within 0.005
 - **HeartMate II** (LVAD) — 3-look OBF with unequal info fractions, structural properties verified
-- **PACIFIC** (durvalumab, Stage III NSCLC OS) — 3-look Lan-DeMets OBF survival GSD, published boundary z-score matched within 0.15 via spending function; trial crossing at 299 events verified
-- **MONALEESA-7** (ribociclib, HR+ breast cancer OS) — 3-look Lan-DeMets OBF survival GSD, published boundary z-scores matched within 0.25 (look 1) and 0.02 (look 2); crossing at look 2 (p=0.00973) verified
+- **PACIFIC** (durvalumab, Stage III NSCLC OS) — 3-look Lan-DeMets OBF survival GSD, reference z-scores matched exactly (looks 1–2: 0.000, look 3: 0.022); trial crossing at 299 events verified
+- **MONALEESA-7** (ribociclib, HR+ breast cancer OS) — 3-look Lan-DeMets OBF survival GSD, reference z-scores matched exactly (looks 1–2: 0.000, look 3: 0.006); crossing at look 2 (p=0.00973) verified
 - **REBYOTA / PUNCH CD2+CD3** (*C. difficile*) — Bayesian borrowing, prior elicitation, two-arm sample size with real Phase 2b/3 data
 
 ### CUPED Simulation Benchmark

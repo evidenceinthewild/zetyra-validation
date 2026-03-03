@@ -196,11 +196,10 @@ def validate_spending_function(client) -> pd.DataFrame:
     z_eff = zetyra["efficacy_boundaries"]
     z_alpha_spent = zetyra["alpha_spent"]
 
-    # Zetyra's z-boundaries should be close to reference. The exact Lan-DeMets
-    # boundaries use multivariate normal root-finding; Zetyra's spending
-    # discretization produces slightly different values (especially at early
-    # looks with low information fraction). Tolerance widens for earlier looks.
-    z_tols = [0.15, 0.08, 0.05]  # Look 1 has most discretization error
+    # Zetyra uses the same Lan-DeMets OBF spending as the reference.
+    # Deviations are from numerical integration precision (scipy vs reference).
+    # Look 3 has the largest deviation (~0.02) due to cumulative MVN error.
+    z_tols = [0.005, 0.005, 0.03]
     for i in range(3):
         ref_z = z_bounds[i]
         api_z = z_eff[i]
@@ -215,16 +214,14 @@ def validate_spending_function(client) -> pd.DataFrame:
 
     # Zetyra's look 1 z-boundary vs the published boundary (z-score scale).
     # Published p=0.00274 (two-sided) → z=2.9955 (one-sided).
-    # Actual API z=2.8822, deviation=0.1133. Tolerance 0.15 gives ~32% headroom.
-    # Using z-score (not p-value) tolerance avoids the ratio distortion at
-    # extreme p-values that made the old p-tolerance deceptively wide.
+    # Actual dev=0.0000: exact match after Lan-DeMets fix.
     published_z1 = sp_stats.norm.ppf(1 - PUBLISHED_LOOK1_P_ONE_SIDED)
     results.append({
         "test": "Look 1 Zetyra z-boundary near published (z-scale)",
         "published_z": round(published_z1, 4),
         "zetyra_z": round(z_eff[0], 4),
         "deviation": round(abs(z_eff[0] - published_z1), 4),
-        "pass": abs(z_eff[0] - published_z1) < 0.15,
+        "pass": abs(z_eff[0] - published_z1) < 0.01,
     })
 
     # Zetyra's cumulative alpha spent at final look = target alpha

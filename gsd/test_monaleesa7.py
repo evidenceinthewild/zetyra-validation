@@ -162,10 +162,9 @@ def validate_spending_function(client) -> pd.DataFrame:
     z_eff = zetyra["efficacy_boundaries"]
     z_alpha_spent = zetyra["alpha_spent"]
 
-    # Zetyra z-boundaries should be close to reference. Lan-DeMets spending
-    # discretization produces larger deviations at early looks (low IF).
-    # MONALEESA-7 look 1 is at 35% IF — expect up to ~0.2 z-score difference.
-    z_tols = [0.25, 0.05, 0.05]
+    # Zetyra uses the same Lan-DeMets OBF spending as the reference.
+    # Deviations are from numerical integration precision only.
+    z_tols = [0.005, 0.005, 0.01]
     for i in range(3):
         ref_z = z_bounds[i]
         api_z = z_eff[i]
@@ -184,23 +183,27 @@ def validate_spending_function(client) -> pd.DataFrame:
     published_z1 = sp_stats.norm.ppf(1 - PUBLISHED_P_LOOK1)  # p=0.00016 → z≈3.60
     published_z2 = sp_stats.norm.ppf(1 - PUBLISHED_P_LOOK2)  # p=0.01018 → z≈2.32
 
-    # Look 1: actual dev ~0.20 z (35% IF has most discretization error).
-    # Tolerance 0.25 gives ~25% headroom.
+    # Published boundaries may differ from standard Lan-DeMets due to
+    # rounding or implementation differences in the original trial software.
+    # Look 1: published z=3.5985, Lan-DeMets z=3.5950, dev=0.0035
+    # Look 2: published z=2.3196, Lan-DeMets z=2.3419, dev=0.0223
     results.append({
         "test": "Look 1 Zetyra z-boundary near published (z-scale)",
         "published_z": round(published_z1, 4),
         "zetyra_z": round(z_eff[0], 4),
         "deviation": round(abs(z_eff[0] - published_z1), 4),
-        "pass": abs(z_eff[0] - published_z1) < 0.25,
+        "pass": abs(z_eff[0] - published_z1) < 0.01,
     })
 
-    # Look 2: actual dev ~0.012 z. Tolerance 0.02 gives ~67% headroom.
+    # Look 2: larger discrepancy vs published (0.022) — consistent with
+    # the reference implementation also differing from published by the
+    # same amount. Tolerance 0.03 accommodates this known gap.
     results.append({
         "test": "Look 2 Zetyra z-boundary near published (z-scale)",
         "published_z": round(published_z2, 4),
         "zetyra_z": round(z_eff[1], 4),
         "deviation": round(abs(z_eff[1] - published_z2), 4),
-        "pass": abs(z_eff[1] - published_z2) < 0.02,
+        "pass": abs(z_eff[1] - published_z2) < 0.03,
     })
 
     # Zetyra cumulative alpha at final look = target alpha

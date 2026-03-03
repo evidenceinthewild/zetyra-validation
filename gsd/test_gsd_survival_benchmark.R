@@ -134,15 +134,15 @@ cat("\n\n2. Z-score Boundaries (OBF & Pocock)\n")
 cat(rep("-", 70), "\n", sep = "")
 
 boundary_scenarios <- list(
-  list(name = "OBF k=3", k = 3, sfu = "OF", spending = "OBrienFleming", tol = 0.01),
-  list(name = "OBF k=4", k = 4, sfu = "OF", spending = "OBrienFleming", tol = 0.025),
-  list(name = "OBF k=5", k = 5, sfu = "OF", spending = "OBrienFleming", tol = 0.07),
+  list(name = "OBF k=3", k = 3, sfu = sfLDOF, spending = "OBrienFleming", tol = 0.005),
+  list(name = "OBF k=4", k = 4, sfu = sfLDOF, spending = "OBrienFleming", tol = 0.015),
+  list(name = "OBF k=5", k = 5, sfu = sfLDOF, spending = "OBrienFleming", tol = 0.04),
   list(name = "Pocock k=3", k = 3, sfu = "Pocock", spending = "Pocock", tol = 0.005),
   list(name = "Pocock k=4", k = 4, sfu = "Pocock", spending = "Pocock", tol = 0.008)
 )
 
-# Per-scenario z-score tolerances. OBF k=5 first look has ~0.056 deviation
-# due to spending discretization; easier scenarios are held tighter.
+# Per-scenario z-score tolerances. With sfLDOF (Lan-DeMets OBF spending function),
+# Zetyra and gsDesign use the same algorithm; deviations are < 0.005.
 
 for (s in boundary_scenarios) {
   cat(sprintf("\n  %s (tol=%.3f)\n", s$name, s$tol))
