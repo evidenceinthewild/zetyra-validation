@@ -141,8 +141,9 @@ boundary_scenarios <- list(
   list(name = "Pocock k=4", k = 4, sfu = "Pocock", spending = "Pocock", tol = 0.008)
 )
 
-# Per-scenario z-score tolerances. With sfLDOF (Lan-DeMets OBF spending function),
-# Zetyra and gsDesign use the same algorithm; deviations are < 0.005.
+# Per-scenario z-score tolerances. With sfLDOF, Zetyra and gsDesign use the same
+# spending algorithm; remaining deviations are from MVN integration precision
+# (scipy vs R's mvtnorm), growing with k. OBF k=3: < 0.005, k=4: < 0.015, k=5: < 0.04.
 
 for (s in boundary_scenarios) {
   cat(sprintf("\n  %s (tol=%.3f)\n", s$name, s$tol))
