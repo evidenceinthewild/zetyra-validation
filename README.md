@@ -3,7 +3,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18253308.svg)](https://doi.org/10.5281/zenodo.18253308)
 ![Tests](https://img.shields.io/badge/tests-499%20passed-success)
 ![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20Survival-blue)
-![Accuracy](https://img.shields.io/badge/max%20deviation-0.04%20z--score-brightgreen)
+![Accuracy](https://img.shields.io/badge/max%20deviation-0.034%20z--score-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 Independent validation of Zetyra statistical calculators against reference implementations and published benchmarks.
