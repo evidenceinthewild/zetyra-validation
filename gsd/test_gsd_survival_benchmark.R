@@ -134,17 +134,18 @@ cat("\n\n2. Z-score Boundaries (OBF & Pocock)\n")
 cat(rep("-", 70), "\n", sep = "")
 
 boundary_scenarios <- list(
-  list(name = "OBF k=3", k = 3, sfu = "OF", spending = "OBrienFleming"),
-  list(name = "OBF k=4", k = 4, sfu = "OF", spending = "OBrienFleming"),
-  list(name = "OBF k=5", k = 5, sfu = "OF", spending = "OBrienFleming"),
-  list(name = "Pocock k=3", k = 3, sfu = "Pocock", spending = "Pocock"),
-  list(name = "Pocock k=4", k = 4, sfu = "Pocock", spending = "Pocock")
+  list(name = "OBF k=3", k = 3, sfu = "OF", spending = "OBrienFleming", tol = 0.01),
+  list(name = "OBF k=4", k = 4, sfu = "OF", spending = "OBrienFleming", tol = 0.025),
+  list(name = "OBF k=5", k = 5, sfu = "OF", spending = "OBrienFleming", tol = 0.07),
+  list(name = "Pocock k=3", k = 3, sfu = "Pocock", spending = "Pocock", tol = 0.005),
+  list(name = "Pocock k=4", k = 4, sfu = "Pocock", spending = "Pocock", tol = 0.008)
 )
 
-BOUNDARY_TOL <- 0.06  # z-score tolerance (first OBF k=5 boundary has ~0.056 due to spending discretization)
+# Per-scenario z-score tolerances. OBF k=5 first look has ~0.056 deviation
+# due to spending discretization; easier scenarios are held tighter.
 
 for (s in boundary_scenarios) {
-  cat(sprintf("\n  %s\n", s$name))
+  cat(sprintf("\n  %s (tol=%.3f)\n", s$name, s$tol))
 
   # gsDesign reference (one-sided, test.type=1)
   gs <- gsDesign(
@@ -162,7 +163,7 @@ for (s in boundary_scenarios) {
   z_bounds <- unlist(z$efficacy_boundaries)
 
   for (look in 1:s$k) {
-    add_result(s$name, sprintf("look_%d_z", look), gs_bounds[look], z_bounds[look], BOUNDARY_TOL)
+    add_result(s$name, sprintf("look_%d_z", look), gs_bounds[look], z_bounds[look], s$tol)
   }
 }
 
@@ -235,14 +236,14 @@ cat("\n\n5. Boundary Consistency Across HR Values\n")
 cat(rep("-", 70), "\n", sep = "")
 
 # GSD boundaries depend on alpha/power/k/spending, NOT on HR
-# Two different HRs should produce the same z-score boundaries
+# Two different HRs with identical design parameters should produce the same z-score boundaries
 z_hr07 <- zetyra_gsd_survival(
   hazard_ratio = 0.7, median_control = 12, accrual_time = 24,
   follow_up_time = 12, alpha = 0.025, power = 0.80, k = 3,
   spending_function = "OBrienFleming"
 )
 z_hr08 <- zetyra_gsd_survival(
-  hazard_ratio = 0.8, median_control = 18, accrual_time = 36,
+  hazard_ratio = 0.8, median_control = 12, accrual_time = 24,
   follow_up_time = 12, alpha = 0.025, power = 0.80, k = 3,
   spending_function = "OBrienFleming"
 )

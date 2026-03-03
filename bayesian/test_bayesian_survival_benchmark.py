@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """
-Bayesian Survival PP: Published Benchmark & Textbook Validation
+Bayesian Survival PP: Internal Oracle & Convergence Validation
 
-Extends the analytical tests in test_bayesian_survival.py with:
-1. Textbook worked examples (Spiegelhalter et al., 2004 framework)
-2. Cross-validation with manual predictive probability calculation
-3. Frequentist convergence: vague prior + many events → PP ≈ conditional power
-4. Known-outcome scenarios: extreme HR with many events → PP ≈ 0 or ≈ 1
+Validates the Zetyra Bayesian survival PP endpoint against independent
+reference implementations of the same Normal-Normal conjugate model.
+This is an internal oracle check (API vs local formula), not a
+reproduction of externally published numerical examples.
+
+Test sections:
+1. Conjugate posterior verification: API posterior mean/variance match
+   closed-form Normal-Normal update across 5 parameter configurations.
+2. Predictive probability cross-validation: API PP matches independent
+   Monte Carlo reference implementation.
+3. Frequentist convergence: vague prior + many events → PP ≈ conditional power.
+4. Known-outcome scenarios: extreme HR with many events → PP ≈ 0 or ≈ 1.
 
 The core math (Normal-Normal conjugate on log HR):
   Prior: log(HR) ~ N(μ₀, σ₀²)
@@ -109,40 +116,40 @@ def reference_predictive_probability(
 
 # ─── Test functions ───────────────────────────────────────────────────
 
-def validate_textbook_posteriors(client) -> pd.DataFrame:
+def validate_conjugate_posteriors(client) -> pd.DataFrame:
     """
-    Textbook-style worked examples for Bayesian survival posterior.
+    Verify API posterior matches closed-form Normal-Normal conjugate update.
 
-    Based on the Spiegelhalter et al. (2004) framework:
-    'For a trial with observed HR = h based on d events, with
-    prior log(HR) ~ N(μ₀, σ₀²), the posterior mean and variance
-    are obtained by standard conjugate update.'
+    These are synthetic scenarios covering a range of HR values, event counts,
+    and prior configurations. The reference values come from the same conjugate
+    formula (reference_posterior()), so this is an internal oracle check, not
+    a reproduction of externally published numerical examples.
     """
     results = []
 
     examples = [
         {
-            "name": "Textbook 1: Standard trial (HR=0.70, d=200, vague prior)",
+            "name": "Scenario 1: Standard trial (HR=0.70, d=200, vague prior)",
             "observed_hr": 0.70, "interim_events": 200, "total_planned_events": 400,
             "prior_log_hr_mean": 0.0, "prior_log_hr_variance": 1.0,
         },
         {
-            "name": "Textbook 2: Near-complete (HR=0.75, d=280/300, vague prior)",
+            "name": "Scenario 2: Near-complete (HR=0.75, d=280/300, vague prior)",
             "observed_hr": 0.75, "interim_events": 280, "total_planned_events": 300,
             "prior_log_hr_mean": 0.0, "prior_log_hr_variance": 1.0,
         },
         {
-            "name": "Textbook 3: Strong prior toward no effect (HR=0.65, d=100)",
+            "name": "Scenario 3: Strong prior toward no effect (HR=0.65, d=100)",
             "observed_hr": 0.65, "interim_events": 100, "total_planned_events": 250,
             "prior_log_hr_mean": 0.0, "prior_log_hr_variance": 0.1,
         },
         {
-            "name": "Textbook 4: Optimistic prior (μ=-0.36, HR=0.80, d=150)",
+            "name": "Scenario 4: Optimistic prior (μ=-0.36, HR=0.80, d=150)",
             "observed_hr": 0.80, "interim_events": 150, "total_planned_events": 300,
             "prior_log_hr_mean": -0.36, "prior_log_hr_variance": 0.25,
         },
         {
-            "name": "Textbook 5: Harmful treatment (HR=1.10, d=200, vague prior)",
+            "name": "Scenario 5: Harmful treatment (HR=1.10, d=200, vague prior)",
             "observed_hr": 1.10, "interim_events": 200, "total_planned_events": 400,
             "prior_log_hr_mean": 0.0, "prior_log_hr_variance": 1.0,
         },
@@ -170,23 +177,25 @@ def validate_textbook_posteriors(client) -> pd.DataFrame:
         var_ok = abs(zetyra["posterior_log_hr_variance"] - ref_var) < POSTERIOR_TOL
         hr_ok = abs(zetyra["hr_posterior_mean"] - math.exp(ref_mean)) < 0.01
 
+        schema_ok = len(schema_errors) == 0
+
         results.append({
             "test": f"{ex['name']}: posterior mean",
             "zetyra": round(zetyra["posterior_log_hr_mean"], 6),
             "reference": round(ref_mean, 6),
-            "pass": mean_ok and len(schema_errors) == 0,
+            "pass": mean_ok and schema_ok,
         })
         results.append({
             "test": f"{ex['name']}: posterior variance",
             "zetyra": round(zetyra["posterior_log_hr_variance"], 6),
             "reference": round(ref_var, 6),
-            "pass": var_ok,
+            "pass": var_ok and schema_ok,
         })
         results.append({
             "test": f"{ex['name']}: HR posterior",
             "zetyra": round(zetyra["hr_posterior_mean"], 4),
             "reference": round(math.exp(ref_mean), 4),
-            "pass": hr_ok,
+            "pass": hr_ok and schema_ok,
         })
 
     return pd.DataFrame(results)
@@ -276,8 +285,8 @@ def validate_frequentist_convergence(client) -> pd.DataFrame:
         z_alpha = sp_stats.norm.ppf(0.975)
         cp = sp_stats.norm.cdf(z_interim * math.sqrt(R) - z_alpha * math.sqrt(R - 1))
 
-        # With very vague prior, PP ≈ CP (not exact because Bayesian uses
-        # posterior predictive, but should be close)
+        # With very vague prior (σ²=100), PP ≈ CP. Residual gap comes from
+        # prior still contributing ~1/100 of posterior precision.
         dev = abs(zetyra["predictive_probability"] - cp)
 
         results.append({
@@ -285,7 +294,7 @@ def validate_frequentist_convergence(client) -> pd.DataFrame:
             "bayesian_pp": round(zetyra["predictive_probability"], 4),
             "freq_cp": round(cp, 4),
             "deviation": round(dev, 4),
-            "pass": dev < 0.10,  # Allow reasonable deviation
+            "pass": dev < 0.02,
         })
 
     return pd.DataFrame(results)
@@ -322,7 +331,7 @@ def validate_known_outcomes(client) -> pd.DataFrame:
         "test": "Clearly harmful: HR=1.5, d=200/300 → PP ≈ 0.0",
         "pp": z2["predictive_probability"],
         "recommendation": z2["recommendation"],
-        "pass": z2["predictive_probability"] < 0.01,
+        "pass": z2["predictive_probability"] < 0.01 and z2["recommendation"] == "stop_for_futility",
     })
 
     # Case 3: Nearly complete with strong effect
@@ -333,7 +342,8 @@ def validate_known_outcomes(client) -> pd.DataFrame:
     results.append({
         "test": "Near-complete + strong: HR=0.5, d=290/300 → PP > 0.95",
         "pp": z3["predictive_probability"],
-        "pass": z3["predictive_probability"] > 0.95,
+        "recommendation": z3["recommendation"],
+        "pass": z3["predictive_probability"] > 0.95 and z3["recommendation"] == "stop_for_efficacy",
     })
 
     # Case 4: Just started, weak signal
@@ -344,7 +354,8 @@ def validate_known_outcomes(client) -> pd.DataFrame:
     results.append({
         "test": "Early + weak: HR=0.90, d=20/400 → PP < 0.50",
         "pp": z4["predictive_probability"],
-        "pass": z4["predictive_probability"] < 0.50,
+        "recommendation": z4["recommendation"],
+        "pass": z4["predictive_probability"] < 0.50 and z4["recommendation"] == "continue",
     })
 
     return pd.DataFrame(results)
@@ -355,14 +366,14 @@ def main():
     client = get_client(base_url)
 
     print("=" * 70)
-    print("BAYESIAN SURVIVAL PP: PUBLISHED BENCHMARK VALIDATION")
+    print("BAYESIAN SURVIVAL PP: INTERNAL ORACLE & CONVERGENCE VALIDATION")
     print("=" * 70)
 
     all_frames = []
 
-    print("\n1. Textbook Posterior Verification (5 examples)")
+    print("\n1. Conjugate Posterior Verification (5 scenarios)")
     print("-" * 70)
-    tp = validate_textbook_posteriors(client)
+    tp = validate_conjugate_posteriors(client)
     print(tp.to_string(index=False))
     all_frames.append(tp)
 

@@ -1,18 +1,16 @@
 #!/usr/bin/env Rscript
-#' Cross-validate Zetyra SSR against gsDesign and rpact R packages
+#' Cross-validate Zetyra SSR against gsDesign R package and reference formulas
 #'
 #' Validates:
 #'   1. Blinded SSR: sample size formulas against base R arithmetic
 #'   2. Unblinded SSR: conditional power against gsDesign::condPower / gsCP
-#'   3. Inverse-normal combination test weights
 #'
 #' Usage:
 #'   Rscript test_ssr_rpact_benchmark.R [base_url]
 #'
-#' Requires: gsDesign, rpact, httr, jsonlite
+#' Requires: gsDesign, httr, jsonlite
 
 library(gsDesign)
-library(rpact)
 library(httr)
 library(jsonlite)
 
@@ -24,7 +22,7 @@ args <- commandArgs(trailingOnly = TRUE)
 BASE_URL <- if (length(args) > 0) args[1] else "https://zetyra-backend-394439308230.us-central1.run.app/api/v1/validation"
 
 cat("=", rep("=", 68), "\n", sep = "")
-cat("ZETYRA SSR vs gsDesign/rpact BENCHMARK\n")
+cat("ZETYRA SSR vs gsDesign BENCHMARK\n")
 cat("API URL:", BASE_URL, "\n")
 cat("Timestamp:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
 cat("=", rep("=", 68), "\n\n", sep = "")
@@ -83,13 +81,6 @@ ref_conditional_power <- function(z_interim, n_final, n_interim, alpha) {
   pnorm(z_interim * sqrt(R) - qnorm(1 - alpha) * sqrt(R - 1))
 }
 
-#' Inverse-normal combination test weights
-ref_inv_normal_weights <- function(interim_fraction) {
-  w1 <- sqrt(interim_fraction)
-  w2 <- sqrt(1 - interim_fraction)
-  list(w1 = w1, w2 = w2)
-}
-
 # =============================================================================
 # Test Results Tracking
 # =============================================================================
@@ -106,13 +97,22 @@ results <- data.frame(
 all_pass <- TRUE
 
 add_result <- function(test, r_ref, zetyra_val, tol = 2, pass_override = NULL) {
-  dev <- abs(as.numeric(r_ref) - as.numeric(zetyra_val))
-  pass_val <- if (!is.null(pass_override)) pass_override else (dev <= tol)
+  # Handle categorical (non-numeric) comparisons cleanly
+  r_num <- suppressWarnings(as.numeric(r_ref))
+  z_num <- suppressWarnings(as.numeric(zetyra_val))
+  if (is.na(r_num) || is.na(z_num)) {
+    dev <- NA_real_
+    pass_val <- if (!is.null(pass_override)) pass_override else (as.character(r_ref) == as.character(zetyra_val))
+  } else {
+    dev <- abs(r_num - z_num)
+    pass_val <- if (!is.null(pass_override)) pass_override else (dev <= tol)
+    dev <- round(dev, 4)
+  }
   results <<- rbind(results, data.frame(
     test = test,
     r_reference = as.character(r_ref),
     zetyra = as.character(zetyra_val),
-    deviation = round(dev, 4),
+    deviation = dev,
     pass = pass_val,
     stringsAsFactors = FALSE
   ))
@@ -415,64 +415,22 @@ for (s in cp_scenarios) {
 }
 
 # =============================================================================
-# Test 7: Inverse-Normal Combination Weights
+# Test 7: Blinded SSR — Binary endpoints
 # =============================================================================
 
-cat("\n7. Inverse-Normal Combination Test Weights\n")
+cat("\n7. Blinded SSR: Binary — Pooled Rate Re-estimation\n")
 cat(rep("-", 70), "\n", sep = "")
 
-for (frac in c(0.25, 0.50, 0.75)) {
-  w <- ref_inv_normal_weights(frac)
-
-  # rpact design to verify weights
-  rpact_design <- getDesignInverseNormal(
-    kMax = 2,
-    alpha = 0.025,
-    beta = 0.10,
-    typeOfDesign = "OF",
-    informationRates = c(frac, 1.0)
-  )
-
-  # Check weight property: w1^2 + w2^2 = 1
-  sum_sq <- w$w1^2 + w$w2^2
-
-  add_result(
-    test = sprintf("INM weights at IF=%.2f: w1^2+w2^2=1", frac),
-    r_ref = 1.0,
-    zetyra_val = round(sum_sq, 6),
-    tol = 0.001
-  )
-
-  cat(sprintf("  IF=%.2f: w1=%.4f, w2=%.4f, w1^2+w2^2=%.6f [%s]\n",
-              frac, w$w1, w$w2, sum_sq,
-              ifelse(abs(sum_sq - 1.0) < 0.001, "PASS", "FAIL")))
-
-  # Verify rpact critical value at final analysis is reasonable
-  # For OBF inverse normal, the final critical value >= z_alpha (accounts for stage 1 spending)
-  rpact_crit <- rpact_design$criticalValues[2]
-  r_crit <- qnorm(1 - 0.025)
-
-  # Critical value should be >= z_alpha and not too far above it
-  crit_reasonable <- (rpact_crit >= r_crit - 0.01) && (rpact_crit <= r_crit + 0.20)
-
-  add_result(
-    test = sprintf("INM final crit value at IF=%.2f is reasonable", frac),
-    r_ref = round(r_crit, 4),
-    zetyra_val = round(rpact_crit, 4),
-    pass_override = crit_reasonable
-  )
-
-  cat(sprintf("           rpact crit=%.4f, z_alpha=%.4f [%s]\n",
-              rpact_crit, r_crit,
-              ifelse(crit_reasonable, "PASS", "FAIL")))
+# Reference: binary sample size per arm with a given pooled rate for the H0 term
+# n = ceil(((z_alpha * sqrt(2*p_pool*(1-p_pool)) + z_beta * sqrt(p_c*(1-p_c)+p_t*(1-p_t))) / delta)^2)
+ref_n_per_arm_binary_pooled <- function(alpha, power, p_c, p_t, p_pooled = NULL) {
+  z_alpha <- qnorm(1 - alpha)
+  z_beta <- qnorm(power)
+  delta <- abs(p_t - p_c)
+  if (is.null(p_pooled)) p_pooled <- (p_c + p_t) / 2
+  ceiling(((z_alpha * sqrt(2 * p_pooled * (1 - p_pooled)) +
+              z_beta * sqrt(p_c * (1 - p_c) + p_t * (1 - p_t))) / delta)^2)
 }
-
-# =============================================================================
-# Test 8: Blinded SSR — Binary endpoints
-# =============================================================================
-
-cat("\n8. Blinded SSR: Binary — Pooled Rate Re-estimation\n")
-cat(rep("-", 70), "\n", sep = "")
 
 z_bin_inflated <- zetyra_ssr_blinded(
   endpoint_type = "binary",
@@ -485,20 +443,24 @@ z_bin_inflated <- zetyra_ssr_blinded(
   n_max_factor = 3.0
 )
 
-# When pooled rate differs, N should change
-# Just verify it returns a valid recalculated N
+# Reference: recalculated N with observed pooled rate replacing planned pooled
+n_recalc_ref <- 2 * ref_n_per_arm_binary_pooled(0.025, 0.90, 0.20, 0.35, p_pooled = 0.40)
+# Floor at interim, cap at n_max_factor * initial
+n_init_ref <- 2 * ref_n_per_arm_binary_pooled(0.025, 0.90, 0.20, 0.35)
+n_interim <- ceiling(0.5 * n_init_ref)
+n_cap <- ceiling(n_init_ref * 3.0)
+n_recalc_bounded <- min(max(n_recalc_ref, n_interim), n_cap)
+
 add_result(
-  test = "Blinded binary: pooled rate change -> N adjusts",
-  r_ref = "adjusted",
-  zetyra_val = "adjusted",
-  pass_override = (z_bin_inflated$recalculated_n_total > 0)
+  test = "Blinded binary: recalculated N matches reference (pooled rate 0.40)",
+  r_ref = n_recalc_bounded,
+  zetyra_val = z_bin_inflated$recalculated_n_total,
+  tol = 2
 )
 
-cat(sprintf("  Initial N=%d, Recalculated N=%d, Increase=%d [%s]\n",
-            z_bin_inflated$initial_n_total,
-            z_bin_inflated$recalculated_n_total,
-            z_bin_inflated$sample_size_increase,
-            ifelse(z_bin_inflated$recalculated_n_total > 0, "PASS", "FAIL")))
+cat(sprintf("  Observed pooled=0.40: R=%d, Zetyra=%d [%s]\n",
+            n_recalc_bounded, z_bin_inflated$recalculated_n_total,
+            ifelse(abs(n_recalc_bounded - z_bin_inflated$recalculated_n_total) <= 2, "PASS", "FAIL")))
 
 # =============================================================================
 # Save Results

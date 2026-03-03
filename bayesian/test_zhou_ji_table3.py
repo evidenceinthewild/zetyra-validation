@@ -169,27 +169,34 @@ def validate_table3_boundaries(client) -> pd.DataFrame:
 
 
 def validate_type_i_error(client) -> pd.DataFrame:
-    """Verify Type I error rate matches the paper's claim of 0.05."""
+    """Verify Type I error rate using Zetyra API-returned boundaries.
+
+    Uses the boundaries from the Zetyra API (not local reference) to compute
+    Type I error via MC multivariate normal integration. This catches regressions
+    in both the boundary computation and the Type I error control.
+    """
     results = []
 
     for config in [TABLE3_VER1, TABLE3_VER2]:
-        # Compute boundaries via reference formula
-        boundaries = bound_bayes_pp(
-            config["prior_mean"],
-            config["prior_variance"],
-            config["data_variance"],
-            config["threshold"],
-            LOOKS,
+        # Get boundaries from Zetyra API
+        zetyra = client.bayesian_sequential(
+            endpoint_type="continuous",
+            n_per_look=LOOKS,
+            prior_mean=config["prior_mean"],
+            prior_variance=config["prior_variance"],
+            data_variance=config["data_variance"],
+            efficacy_threshold=config["threshold"],
         )
+        api_boundaries = zetyra["efficacy_boundaries"]
 
-        # Compute Type I error via MC multivariate normal
-        type_i = calc_type_i_error(boundaries.tolist(), LOOKS)
+        # Compute Type I error via MC multivariate normal using API boundaries
+        type_i = calc_type_i_error(api_boundaries, LOOKS)
 
         # Paper claims these are calibrated to alpha = 0.05
-        # MC estimate should be within ~0.005 of 0.05
+        # MC estimate should be within ~0.008 of 0.05
         results.append({
-            "test": f"Type I error: {config['name']}",
-            "boundaries": str([round(b, 2) for b in boundaries]),
+            "test": f"Type I error (API boundaries): {config['name']}",
+            "boundaries": str([round(b, 2) for b in api_boundaries]),
             "type_i_mc": round(type_i, 4),
             "target": 0.05,
             "pass": abs(type_i - 0.05) < 0.008,

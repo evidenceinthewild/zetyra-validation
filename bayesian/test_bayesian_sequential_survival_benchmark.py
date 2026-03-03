@@ -144,7 +144,12 @@ def validate_survival_boundary_formula(client) -> pd.DataFrame:
 
 
 def validate_survival_type_i_error(client) -> pd.DataFrame:
-    """Verify Type I error control for survival boundaries."""
+    """Verify Type I error control using Zetyra API-returned boundaries.
+
+    Uses the boundaries from the Zetyra API (not local reference) to compute
+    Type I error via MC multivariate normal integration. Also checks the
+    Type I rate is reasonable for the design's gamma threshold.
+    """
     results = []
 
     configs = [
@@ -153,33 +158,44 @@ def validate_survival_type_i_error(client) -> pd.DataFrame:
             "events": [100, 200, 300],
             "efficacy_threshold": 0.975,
             "prior_variance": 1.0,
+            # γ=0.975 → single-look ≈ 0.025, 3 looks inflates to ~0.05.
+            # Observed: 0.0485. Band catches both inflation and over-conservatism.
+            "type_i_lower": 0.03,
+            "type_i_upper": 0.06,
         },
         {
             "name": "5-look strict (γ=0.99, vague prior)",
             "events": [50, 100, 150, 200, 250],
             "efficacy_threshold": 0.99,
             "prior_variance": 1.0,
+            # γ=0.99 → single-look ≈ 0.01, 5 looks inflates to ~0.025.
+            # Observed: 0.0250. Band catches both inflation and over-conservatism.
+            "type_i_lower": 0.015,
+            "type_i_upper": 0.04,
         },
     ]
 
     for cfg in configs:
-        # Compute boundaries via reference formula
-        boundaries = bound_bayes_pp_survival(
-            0.0, cfg["prior_variance"], cfg["events"], cfg["efficacy_threshold"]
+        # Get boundaries from Zetyra API
+        zetyra = client.bayesian_sequential_survival(
+            endpoint_type="survival",
+            n_per_look=cfg["events"],
+            hazard_ratio=0.7,
+            efficacy_threshold=cfg["efficacy_threshold"],
+            futility_threshold=0.10,
         )
+        api_boundaries = zetyra["efficacy_boundaries"]
 
-        # MC Type I error
-        type_i = calc_type_i_error_survival(boundaries.tolist(), cfg["events"])
+        # MC Type I error using API boundaries
+        type_i = calc_type_i_error_survival(api_boundaries, cfg["events"])
 
-        # With vague prior and posterior probability threshold γ,
-        # the Type I error should be approximately 2*(1-γ) for one-sided tests
-        # But this depends on design. Check it's controlled below a reasonable bound.
-        # For γ=0.975, exact one-look Type I ≈ 0.025; multi-look inflates somewhat
+        in_band = cfg["type_i_lower"] <= type_i <= cfg["type_i_upper"]
         results.append({
-            "test": f"Type I: {cfg['name']}",
-            "boundaries": str([round(b, 3) for b in boundaries]),
+            "test": f"Type I (API boundaries): {cfg['name']}",
+            "boundaries": str([round(b, 3) for b in api_boundaries]),
             "type_i_mc": round(type_i, 4),
-            "pass": type_i < 0.10,  # Should be well-controlled
+            "band": f"[{cfg['type_i_lower']}, {cfg['type_i_upper']}]",
+            "pass": in_band,
         })
 
     return pd.DataFrame(results)

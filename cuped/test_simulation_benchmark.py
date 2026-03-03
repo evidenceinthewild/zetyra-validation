@@ -110,12 +110,14 @@ def validate_mc_variance_reduction(client) -> pd.DataFrame:
 
 def validate_mc_sample_size_effect(client) -> pd.DataFrame:
     """
-    MC simulation: run many 'mini-experiments' with and without CUPED,
-    verify that the power gain matches the sample size reduction.
+    MC simulation: verify that CUPED at n_adjusted achieves the same power
+    as no-CUPED at n_original.
 
     Under CUPED, the effective sample size for a test of size n is
     n_eff = n / (1 - ρ²). So a test with n_adj subjects and CUPED
     should have the same power as n_original subjects without CUPED.
+
+    Both arms are simulated independently and compared.
     """
     results = []
 
@@ -133,41 +135,63 @@ def validate_mc_sample_size_effect(client) -> pd.DataFrame:
             correlation=rho, alpha=alpha, power=0.80,
         )
         n_adj = zetyra["n_adjusted"]
+        n_orig = zetyra["n_original"]
 
-        # Simulate: with n_adj subjects and CUPED, should achieve ~80% power
-        rejections = 0
+        # --- Arm A: no-CUPED at n_original ---
+        rejections_no_cuped = 0
+        rng_a = np.random.default_rng(200 + int(rho * 100))
         for _ in range(n_trials):
-            # Control arm
-            x_c = rng.normal(mu, sigma, size=n_adj)
-            noise_std = sigma * np.sqrt(max(1 - rho ** 2, 0))
-            y_c = mu + rho * (x_c - mu) + rng.normal(0, noise_std, size=n_adj)
+            y_c = rng_a.normal(mu, sigma, size=n_orig)
+            y_t = rng_a.normal(mu + delta, sigma, size=n_orig)
+            _, p_val = stats.ttest_ind(y_t, y_c)
+            if p_val < alpha:
+                rejections_no_cuped += 1
+        power_no_cuped = rejections_no_cuped / n_trials
 
-            # Treatment arm (effect = delta)
-            x_t = rng.normal(mu, sigma, size=n_adj)
-            y_t = (mu + delta) + rho * (x_t - mu) + rng.normal(0, noise_std, size=n_adj)
+        # --- Arm B: CUPED at n_adjusted ---
+        rejections_cuped = 0
+        rng_b = np.random.default_rng(300 + int(rho * 100))
+        noise_std = sigma * np.sqrt(max(1 - rho ** 2, 0))
+        for _ in range(n_trials):
+            x_c = rng_b.normal(mu, sigma, size=n_adj)
+            y_c = mu + rho * (x_c - mu) + rng_b.normal(0, noise_std, size=n_adj)
+            x_t = rng_b.normal(mu, sigma, size=n_adj)
+            y_t = (mu + delta) + rho * (x_t - mu) + rng_b.normal(0, noise_std, size=n_adj)
 
-            # CUPED adjustment (combined covariance estimate)
             x_all = np.concatenate([x_c, x_t])
             y_all = np.concatenate([y_c, y_t])
             b_opt = np.cov(y_all, x_all)[0, 1] / np.var(x_all, ddof=1)
-
             y_c_adj = y_c - b_opt * (x_c - np.mean(x_all))
             y_t_adj = y_t - b_opt * (x_t - np.mean(x_all))
-
-            # Two-sample t-test
-            t_stat, p_val = stats.ttest_ind(y_t_adj, y_c_adj)
+            _, p_val = stats.ttest_ind(y_t_adj, y_c_adj)
             if p_val < alpha:
-                rejections += 1
+                rejections_cuped += 1
+        power_cuped = rejections_cuped / n_trials
 
-        empirical_power = rejections / n_trials
-        # With n_adj and CUPED, power should be approximately 0.80
-        # Allow ±5% for MC variability
+        # Both should achieve ~80% power
         results.append({
-            "test": f"ρ={rho}: n_adj={n_adj} achieves ~80% power",
-            "empirical_power": round(empirical_power, 4),
+            "test": f"ρ={rho}: no-CUPED n_orig={n_orig} achieves ~80% power",
+            "empirical_power": round(power_no_cuped, 4),
             "target_power": 0.80,
-            "deviation": round(abs(empirical_power - 0.80), 4),
-            "pass": abs(empirical_power - 0.80) < 0.05,
+            "deviation": round(abs(power_no_cuped - 0.80), 4),
+            "pass": abs(power_no_cuped - 0.80) < 0.05,
+        })
+        results.append({
+            "test": f"ρ={rho}: CUPED n_adj={n_adj} achieves ~80% power",
+            "empirical_power": round(power_cuped, 4),
+            "target_power": 0.80,
+            "deviation": round(abs(power_cuped - 0.80), 4),
+            "pass": abs(power_cuped - 0.80) < 0.05,
+        })
+
+        # Power equivalence: both designs should have similar power
+        power_diff = abs(power_no_cuped - power_cuped)
+        results.append({
+            "test": f"ρ={rho}: power equivalence (no-CUPED @ n_orig ≈ CUPED @ n_adj)",
+            "power_no_cuped": round(power_no_cuped, 4),
+            "power_cuped": round(power_cuped, 4),
+            "difference": round(power_diff, 4),
+            "pass": power_diff < 0.06,
         })
 
     return pd.DataFrame(results)
@@ -204,26 +228,37 @@ def validate_deng_et_al_reduction_ratio(client) -> pd.DataFrame:
             # Theoretical ratio (using continuous formula before ceiling)
             theoretical_ratio = 1 - rho ** 2
 
-            # Actual ratio — ceiling introduces noise, so compute with floats
+            # Compute expected values from first principles
             z_alpha = stats.norm.ppf(1 - params["alpha"] / 2)
             z_beta = stats.norm.ppf(params["power"])
             delta = params["baseline_mean"] * params["mde"]
             sigma = params["baseline_std"]
 
             n_orig_float = 2 * ((z_alpha + z_beta) * sigma / delta) ** 2
+            expected_orig = int(np.ceil(n_orig_float))
             n_adj_float = n_orig_float * theoretical_ratio
-
-            # API n_adj should be ceil(n_adj_float), ±1 for rounding differences
             expected_adj = int(np.ceil(n_adj_float))
+
+            # Check n_original matches reference
+            n_orig_ok = abs(n_orig - expected_orig) <= 1
+
+            # Check n_adjusted matches reference
+            n_adj_ok = abs(n_adj - expected_adj) <= 1
+
+            # Check actual ratio is close to theoretical (1 - ρ²)
+            # Ceiling rounding introduces noise, so allow ±0.03
+            actual_ratio = n_adj / max(n_orig, 1)
+            ratio_ok = abs(actual_ratio - theoretical_ratio) < 0.03
 
             results.append({
                 "test": f"μ={params['baseline_mean']},σ={params['baseline_std']},MDE={params['mde']},ρ={rho}",
                 "n_original": n_orig,
+                "expected_orig": expected_orig,
                 "n_adjusted": n_adj,
                 "expected_adj": expected_adj,
-                "ratio": round(n_adj / max(n_orig, 1), 4),
+                "ratio": round(actual_ratio, 4),
                 "target_ratio": round(theoretical_ratio, 4),
-                "pass": abs(n_adj - expected_adj) <= 1,
+                "pass": n_orig_ok and n_adj_ok and ratio_ok,
             })
 
     return pd.DataFrame(results)
