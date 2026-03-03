@@ -7,7 +7,7 @@ O'Brien-Fleming group sequential design.
 
 Reference:
 - Landovitz et al. (2021) NEJM "Cabotegravir for HIV Prevention"
-- gsDesign reference: gsDesign(k=4, alpha=0.025, test.type=1, sfu='OF')
+- gsDesign reference: gsDesign(k=4, alpha=0.025, test.type=1, sfu=sfLDOF)
 """
 
 import sys
@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from common.zetyra_client import get_client
 import pandas as pd
 
-BOUNDARY_TOLERANCE = 0.05
+BOUNDARY_TOLERANCE = 0.015
 
 
 def validate_hptn083(base_url: str = None) -> pd.DataFrame:
@@ -28,8 +28,9 @@ def validate_hptn083(base_url: str = None) -> pd.DataFrame:
     results = []
 
     # HPTN 083 design: 4-look O'Brien-Fleming, alpha=0.025, one-sided
-    # gsDesign reference boundaries: [4.049, 2.863, 2.337, 2.024]
-    reference_boundaries = [4.049, 2.863, 2.337, 2.024]
+    # gsDesign reference: gsDesign(k=4, alpha=0.025, test.type=1, sfu=sfLDOF)
+    # Using Lan-DeMets OBF spending (sfLDOF), not classical parametric (sfu="OF")
+    reference_boundaries = [4.3326, 2.9631, 2.3590, 2.0141]
     info_fracs = [0.25, 0.50, 0.75, 1.00]
 
     zetyra = client.gsd(

@@ -2,42 +2,44 @@
 
 Detailed breakdown of validation results comparing Zetyra calculators against reference implementations.
 
-**Total: 169 tests across 12 scripts, all passing.**
+**Total: 499 tests across 25 scripts, all passing.**
 
 ---
 
 ## GSD Validation Against gsDesign
 
-**Maximum deviation: 0.0046 z-score** (target: 0.05)
-**Mean deviation: 0.0012 z-score**
+**Maximum deviation: 0.034 z-score** (target: 0.04)
+**Mean deviation: 0.004 z-score**
+
+Note: OBF uses Lan-DeMets spending (sfLDOF), matching gsDesign's `sfu=sfLDOF`. Residual deviations at later looks of k≥4 designs are from MVN integration precision differences between scipy and R's mvtnorm.
 
 ### Boundary Comparisons by Design
 
 | Design | Looks | Boundaries Tested | Max Dev | Status |
 |--------|-------|-------------------|---------|--------|
 | OF_2   | 2     | 2                 | 0.0000  | ✅ Pass |
-| OF_3   | 3     | 3                 | 0.0001  | ✅ Pass |
-| OF_4   | 4     | 4                 | 0.0017  | ✅ Pass |
-| OF_5   | 5     | 5                 | 0.0046  | ✅ Pass |
+| OF_3   | 3     | 3                 | 0.0015  | ✅ Pass |
+| OF_4   | 4     | 4                 | 0.0117  | ✅ Pass |
+| OF_5   | 5     | 5                 | 0.0332  | ✅ Pass |
 | Pocock_2 | 2   | 2                 | 0.0000  | ✅ Pass |
-| Pocock_3 | 3   | 3                 | 0.0002  | ✅ Pass |
-| Pocock_4 | 4   | 4                 | 0.0008  | ✅ Pass |
+| Pocock_3 | 3   | 3                 | 0.0010  | ✅ Pass |
+| Pocock_4 | 4   | 4                 | 0.0033  | ✅ Pass |
 
 [See detailed results →](../gsd/results/gsd_validation_results.csv)
 
 ### Published Trial Replications
 
 #### HPTN 083 (HIV Prevention Trial)
-- **Design**: 4-look O'Brien-Fleming
-- **Reference**: gsDesign R package
-- **Max deviation**: 0.0046 z-score
+- **Design**: 4-look O'Brien-Fleming (Lan-DeMets sfLDOF)
+- **Reference**: gsDesign R package (`sfu=sfLDOF`)
+- **Max deviation**: 0.012 z-score
 
 | Look | Info Frac | Zetyra | Reference | Deviation |
 |------|-----------|--------|-----------|-----------|
-| 1    | 0.25      | 4.0444 | 4.049     | 0.0046    |
-| 2    | 0.50      | 2.8598 | 2.863     | 0.0032    |
-| 3    | 0.75      | 2.3351 | 2.337     | 0.0019    |
-| 4    | 1.00      | 2.0222 | 2.024     | 0.0018    |
+| 1    | 0.25      | 4.3326 | 4.3326    | 0.0000    |
+| 2    | 0.50      | 2.9631 | 2.9631    | 0.0000    |
+| 3    | 0.75      | 2.3524 | 2.3590    | 0.0066    |
+| 4    | 1.00      | 2.0258 | 2.0141    | 0.0117    |
 
 [See detailed results →](../gsd/results/hptn083_validation.csv)
 
