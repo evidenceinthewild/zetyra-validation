@@ -2,13 +2,16 @@
 """
 Validate Zetyra GSD Survival/TTE Endpoint
 
-Tests Group Sequential Design with survival (time-to-event) endpoints:
-1. Schoenfeld formula: events match analytical reference
-2. Sample size computed from events via event probability
-3. Boundaries match continuous GSD with equivalent effect size
-4. Structural properties (monotonicity, alpha control)
-5. Input guards
-6. Schema contract
+Property-based validation for survival GSD:
+1. Schoenfeld formula: fixed events match analytical reference
+2. Sample size consistency: N = max_events / event_probability
+3. Structural properties (monotonicity, alpha control, arm sums)
+4. Input guards (invalid HR, negative median, etc.)
+5. Schema contract
+
+Note: Boundary accuracy against gsDesign is validated separately in
+test_gsd_survival_benchmark.R, which compares z-score boundaries and
+cumulative alpha spending against gsDesign (R).
 
 Reference:
 - Schoenfeld (1983) "Sample-Size Formula for the Proportional-Hazards Regression Model"
@@ -240,15 +243,27 @@ def validate_input_guards(client) -> pd.DataFrame:
         {"name": "HR>1", "data": {**valid_base, "hazard_ratio": 1.5}},
         {"name": "HR=0", "data": {**valid_base, "hazard_ratio": 0.0}},
         {"name": "Negative median", "data": {**valid_base, "median_control": -1}},
+        {"name": "binding_futility=True (unsupported)", "data": {**valid_base, "binding_futility": True}},
     ]
 
     for g in guards:
         resp = client.gsd_survival_raw(**g["data"])
         results.append({
-            "test": f"Guard: {g['name']}",
+            "test": f"Guard (survival): {g['name']}",
             "status_code": resp.status_code,
             "pass": resp.status_code in (400, 422),
         })
+
+    # Also test binding_futility guard on the continuous /gsd endpoint
+    resp = client.gsd_raw(
+        effect_size=0.3, alpha=0.025, power=0.80, k=3,
+        binding_futility=True,
+    )
+    results.append({
+        "test": "Guard (continuous): binding_futility=True (unsupported)",
+        "status_code": resp.status_code,
+        "pass": resp.status_code in (400, 422),
+    })
 
     return pd.DataFrame(results)
 

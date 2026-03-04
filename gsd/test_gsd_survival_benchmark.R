@@ -138,7 +138,10 @@ boundary_scenarios <- list(
   list(name = "OBF k=4", k = 4, sfu = sfLDOF, spending = "OBrienFleming", tol = 0.015),
   list(name = "OBF k=5", k = 5, sfu = sfLDOF, spending = "OBrienFleming", tol = 0.04),
   list(name = "Pocock k=3", k = 3, sfu = "Pocock", spending = "Pocock", tol = 0.005),
-  list(name = "Pocock k=4", k = 4, sfu = "Pocock", spending = "Pocock", tol = 0.008)
+  list(name = "Pocock k=4", k = 4, sfu = "Pocock", spending = "Pocock", tol = 0.008),
+  # Classical (parametric) O'Brien-Fleming: sfu="OF" in gsDesign
+  list(name = "OFparam k=3", k = 3, sfu = "OF", spending = "OBrienFlemingParametric", tol = 0.005),
+  list(name = "OFparam k=4", k = 4, sfu = "OF", spending = "OBrienFlemingParametric", tol = 0.015)
 )
 
 # Per-scenario z-score tolerances. With sfLDOF, Zetyra and gsDesign use the same
@@ -176,7 +179,8 @@ cat("\n\n3. Cumulative Alpha Spent\n")
 cat(rep("-", 70), "\n", sep = "")
 
 # OBF k=3: compare alpha spending at each look
-gs_obf3 <- gsDesign(k = 3, alpha = 0.025, beta = 0.20, test.type = 1, sfu = "OF")
+# Use sfLDOF (Lan-DeMets OBF approximation) to match Zetyra's OBrienFleming spending
+gs_obf3 <- gsDesign(k = 3, alpha = 0.025, beta = 0.20, test.type = 1, sfu = sfLDOF)
 z_obf3 <- zetyra_gsd_survival(
   hazard_ratio = 0.7, median_control = 12, accrual_time = 24,
   follow_up_time = 12, alpha = 0.025, power = 0.80, k = 3,
@@ -211,6 +215,26 @@ for (look in 1:3) {
   add_result("Pocock k=3", sprintf("alpha_spent_look_%d", look),
              gs_poc_alpha[look], z_poc_alpha[look], 0.002)
 }
+
+# Classical OBF (parametric) k=3: cumulative alpha from actual H0 crossing probs
+gs_ofparam3 <- gsDesign(k = 3, alpha = 0.025, beta = 0.20, test.type = 1, sfu = "OF")
+z_ofparam3 <- zetyra_gsd_survival(
+  hazard_ratio = 0.7, median_control = 12, accrual_time = 24,
+  follow_up_time = 12, alpha = 0.025, power = 0.80, k = 3,
+  spending_function = "OBrienFlemingParametric"
+)
+
+gs_ofparam_alpha <- cumsum(gs_ofparam3$upper$prob[, 1])
+z_ofparam_alpha <- unlist(z_ofparam3$alpha_spent)
+
+for (look in 1:3) {
+  add_result("OFparam k=3", sprintf("alpha_spent_look_%d", look),
+             gs_ofparam_alpha[look], z_ofparam_alpha[look], 0.002)
+}
+
+# Final alpha should equal target
+add_result("OFparam k=3", "final_alpha = 0.025",
+           0.025, z_ofparam_alpha[3], 0.001)
 
 # =============================================================================
 # Test 4: Information Fractions

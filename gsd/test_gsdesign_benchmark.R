@@ -76,7 +76,11 @@ test_configs <- list(
   list(name = "OF_5", k = 5, sfu = sfLDOF, spending = "OBrienFleming"),
   list(name = "Pocock_2", k = 2, sfu = "Pocock", spending = "Pocock"),
   list(name = "Pocock_3", k = 3, sfu = "Pocock", spending = "Pocock"),
-  list(name = "Pocock_4", k = 4, sfu = "Pocock", spending = "Pocock")
+  list(name = "Pocock_4", k = 4, sfu = "Pocock", spending = "Pocock"),
+  # Classical (parametric) O'Brien-Fleming: sfu="OF" in gsDesign
+  list(name = "OFparam_2", k = 2, sfu = "OF", spending = "OBrienFlemingParametric"),
+  list(name = "OFparam_3", k = 3, sfu = "OF", spending = "OBrienFlemingParametric"),
+  list(name = "OFparam_4", k = 4, sfu = "OF", spending = "OBrienFlemingParametric")
 )
 
 cat("Testing", length(test_configs), "design configurations...\n\n")

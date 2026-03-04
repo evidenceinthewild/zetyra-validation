@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 """
-Validate Zetyra GSD against HeartMate II trial design
+Property checks for GSD with unequal information fractions
 
-HeartMate II was an LVAD trial with unequal information fractions,
-testing O'Brien-Fleming boundaries with non-standard timing.
+Uses HeartMate II-inspired timing (0.27, 0.67, 1.00) to verify that
+Zetyra handles non-equal spacing correctly: monotonicity, info fraction
+echo, and the expected behavior that earlier first looks raise the first
+boundary.
+
+Note: This is a structural/shape check, not a trial replication. The
+HeartMate II paper does not publish the exact z-score boundary values
+needed for a numerical comparison.
 
 Reference:
 - Slaughter et al. (2009) NEJM "Advanced Heart Failure Treated with
@@ -21,7 +27,7 @@ import pandas as pd
 
 
 def validate_heartmate(base_url: str = None) -> pd.DataFrame:
-    """Validate against HeartMate II design with unequal info fractions."""
+    """Property checks for GSD with HeartMate II-inspired unequal info fractions."""
     client = get_client(base_url)
     results = []
 
@@ -85,7 +91,7 @@ def main():
     base_url = sys.argv[1] if len(sys.argv) > 1 else None
 
     print("=" * 70)
-    print("HEARTMATE II TRIAL REPLICATION")
+    print("GSD UNEQUAL SPACING (HEARTMATE II-INSPIRED)")
     print("=" * 70)
 
     results = validate_heartmate(base_url)

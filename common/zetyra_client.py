@@ -49,6 +49,10 @@ class ZetyraClient:
         """Calculate Group Sequential Design boundaries."""
         return self._post("/gsd", kwargs)
 
+    def gsd_raw(self, **kwargs):
+        """GSD — return raw Response for error testing."""
+        return self._post_raw("/gsd", kwargs)
+
     def bayesian_continuous(self, **kwargs) -> dict:
         """Calculate Bayesian predictive power for continuous outcomes."""
         return self._post("/bayesian/continuous", kwargs)

@@ -214,12 +214,13 @@ def validate_vague_prior_convergence(client) -> pd.DataFrame:
     gamma = 0.975
     z_gamma = sp_stats.norm.ppf(gamma)  # ≈ 1.96
 
-    # Large events + vague prior: boundary → z_gamma
+    # Large events + truly vague prior (ν² = 1e6): boundary → z_gamma
     large_events = [500, 1000, 1500, 2000]
     zetyra = client.bayesian_sequential_survival(
         endpoint_type="survival",
         n_per_look=large_events,
         hazard_ratio=0.7,
+        prior_variance=1e6,
         efficacy_threshold=gamma,
         futility_threshold=0.10,
     )
