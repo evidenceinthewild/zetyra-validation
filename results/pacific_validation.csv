@@ -1,0 +1,18 @@
+test,published_p_2s,computed_p_2s,deviation,d_max,pass,ref_z,zetyra_z,published_z,alpha_spent,target,z_observed,z_boundary_at_299,info_frac,HR,events,p_observed,published_cutoff,boundaries,expected,actual,boundary_1,boundary_final,z_alpha,zetyra_events,schoenfeld_events,rel_err,max_events,fixed_events,n_total
+Look 1 boundary matches published (reference),0.00274,0.00274,0.0,581.2,True,,,,,,,,,,,,,,,,,,,,,,,,
+Look 1 Zetyra z-boundary matches reference,,,0.0,,True,2.9955,2.9955,,,,,,,,,,,,,,,,,,,,,,
+Look 2 Zetyra z-boundary matches reference,,,0.0,,True,2.5132,2.5132,,,,,,,,,,,,,,,,,,,,,,
+Look 3 Zetyra z-boundary matches reference,,,0.0222,,True,1.9818,2.004,,,,,,,,,,,,,,,,,,,,,,
+Look 1 Zetyra z-boundary near published (z-scale),,,0.0,,True,,2.9955,2.9955,,,,,,,,,,,,,,,,,,,,,
+Zetyra cumulative alpha = 0.025 at final look,,,,,True,,,,0.025,0.025,,,,,,,,,,,,,,,,,,,
+Back-computed D_max is reasonable (491-600),,,,581.2,True,,,,,,,,,,,,,,,,,,,,,,,,
+Trial z-score exceeds Zetyra boundary at actual crossing (299 events),,,,,True,,,,,,3.3344,2.9151,0.5144,0.68,299.0,,,,,,,,,,,,,,
+Observed p < published planned-look cutoff (two-sided),,,,,True,,,,,,,,,,,0.00085,0.00274,,,,,,,,,,,,
+OBF efficacy boundaries decrease,,,,,True,,,,,,,,,,,,,"[2.7203, 2.2826, 2.0307]",,,,,,,,,,,
+Info fractions match PACIFIC design,,,,,True,,,,,,,,,,,,,,"[0.5804, 0.8004, 1.0]","[0.5804, 0.8004, 1.0]",,,,,,,,,
+First boundary sufficiently conservative (>2.5),,,,,True,,,,,,,,,,,,,,,,2.7203,,,,,,,,
+Final boundary near z_alpha,,,,,True,,,,,,,,,,,,,,,,,2.0307,1.96,,,,,,
+Fixed events match Schoenfeld formula,,,,,True,,,,,,,,,,,,,,,,,,,242.0,242.0,0.0,,,
+Max events >= fixed events,,,,,True,,,,,,,,,,,,,,,,,,,,,,281.0,242.0,
+N_total >= max_events,,,,,True,,,,,,,,,,,,,,,,,,,,,,281.0,,414.0
+Efficacy boundaries decrease (OBF),,,,,True,,,,,,,,,,,,,"[3.7103, 2.5114, 1.9945]",,,,,,,,,,,

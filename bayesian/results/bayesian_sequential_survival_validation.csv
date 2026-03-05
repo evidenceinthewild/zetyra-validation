@@ -1,0 +1,35 @@
+test,zetyra,reference,deviation,pass,boundaries,endpoint_type,n_looks,expected,hr07,hr05,diff,few_events_boundary,many_events_boundary,front_b1,uniform_b1,front_bk,uniform_bk,odd_b1,even_b1,status_code
+Look 1 (d=100): efficacy,2.0369,2.0369,0.0,True,,,,,,,,,,,,,,,,
+Look 1 (d=100): futility,-1.3318,-1.3318,0.0,True,,,,,,,,,,,,,,,,
+Look 2 (d=200): efficacy,1.9988,1.9988,0.0,True,,,,,,,,,,,,,,,,
+Look 2 (d=200): futility,-1.3069,-1.3069,0.0,True,,,,,,,,,,,,,,,,
+Look 3 (d=300): efficacy,1.9859,1.9859,0.0,True,,,,,,,,,,,,,,,,
+Look 3 (d=300): futility,-1.2985,-1.2985,0.0,True,,,,,,,,,,,,,,,,
+Efficacy boundaries decrease with events,,,,True,"[2.111, 2.037, 2.012, 1.999]",,,,,,,,,,,,,,,
+Futility < efficacy at each look,,,,True,,,,,,,,,,,,,,,,
+endpoint_type is 'survival',,,,True,,survival,,,,,,,,,,,,,,
+n_looks = len(events_per_look),,,,True,,,4.0,4.0,,,,,,,,,,,,
+Look 1: HR=0.7 vs HR=0.5 boundary diff,,,,True,,,,,2.0369,2.0369,0.0,,,,,,,,,
+Look 2: HR=0.7 vs HR=0.5 boundary diff,,,,True,,,,,1.9988,1.9988,0.0,,,,,,,,,
+Look 3: HR=0.7 vs HR=0.5 boundary diff,,,,True,,,,,1.9859,1.9859,0.0,,,,,,,,,
+Look 1: more events -> lower boundary,,,,True,,,,,,,,2.1109,1.9988,,,,,,,
+Look 2: more events -> lower boundary,,,,True,,,,,,,,2.0369,1.9795,,,,,,,
+Non-uniform: front-loaded has lower first boundary,,,,True,,,,,,,,,,1.9988,2.0369,,,,,
+Non-uniform: same final events -> same final boundary,,,,True,,,,,,,,,,,,1.9859,1.9859,,,
+Non-uniform look 1 (d=200): matches reference,1.9988,1.9988,,True,,,,,,,0.0,,,,,,,,,
+Non-uniform look 2 (d=250): matches reference,1.9911,1.9911,,True,,,,,,,0.0,,,,,,,,,
+Non-uniform look 3 (d=300): matches reference,1.9859,1.9859,,True,,,,,,,0.0,,,,,,,,,
+Odd d=101: matches d/2 reference (not d//2),2.0361,2.0361,,True,,,,,,,0.0,,,,,,,,,
+Odd d=201: matches d/2 reference (not d//2),1.9986,1.9986,,True,,,,,,,0.0,,,,,,,,,
+Odd d=301: matches d/2 reference (not d//2),1.9858,1.9858,,True,,,,,,,0.0,,,,,,,,,
+Odd events -> slightly lower boundaries than even,,,,True,,,,,,,,,,,,,,2.0361,2.0369,
+Guard: single look rejected (survival),,,,True,,,,,,,,,,,,,,,,422.0
+Guard: non-increasing rejected,,,,True,,,,,,,,,,,,,,,,422.0
+Guard: decreasing rejected,,,,True,,,,,,,,,,,,,,,,422.0
+Guard: zero events rejected,,,,True,,,,,,,,,,,,,,,,422.0
+Guard: unequal allocation rejected,,,,True,,,,,,,,,,,,,,,,422.0
+Guard: futility_threshold=0 rejected,,,,True,,,,,,,,,,,,,,,,422.0
+Guard: futility >= efficacy rejected,,,,True,,,,,,,,,,,,,,,,422.0
+Accept: hazard_ratio omitted,,,,True,,,,,,,,,,,,,,,,200.0
+Accept: hazard_ratio >= 1 (metadata),,,,True,,,,,,,,,,,,,,,,200.0
+Accept: arbitrary metadata values,,,,True,,,,,,,,,,,,,,,,200.0

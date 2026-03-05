@@ -1,0 +1,23 @@
+test,zetyra_alpha,ref_alpha,zetyra_beta,ref_beta,zetyra_ess,ref_ess,pass,zetyra_mean,ref_mean,status_code,field_in_body
+ESS: Weakly informative (ESS=2),0.6,0.6,1.4,1.4,2.0,2.0,True,,,,
+ESS: Berry et al. (2010),2.5,2.5,7.5,7.5,10.0,10.0,True,,,,
+ESS: Vague prior,1.0,1.0,1.0,1.0,2.0,2.0,True,,,,
+ESS: Moderate informative,3.0,3.0,17.0,17.0,20.0,20.0,True,,,,
+Historical: REBYOTA CD2 δ=0.5,13.5,13.5,11.0,11.0,,,True,0.551,0.551,,
+Historical: REBYOTA CD2 δ=1.0,26.0,26.0,21.0,21.0,,,True,0.5532,0.5532,,
+Historical: REBYOTA CD2 δ=0.1,3.5,3.5,3.0,3.0,,,True,0.5385,0.5385,,
+Historical: REBYOTA CD2 δ=0.0,1.0,1.0,1.0,1.0,,,True,0.5,0.5,,
+"Quantile: Berry: median≈0.25, 90%CI=[0.10,0.40]",5.286,,16.355,,,,True,0.2443,,,
+"Quantile: Tight prior: median≈0.50, 90%CI=[0.40,0.60]",33.478,,33.462,,,,True,0.5001,,,
+Oracle: Berry median≈0.25,5.286,5.297,16.355,16.386,,,True,,,,
+Oracle: Tight median≈0.50,33.478,33.387,33.462,33.387,,,True,,,,
+Guard: invalid method,,,,,,,True,,,422.0,True
+Guard: ess = 0 (must be > 0),,,,,,,True,,,422.0,True
+Guard: mean > 1,,,,,,,True,,,422.0,True
+Guard: discount_factor > 1,,,,,,,True,,,422.0,True
+Boundary: ESS=1 minimum,0.5,0.5,0.5,0.5,,,True,,,,
+Boundary: ESS=1000 very strong,300.0,300.0,700.0,700.0,,,True,,,,
+Boundary: mean≈0,0.01,0.01,9.99,9.99,,,True,,,,
+Boundary: mean≈1,9.99,9.99,0.01,0.010000000000000009,,,True,,,,
+Boundary: zero events,1.0,1.0,26.0,26.0,,,True,,,,
+Boundary: all events,26.0,26.0,1.0,1.0,,,True,,,,

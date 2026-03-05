@@ -4,8 +4,9 @@ title: "Zetyra Validation Suite"
 authors:
   - family-names: "Qian"
     given-names: "Maggie"
-version: 1.0.0
-date-released: 2026-01-06
+version: 2.0.0
+date-released: 2026-03-05
+doi: "10.5281/zenodo.18880066"
 url: "https://github.com/evidenceinthewild/zetyra-validation"
 repository-code: "https://github.com/evidenceinthewild/zetyra-validation"
 license: MIT
@@ -15,3 +16,6 @@ keywords:
   - CUPED
   - Bayesian
   - clinical trials
+  - sample size re-estimation
+  - survival analysis
+  - adaptive design

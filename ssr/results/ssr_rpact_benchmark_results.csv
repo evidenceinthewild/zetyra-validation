@@ -1,0 +1,15 @@
+"test","r_reference","zetyra","deviation","pass"
+"Blinded cont. initial N: delta=0.3, alpha=0.025, power=0.90","468","468",0,TRUE
+"Blinded cont. initial N: delta=0.5, alpha=0.025, power=0.80","126","126",0,TRUE
+"Blinded cont. initial N: delta=0.1, alpha=0.05, power=0.90","3426","3426",0,TRUE
+"Blinded cont. inflated variance: recalculated N","934","934",0,TRUE
+"Blinded binary initial N: pc=0.20, pt=0.35","370","370",0,TRUE
+"Blinded binary initial N: pc=0.50, pt=0.70","186","186",0,TRUE
+"Blinded cont. CP (no change) ~ design power","0.901","0.901",0,TRUE
+"Unblinded cont. favorable zone","favorable","favorable",NA,TRUE
+"Unblinded cont. promising zone + N increase","promising","promising",NA,TRUE
+"Unblinded cont. unfavorable/futility zone","unfavorable_or_futility","futility",NA,TRUE
+"CP formula: CP favorable (obs=planned)","0.901","0.901",0,TRUE
+"CP formula: CP promising (obs=half)","0.368","0.368",0,TRUE
+"CP formula: CP low (obs=small)","0.137","0.137",0,TRUE
+"Blinded binary: recalculated N matches reference (pooled rate 0.40)","414","414",0,TRUE

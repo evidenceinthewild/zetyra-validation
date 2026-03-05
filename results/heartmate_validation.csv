@@ -1,0 +1,4 @@
+property,expected,actual,pass
+Monotonically decreasing,b1 ≥ b2 ≥ b3,4.158 ≥ 2.502 ≥ 1.995,True
+Info fractions match,"[0.27, 0.67, 1.0]","[0.27, 0.67, 1.0]",True
+Earlier look → higher boundary,b1(0.27) ≥ b1(0.33),4.158 ≥ 3.710,True

@@ -1,0 +1,37 @@
+"test","metric","gsdesign_val","zetyra_val","deviation","pass"
+"HR=0.7, α=0.025, 90%","fixed_events",331,331,0,TRUE
+"HR=0.8, α=0.025, 80%","fixed_events",631,631,0,TRUE
+"HR=0.5, α=0.025, 90%","fixed_events",88,88,0,TRUE
+"HR=0.6, α=0.025, 80%","fixed_events",121,121,0,TRUE
+"OBF k=3","look_1_z",3.7103,3.7103,0,TRUE
+"OBF k=3","look_2_z",2.5114,2.5114,0,TRUE
+"OBF k=3","look_3_z",1.993,1.9945,0.0015,TRUE
+"OBF k=4","look_1_z",4.3326,4.3326,0,TRUE
+"OBF k=4","look_2_z",2.9631,2.9631,0,TRUE
+"OBF k=4","look_3_z",2.359,2.3524,0.0066,TRUE
+"OBF k=4","look_4_z",2.0141,2.0258,0.0117,TRUE
+"OBF k=5","look_1_z",4.8769,4.8769,0,TRUE
+"OBF k=5","look_2_z",3.357,3.357,0,TRUE
+"OBF k=5","look_3_z",2.6803,2.6757,0.0046,TRUE
+"OBF k=5","look_4_z",2.2898,2.3011,0.0113,TRUE
+"OBF k=5","look_5_z",2.031,2.0642,0.0332,TRUE
+"Pocock k=3","look_1_z",2.2895,2.2905,0.001,TRUE
+"Pocock k=3","look_2_z",2.2895,2.2905,0.001,TRUE
+"Pocock k=3","look_3_z",2.2895,2.2905,0.001,TRUE
+"Pocock k=4","look_1_z",2.3613,2.3646,0.0033,TRUE
+"Pocock k=4","look_2_z",2.3613,2.3646,0.0033,TRUE
+"Pocock k=4","look_3_z",2.3613,2.3646,0.0033,TRUE
+"Pocock k=4","look_4_z",2.3613,2.3646,0.0033,TRUE
+"OBF k=3","alpha_spent_look_1",3e-04,1e-04,2e-04,TRUE
+"OBF k=3","alpha_spent_look_2",0.0072,0.006,0.0011,TRUE
+"OBF k=3","alpha_spent_look_3",0.025,0.025,0,TRUE
+"OBF k=3","final_alpha = 0.025",0.025,0.025,0,TRUE
+"Pocock k=3","alpha_spent_look_1",0.011,0.0113,3e-04,TRUE
+"Pocock k=3","alpha_spent_look_2",0.019,0.0191,1e-04,TRUE
+"Pocock k=3","alpha_spent_look_3",0.025,0.025,0,TRUE
+"OBF k=3","info_frac_look_1",0.3333,0.3333,0,TRUE
+"OBF k=3","info_frac_look_2",0.6667,0.6667,0,TRUE
+"OBF k=3","info_frac_look_3",1,1,0,TRUE
+"HR consistency","look_1: HR=0.7 vs HR=0.8",3.7103,3.7103,0,TRUE
+"HR consistency","look_2: HR=0.7 vs HR=0.8",2.5114,2.5114,0,TRUE
+"HR consistency","look_3: HR=0.7 vs HR=0.8",1.9945,1.9945,0,TRUE

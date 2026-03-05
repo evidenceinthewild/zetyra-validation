@@ -1,0 +1,26 @@
+test,zetyra,reference,pass,zetyra_pp,reference_pp,deviation,bayesian_pp,freq_cp,pp,recommendation
+"Scenario 1: Standard trial (HR=0.70, d=200, vague prior): posterior mean",-0.349681,-0.349681,True,,,,,,,
+"Scenario 1: Standard trial (HR=0.70, d=200, vague prior): posterior variance",0.019608,0.019608,True,,,,,,,
+"Scenario 1: Standard trial (HR=0.70, d=200, vague prior): HR posterior",0.7049,0.7049,True,,,,,,,
+"Scenario 2: Near-complete (HR=0.75, d=280/300, vague prior): posterior mean",-0.28363,-0.28363,True,,,,,,,
+"Scenario 2: Near-complete (HR=0.75, d=280/300, vague prior): posterior variance",0.014085,0.014085,True,,,,,,,
+"Scenario 2: Near-complete (HR=0.75, d=280/300, vague prior): HR posterior",0.753,0.753,True,,,,,,,
+"Scenario 3: Strong prior toward no effect (HR=0.65, d=100): posterior mean",-0.307702,-0.307702,True,,,,,,,
+"Scenario 3: Strong prior toward no effect (HR=0.65, d=100): posterior variance",0.028571,0.028571,True,,,,,,,
+"Scenario 3: Strong prior toward no effect (HR=0.65, d=100): HR posterior",0.7351,0.7351,True,,,,,,,
+"Scenario 4: Optimistic prior (μ=-0.36, HR=0.80, d=150): posterior mean",-0.236335,-0.236335,True,,,,,,,
+"Scenario 4: Optimistic prior (μ=-0.36, HR=0.80, d=150): posterior variance",0.024096,0.024096,True,,,,,,,
+"Scenario 4: Optimistic prior (μ=-0.36, HR=0.80, d=150): HR posterior",0.7895,0.7895,True,,,,,,,
+"Scenario 5: Harmful treatment (HR=1.10, d=200, vague prior): posterior mean",0.093441,0.093441,True,,,,,,,
+"Scenario 5: Harmful treatment (HR=1.10, d=200, vague prior): posterior variance",0.019608,0.019608,True,,,,,,,
+"Scenario 5: Harmful treatment (HR=1.10, d=200, vague prior): HR posterior",1.0979,1.0979,True,,,,,,,
+"PP: Strong effect, halfway (HR=0.65, d=150/300)",,,True,0.9784,0.9793,0.0009,,,,
+"PP: Moderate effect, early (HR=0.75, d=100/350)",,,True,0.727,0.7307,0.0037,,,,
+"PP: Weak effect, late (HR=0.90, d=250/300)",,,True,0.0473,0.0466,0.0007,,,,
+"Freq. convergence: HR=0.7, d=200/400",,,True,,,0.0016,0.9443,0.9459,,
+"Freq. convergence: HR=0.8, d=150/300",,,True,,,0.0009,0.4881,0.489,,
+"Freq. convergence: HR=0.6, d=100/200",,,True,,,0.0014,0.9493,0.9507,,
+"Overwhelming efficacy: HR=0.3, d=400/500 → PP ≈ 1.0",,,True,,,,,,1.0,stop_for_efficacy
+"Clearly harmful: HR=1.5, d=200/300 → PP ≈ 0.0",,,True,,,,,,0.0,stop_for_futility
+"Near-complete + strong: HR=0.5, d=290/300 → PP > 0.95",,,True,,,,,,1.0,stop_for_efficacy
+"Early + weak: HR=0.90, d=20/400 → PP < 0.50",,,True,,,,,,0.4192,continue

@@ -1,0 +1,25 @@
+test,reference,zetyra,deviation,pass,boundaries,type_i_mc,band,boundary,z_gamma
+"Standard (d=[100,200,300], γ=0.975), look 1 (d=100)",2.0369,2.0369,0.0,True,,,,,
+"Standard (d=[100,200,300], γ=0.975), look 2 (d=200)",1.9988,1.9988,0.0,True,,,,,
+"Standard (d=[100,200,300], γ=0.975), look 3 (d=300)",1.9859,1.9859,0.0,True,,,,,
+"Many looks (d=[50,100,150,200,250], γ=0.95), look 1 (d=50)",1.7716,1.7716,0.0,True,,,,,
+"Many looks (d=[50,100,150,200,250], γ=0.95), look 2 (d=100)",1.7094,1.7094,0.0,True,,,,,
+"Many looks (d=[50,100,150,200,250], γ=0.95), look 3 (d=150)",1.6881,1.6881,0.0,True,,,,,
+"Many looks (d=[50,100,150,200,250], γ=0.95), look 4 (d=200)",1.6774,1.6774,0.0,True,,,,,
+"Many looks (d=[50,100,150,200,250], γ=0.95), look 5 (d=250)",1.671,1.671,0.0,True,,,,,
+"Large events (d=[200,400,600,800], γ=0.975), look 1 (d=200)",1.9988,1.9988,0.0,True,,,,,
+"Large events (d=[200,400,600,800], γ=0.975), look 2 (d=400)",1.9795,1.9795,0.0,True,,,,,
+"Large events (d=[200,400,600,800], γ=0.975), look 3 (d=600)",1.973,1.973,0.0,True,,,,,
+"Large events (d=[200,400,600,800], γ=0.975), look 4 (d=800)",1.9697,1.9697,0.0,True,,,,,
+"Front-loaded (d=[200,250,300], γ=0.95), look 1 (d=200)",1.6774,1.6774,0.0,True,,,,,
+"Front-loaded (d=[200,250,300], γ=0.95), look 2 (d=250)",1.671,1.671,0.0,True,,,,,
+"Front-loaded (d=[200,250,300], γ=0.95), look 3 (d=300)",1.6666,1.6666,0.0,True,,,,,
+"Type I (API boundaries): Standard 3-look (γ=0.975, vague prior)",,,,True,"[2.037, 1.999, 1.986]",0.0485,"[0.03, 0.06]",,
+"Type I (API boundaries): 5-look strict (γ=0.99, vague prior)",,,,True,"[2.506, 2.418, 2.388, 2.372, 2.363]",0.025,"[0.015, 0.04]",,
+Vague prior convergence (d=500): → Φ⁻¹(0.975),,,0.0156,True,,,,1.9756,1.96
+Vague prior convergence (d=1000): → Φ⁻¹(0.975),,,0.0078,True,,,,1.9678,1.96
+Vague prior convergence (d=1500): → Φ⁻¹(0.975),,,0.0052,True,,,,1.9652,1.96
+Vague prior convergence (d=2000): → Φ⁻¹(0.975),,,0.0039,True,,,,1.9639,1.96
+Futility look 1 (d=100),-1.3318,-1.3318,0.0,True,,,,,
+Futility look 2 (d=200),-1.3069,-1.3069,0.0,True,,,,,
+Futility look 3 (d=300),-1.2985,-1.2985,0.0,True,,,,,
