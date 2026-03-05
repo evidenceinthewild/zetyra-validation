@@ -1,6 +1,7 @@
 # Zetyra Validation Suite
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18253308.svg)](https://doi.org/10.5281/zenodo.18253308)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18879839.svg)](https://doi.org/10.5281/zenodo.18879839)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18880066.svg)](https://doi.org/10.5281/zenodo.18880066)
 ![Tests](https://img.shields.io/badge/tests-499%20passed-success)
 ![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20Survival-blue)
 ![Accuracy](https://img.shields.io/badge/max%20deviation-0.034%20z--score-brightgreen)
@@ -306,6 +307,32 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 10. **MONALEESA-7**: Im et al. (2019) NEJM 381:307-316 *Overall Survival with Ribociclib*
 11. **Mehta & Pocock**: Mehta & Pocock (2011) *Adaptive increase in sample size when interim results are promising*
 12. **Bayesian PP**: Spiegelhalter, Abrams & Myles (2004) *Bayesian Approaches to Clinical Trials*
+
+## Citation
+
+If you use this validation suite in your work, please cite the accompanying white papers:
+
+```bibtex
+@software{qian2026zetyra,
+  author    = {Qian, Lu},
+  title     = {Zetyra: A Validated Suite of Statistical Calculators for Efficient Clinical Trial Design},
+  version   = {2.0},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.18879839},
+  url       = {https://doi.org/10.5281/zenodo.18879839}
+}
+
+@software{qian2026zetyra_bayesian,
+  author    = {Qian, Lu},
+  title     = {Zetyra Bayesian Toolkit: A Comprehensive Suite of Validated Bayesian Calculators for Clinical Trial Design},
+  version   = {1.0},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.18880066},
+  url       = {https://doi.org/10.5281/zenodo.18880066}
+}
+```
 
 ## License
 
