@@ -2,8 +2,8 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18879839.svg)](https://doi.org/10.5281/zenodo.18879839)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18880066.svg)](https://doi.org/10.5281/zenodo.18880066)
-![Tests](https://img.shields.io/badge/tests-499%20passed-success)
-![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20Survival-blue)
+![Tests](https://img.shields.io/badge/tests-602%20passed-success)
+![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20RAR%20%7C%20Master%20Protocol-blue)
 ![Accuracy](https://img.shields.io/badge/max%20deviation-0.034%20z--score-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
@@ -34,9 +34,14 @@ Independent validation of Zetyra statistical calculators against reference imple
 | SSR Blinded | 20 | ✅ Pass | Conditional power formulas |
 | SSR Unblinded | 21 | ✅ Pass | Zone classification, CP thresholds |
 | SSR gsDesign Benchmark | 14 | ✅ Pass | gsDesign R package, reference formulas |
+| RAR (Adaptive Randomization) | 20 | ✅ Pass | Rosenberger optimal, DBCD, Thompson, Neyman |
+| Minimization (Pocock-Simon) | 17 | ✅ Pass | Imbalance reduction, pure random benchmark |
+| Basket Trial | 21 | ✅ Pass | Independent, BHM, EXNEX; Beta-Binomial conjugate |
+| Umbrella Trial | 21 | ✅ Pass | Frequentist/Bayesian; binary, continuous, survival |
+| Platform Trial (MAMS) | 24 | ✅ Pass | Boundaries, staggered entry, control modes |
 | Offline References | 23 | ✅ Pass | Pure math (no API) |
 
-**Total: 499 tests across 25 scripts, all passing.**
+**Total: 602 tests across 30 scripts, all passing.**
 
 ## Repository Structure
 
@@ -47,7 +52,7 @@ zetyra-validation/
 ├── requirements.txt
 ├── common/                              # Shared utilities
 │   ├── __init__.py
-│   ├── zetyra_client.py                 # API client (20 endpoints)
+│   ├── zetyra_client.py                 # API client (25 endpoints)
 │   └── assertions.py                    # Binomial CI, schema contracts
 ├── gsd/
 │   ├── test_gsdesign_benchmark.R        # 23 gsDesign comparisons
@@ -77,10 +82,17 @@ zetyra-validation/
 │   ├── test_bayesian_survival_benchmark.py  # Survival PP conjugate oracle + MC cross-validation
 │   ├── test_offline_references.py       # Pure-math tests (no API)
 │   └── results/
-└── ssr/
-    ├── test_ssr_blinded.py              # Blinded sample size re-estimation
-    ├── test_ssr_unblinded.py            # Unblinded SSR with zone classification
-    └── test_ssr_rpact_benchmark.R       # SSR cross-validation against gsDesign
+├── ssr/
+│   ├── test_ssr_blinded.py              # Blinded sample size re-estimation
+│   ├── test_ssr_unblinded.py            # Unblinded SSR with zone classification
+│   └── test_ssr_rpact_benchmark.R       # SSR cross-validation against gsDesign
+├── adaptive/                            # Adaptive randomization
+│   ├── test_rar.py                      # RAR: DBCD, Thompson, Neyman (binary, continuous, survival)
+│   └── test_minimization.py             # Pocock-Simon covariate-adaptive minimization
+└── master_protocol/                     # Master protocol designs
+    ├── test_basket.py                   # Basket trial: independent, BHM, EXNEX
+    ├── test_umbrella.py                 # Umbrella trial: frequentist/Bayesian × 3 endpoints
+    └── test_platform.py                 # Platform trial: MAMS, staggered entry, control modes
 ```
 
 ## What's Validated
@@ -140,6 +152,17 @@ Three calculators now support time-to-event outcomes via the Schoenfeld variance
 - **Unblinded SSR** — four-zone classification (futility, unfavorable, promising, favorable) based on conditional power thresholds, with sample size inflation caps
 - **gsDesign cross-validation** — sample size formulas, conditional power, zone classification, and binary rate re-estimation verified against reference formulas and gsDesign R package
 
+### Adaptive Randomization (v2.0)
+
+- **RAR** — Response-adaptive randomization with DBCD, Thompson sampling, and Neyman allocation. Analytical tests verify Rosenberger optimal allocation formula (√p / Σ√p), Neyman allocation (proportional to √(p(1-p))), and allocation sum invariants. Simulation tests verify power > 0 under H1, type I error controlled, arm sample size distributions, and allocation trajectories. Reference checks match closed-form Rosenberger values within machine precision. Binary, continuous, and survival endpoints covered.
+- **Minimization** — Pocock-Simon covariate-adaptive minimization. Analytical tests verify pure random imbalance benchmarks. Simulation tests verify minimization reduces imbalance vs pure random, higher p_randomization → lower imbalance, and deterministic assignment (p=1.0) achieves very low imbalance. Input guards for factor levels, prevalences, and imbalance function validated.
+
+### Master Protocol (v2.0)
+
+- **Basket Trial** — Independent, BHM (Berry et al. 2013), and EXNEX (Neuenschwander et al. 2016) analyses. Analytical tests verify Beta-Binomial conjugate posterior mean ((1+s)/(2+n)), BHM shrinkage property (posteriors between independent estimate and grand mean), and EXNEX convergence to BHM/independent at extreme weights. Simulation tests verify per-basket power, type I error, and FWER reporting.
+- **Umbrella Trial** — Frequentist and Bayesian analyses across binary, continuous, and survival endpoints. Tests verify Bonferroni/Holm multiplicity adjustment, shared control allocation, biomarker prevalence effects, and per-substudy power. Simulation tests cover frequentist binary, Bayesian, and survival paths.
+- **Platform Trial** — Multi-arm multi-stage with staggered arm entry and three control pooling modes. Tests verify O'Brien-Fleming and Pocock spending boundaries, per-arm power estimates, total N max formula, concurrent/pooled/naive control allocation, and input guards. Simulation tests verify power and FWER control.
+
 ### Bayesian Sequential Cross-Validation
 
 Zhou & Ji (2024) Table 3 provides exact numerical boundary values for two prior configurations (conservative and vague). The cross-validation:
@@ -173,7 +196,7 @@ install.packages(c("gsDesign", "httr", "jsonlite"))
 
 ```bash
 # All Python tests (against local server)
-for f in bayesian/test_*.py gsd/test_*.py cuped/test_*.py ssr/test_*.py; do
+for f in bayesian/test_*.py gsd/test_*.py cuped/test_*.py ssr/test_*.py adaptive/test_*.py master_protocol/test_*.py; do
   python "$f" http://localhost:8000
 done
 
@@ -248,6 +271,11 @@ Endpoints:
 - `POST /bayesian/sequential/survival`
 - `POST /ssr/blinded`
 - `POST /ssr/unblinded`
+- `POST /rar`
+- `POST /minimization`
+- `POST /basket`
+- `POST /umbrella`
+- `POST /platform`
 
 ## Assertion Helpers
 
@@ -307,6 +335,12 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 10. **MONALEESA-7**: Im et al. (2019) NEJM 381:307-316 *Overall Survival with Ribociclib*
 11. **Mehta & Pocock**: Mehta & Pocock (2011) *Adaptive increase in sample size when interim results are promising*
 12. **Bayesian PP**: Spiegelhalter, Abrams & Myles (2004) *Bayesian Approaches to Clinical Trials*
+13. **RAR**: Rosenberger et al. (2001) *Optimal adaptive designs for binary response trials*
+14. **RAR**: Hu & Zhang (2004) *Asymptotic properties of doubly adaptive biased coin designs*
+15. **Basket**: Berry et al. (2013) *Bayesian Hierarchical Models for Basket Trials*
+16. **EXNEX**: Neuenschwander et al. (2016) *Robust exchangeability designs*
+17. **Platform**: Saville & Berry (2016) *Efficiencies of platform clinical trials*
+18. **Master Protocol**: FDA (2022) *Master Protocols: Efficient Clinical Trial Design Strategies*
 
 ## Citation
 

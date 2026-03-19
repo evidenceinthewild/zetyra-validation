@@ -1,0 +1,25 @@
+test,n_per_arm,pass,powers,n_boundary_rows,expected,actual,n_rows,power,power_small,power_large,has_expected_events,has_events_required,arm_a_entry,arm_b_entry,arm_a_max_stages,arm_b_max_stages,arm_b_ctrl_final,per_arm_power,any_arm_power,fwer,fwer_upper_99ci,n_arms_with_dist,has_p_stop_per_stage,early_z,late_z,pocock_range,obf_range,status_code
+1. Freq binary: per_arm returned for 2-arm 3-stage,2.0,True,,,,,,,,,,,,,,,,,,,,,,,,,,
+2. Freq binary: power > 0 for active arms,,True,"[0.9997, 0.9845]",,,,,,,,,,,,,,,,,,,,,,,,,
+3. Freq binary: boundaries per stage,,True,,3.0,,,,,,,,,,,,,,,,,,,,,,,,
+4. Freq binary: total_n_max correct,,True,,,900.0,900.0,,,,,,,,,,,,,,,,,,,,,,
+5. Freq binary: Bonferroni boundary method works,,True,,3.0,,,,,,,,,,,,,,,,,,,,,,,,
+6. Bayesian binary: posterior-based boundary table,,True,,,,,3.0,,,,,,,,,,,,,,,,,,,,,
+7. Bayesian binary sim: strong effect -> high power,,True,,,,,,1.0,,,,,,,,,,,,,,,,,,,,
+8. Freq continuous: endpoint works,,True,"[0.924, 0.9999]",,,,,,,,,,,,,,,,,,,,,,,,,
+9. Freq continuous: larger effect -> higher power,,True,,,,,,,0.924,0.9999,,,,,,,,,,,,,,,,,,
+10. Freq survival: HR < 1 works,2.0,True,,,,,,,,,,,,,,,,,,,,,,,,,,
+11. Freq survival: events info present,,True,,,,,,,,,True,True,,,,,,,,,,,,,,,,
+12. Staggered: entry_stage > 1 handled,,True,,,,,,,,,,,1.0,3.0,,,,,,,,,,,,,,
+13. Staggered: late arm fewer stages,,True,,,,,,,,,,,,,4.0,2.0,,,,,,,,,,,,
+14. concurrent_only: limited control,,True,,,,,,,,,,,,,,,200.0,,,,,,,,,,,
+15. pooled_adjusted: more control data,,True,,,,,,,,,,,,,,,300.0,,,,,,,,,,,
+16. pooled_naive: most control data,,True,,,,,,,,,,,,,,,400.0,,,,,,,,,,,
+17. Sim binary: power > 0 for active arms,,True,,,,,,,,,,,,,,,,"[1.0, 0.9965]",1.0,,,,,,,,,
+18. Sim binary: type I error <= 0.10,,True,,,,,,,,,,,,,,,,,,0.0225,0.0325,,,,,,,
+19. Sim binary: stopping distribution returned,,True,,,,,,,,,,,,,,,,,,,,2.0,True,,,,,
+20. OBF spending: early stricter than late,,True,,,,,,,,,,,,,,,,,,,,,,4.1708,2.316,,,
+21. Pocock spending: more uniform than OBF,,True,,,,,,,,,,,,,,,,,,,,,,,,0.2198,1.8548,
+22. Guard: n_stages < 2 rejected,,True,,,,,,,,,,,,,,,,,,,,,,,,,,400.0
+23. Guard: n_per_stage < 1 rejected,,True,,,,,,,,,,,,,,,,,,,,,,,,,,400.0
+24. Guard: empty arms list rejected,,True,,,,,,,,,,,,,,,,,,,,,,,,,,400.0

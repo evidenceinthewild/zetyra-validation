@@ -125,6 +125,50 @@ class ZetyraClient:
         """Bayesian survival — return raw Response for error testing."""
         return self._post_raw("/bayesian/survival", kwargs)
 
+    # ─── Adaptive Randomization ───────────────────────────────────────
+
+    def rar(self, **kwargs) -> dict:
+        """Calculate response-adaptive randomization."""
+        return self._post("/rar", kwargs)
+
+    def rar_raw(self, **kwargs):
+        """RAR — return raw Response for error testing."""
+        return self._post_raw("/rar", kwargs)
+
+    def minimization(self, **kwargs) -> dict:
+        """Calculate Pocock-Simon minimization."""
+        return self._post("/minimization", kwargs)
+
+    def minimization_raw(self, **kwargs):
+        """Minimization — return raw Response for error testing."""
+        return self._post_raw("/minimization", kwargs)
+
+    # ─── Master Protocol ──────────────────────────────────────────────
+
+    def basket(self, **kwargs) -> dict:
+        """Calculate basket trial design."""
+        return self._post("/basket", kwargs)
+
+    def basket_raw(self, **kwargs):
+        """Basket — return raw Response for error testing."""
+        return self._post_raw("/basket", kwargs)
+
+    def umbrella(self, **kwargs) -> dict:
+        """Calculate umbrella trial design."""
+        return self._post("/umbrella", kwargs)
+
+    def umbrella_raw(self, **kwargs):
+        """Umbrella — return raw Response for error testing."""
+        return self._post_raw("/umbrella", kwargs)
+
+    def platform(self, **kwargs) -> dict:
+        """Calculate platform trial design."""
+        return self._post("/platform", kwargs)
+
+    def platform_raw(self, **kwargs):
+        """Platform — return raw Response for error testing."""
+        return self._post_raw("/platform", kwargs)
+
 
 def get_client(base_url: str = None) -> ZetyraClient:
     """Get a configured Zetyra client."""

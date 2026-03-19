@@ -1,0 +1,22 @@
+test,n_substudies,pass,p_value,adjusted_alpha,expected,n_control,n_treatments_sum,total_allocated,total_n,events_required,posterior_prob,per_sub_power,fwer,upper_bound_99,avg_power,actual_frac,n_trt,adjusted_alphas,n_unique,status_code
+Freq binary: 3-substudy basic structure,3.0,True,,,,,,,,,,,,,,,,,,
+Freq binary: active substudy has p_value < 1,,True,0.001186,,,,,,,,,,,,,,,,,
+Freq binary: Bonferroni adjusted_alpha = alpha/3,,True,,0.008333,0.008333,,,,,,,,,,,,,,,
+Freq binary: no multiplicity -> raw alpha,,True,,,,,,,,,,,,,,,,,,
+Freq binary: control + treatments = total_n,,True,,,,99.0,201.0,300.0,300.0,,,,,,,,,,,
+Freq continuous: 3-substudy structure,3.0,True,,,,,,,,,,,,,,,,,,
+Freq continuous: large effect -> small p-value,,True,0.000423,,,,,,,,,,,,,,,,,
+Freq survival: events_required present,,True,,,,,,,,161.0,,,,,,,,,,
+Freq survival: HR<1 yields p_value < 1,,True,0.0,,,,,,,,,,,,,,,,,
+Bayesian binary: posterior_prob per substudy,,True,,,,,,,,,,,,,,,,,,
+Bayesian binary: strong effect -> high posterior,,True,,,,,,,,,1.0,,,,,,,,,
+Bayesian binary: null scenario -> low posterior,,True,,,,,,,,,0.4637,,,,,,,,,
+Sim freq binary: power > 0 for active substudies,,True,,,,,,,,,,"[0.998, 0.976, 0.745]",,,,,,,,
+Sim freq binary: type I error (FWER) <= 0.10,,True,,,,,,,,,,,0.0275,0.0384,,,,,,
+Sim Bayesian binary: simulation runs,,True,,,,,,,,,,,,,0.8992,,,,,
+Sim survival: simulation runs and returns estimates,,True,,,,,,,,,,,,,0.1315,,,,,
+Structural: control_allocation=0.33 -> ~33% to control,,True,,,,99.0,,,,,,,,,,0.33,,,,
+"Structural: prevalence [0.6,0.2,0.2] -> arm 1 largest",,True,,,,,,,,,,,,,,,"[121, 40, 40]",,,
+Structural: Holm produces different thresholds,,True,,,,,,,,,,,,,,,,"[0.008333, 0.0125, 0.025]",3.0,
+Guard: n_substudies < 2 rejected,,True,,,,,,,,,,,,,,,,,,400.0
+Guard: mismatched array lengths rejected,,True,,,,,,,,,,,,,,,,,,400.0

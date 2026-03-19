@@ -1,0 +1,18 @@
+test,has_analytical,pass,factor_keys,names,n_arms,imbalance_function,weights,min_imbalance,pure_imbalance,imbalance_p90,imbalance_p60,factors_found,n_arm_keys,status_code,det_imbalance,half_imbalance,ratio,n_factors_2,n_factors_3,n_imbalance_keys_3f
+Analytical: two-arm 2-factor returns analytical_results,True,True,,,,,,,,,,,,,,,,,,
+Analytical: pure_random_expected_imbalance per factor,,True,"['factor_0', 'factor_1']",,,,,,,,,,,,,,,,,
+Analytical: factor_summary has correct names,,True,,"['Age group', 'Sex']",,,,,,,,,,,,,,,,
+Analytical: three-arm returns n_arms=3,,True,,,3.0,,,,,,,,,,,,,,,
+Analytical: variance imbalance_function echoed,,True,,,,variance,,,,,,,,,,,,,,
+Analytical: different factor weights accepted,,True,,,,,"[2.0, 0.5]",,,,,,,,,,,,,
+Simulation: minimization < pure random imbalance,,True,,,,,,1.255,7.795,,,,,,,,,,,
+Simulation: p=0.90 lower imbalance than p=0.60,,True,,,,,,,,0.706,3.34,,,,,,,,,
+Simulation: per-factor imbalance data present,,True,,,,,,,,,,"['Age group', 'Sex']",,,,,,,,
+Simulation: three-arm works (3 arm counts),,True,,,,,,,,,,,3.0,,,,,,,
+Guard: factor with 1 level rejected,,True,,,,,,,,,,,,400.0,,,,,,
+Guard: prevalences not summing to 1.0 rejected,,True,,,,,,,,,,,,400.0,,,,,,
+Guard: >10 factors rejected,,True,,,,,,,,,,,,400.0,,,,,,
+Guard: invalid imbalance_function rejected,,True,,,,,,,,,,,,400.0,,,,,,
+Structural: p=1.0 deterministic -> very low imbalance,,True,,,,,,,7.994,,,,,,0.528,,,,,
+Structural: p=0.5 approaches random (ratio near 1),,True,,,,,,,7.796,,,,,,,7.759,0.995,,,
+Structural: more factors -> more imbalance entries,,True,,,,,,,,,,,,,,,,2.0,3.0,3.0
