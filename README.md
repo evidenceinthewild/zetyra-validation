@@ -13,36 +13,36 @@ Independent validation of Zetyra statistical calculators against reference imple
 
 | Calculator | Tests | Status | Reference |
 |------------|-------|--------|-----------|
-| GSD | 30 | ✅ Pass | gsDesign R package |
-| GSD PACIFIC OS | 17 | ✅ Pass | Antonia et al. (2018) NEJM, Lan-DeMets OBF |
-| GSD MONALEESA-7 OS | 20 | ✅ Pass | Im et al. (2019) NEJM, Lan-DeMets OBF |
-| GSD Survival/TTE | 15 | ✅ Pass | Schoenfeld (1983), gsDesign |
-| GSD Survival gsDesign Benchmark | 36 | ✅ Pass | gsDesign R package (boundaries, alpha spending) |
-| CUPED | 12 | ✅ Pass | Analytical formulas |
-| CUPED Simulation Benchmark | 43 | ✅ Pass | MC simulation, Deng et al. (2013) |
-| Bayesian Predictive Power | 17 | ✅ Pass | Conjugate priors |
-| Bayesian Survival | 21 | ✅ Pass | Normal-Normal conjugate on log(HR) |
-| Bayesian Survival Benchmark | 25 | ✅ Pass | Conjugate oracle, MC PP cross-validation |
-| Prior Elicitation | 22 | ✅ Pass | ESS formula, scipy.optimize |
-| Bayesian Borrowing | 18 | ✅ Pass | Power prior, Cochran's Q |
-| Bayesian Sample Size | 26 | ✅ Pass | Binomial CI, MC search (binary + continuous) |
-| Bayesian Two-Arm | 24 | ✅ Pass | Binomial CI, MC search (binary + continuous) |
-| Bayesian Sequential | 20 | ✅ Pass | Zhou & Ji (2024) |
-| Bayesian Sequential Table 3 | 27 | ✅ Pass | Zhou & Ji (2024) Table 3 + companion R code |
-| Bayesian Sequential Survival | 24 | ✅ Pass | Zhou & Ji (2024) + Schoenfeld |
-| Bayesian Sequential Survival Benchmark | 24 | ✅ Pass | Zhou & Ji formula + Type I error + convergence |
-| SSR Blinded | 20 | ✅ Pass | Conditional power formulas |
-| SSR Unblinded | 21 | ✅ Pass | Zone classification, CP thresholds |
-| SSR gsDesign Benchmark | 14 | ✅ Pass | gsDesign R package, reference formulas |
-| RAR (Adaptive Randomization) | 20 | ✅ Pass | Rosenberger optimal, DBCD, Thompson, Neyman |
-| Minimization (Pocock-Simon) | 17 | ✅ Pass | Imbalance reduction, pure random benchmark |
-| Basket Trial | 21 | ✅ Pass | Independent, BHM, EXNEX; Beta-Binomial conjugate |
-| Umbrella Trial | 21 | ✅ Pass | Frequentist/Bayesian; binary, continuous, survival |
-| Platform Trial (MAMS) | 24 | ✅ Pass | Boundaries, staggered entry, control modes |
-| I-SPY 2 Replication | 10 | ✅ Pass | Barker et al. (2009), published pCR rates |
-| STAMPEDE Replication | 9 | ✅ Pass | Sydes et al. (2012), MAMS boundaries, OS/FFS |
-| REMAP-CAP Replication | 8 | ✅ Pass | Angus et al. (2020), Bayesian platform |
-| Offline References | 23 | ✅ Pass | Pure math (no API) |
+| GSD | 30 | ✅&nbsp;Pass | gsDesign R package |
+| GSD PACIFIC OS | 17 | ✅&nbsp;Pass | Antonia et al. (2018) NEJM, Lan-DeMets OBF |
+| GSD MONALEESA-7 OS | 20 | ✅&nbsp;Pass | Im et al. (2019) NEJM, Lan-DeMets OBF |
+| GSD Survival/TTE | 15 | ✅&nbsp;Pass | Schoenfeld (1983), gsDesign |
+| GSD Survival gsDesign Benchmark | 36 | ✅&nbsp;Pass | gsDesign R package (boundaries, alpha spending) |
+| CUPED | 12 | ✅&nbsp;Pass | Analytical formulas |
+| CUPED Simulation Benchmark | 43 | ✅&nbsp;Pass | MC simulation, Deng et al. (2013) |
+| Bayesian Predictive Power | 17 | ✅&nbsp;Pass | Conjugate priors |
+| Bayesian Survival | 21 | ✅&nbsp;Pass | Normal-Normal conjugate on log(HR) |
+| Bayesian Survival Benchmark | 25 | ✅&nbsp;Pass | Conjugate oracle, MC PP cross-validation |
+| Prior Elicitation | 22 | ✅&nbsp;Pass | ESS formula, scipy.optimize |
+| Bayesian Borrowing | 18 | ✅&nbsp;Pass | Power prior, Cochran's Q |
+| Bayesian Sample Size | 26 | ✅&nbsp;Pass | Binomial CI, MC search (binary + continuous) |
+| Bayesian Two-Arm | 24 | ✅&nbsp;Pass | Binomial CI, MC search (binary + continuous) |
+| Bayesian Sequential | 20 | ✅&nbsp;Pass | Zhou & Ji (2024) |
+| Bayesian Sequential Table 3 | 27 | ✅&nbsp;Pass | Zhou & Ji (2024) Table 3 + companion R code |
+| Bayesian Sequential Survival | 24 | ✅&nbsp;Pass | Zhou & Ji (2024) + Schoenfeld |
+| Bayesian Sequential Survival Benchmark | 24 | ✅&nbsp;Pass | Zhou & Ji formula + Type I error + convergence |
+| SSR Blinded | 20 | ✅&nbsp;Pass | Conditional power formulas |
+| SSR Unblinded | 21 | ✅&nbsp;Pass | Zone classification, CP thresholds |
+| SSR gsDesign Benchmark | 14 | ✅&nbsp;Pass | gsDesign R package, reference formulas |
+| RAR (Adaptive Randomization) | 20 | ✅&nbsp;Pass | Rosenberger optimal, DBCD, Thompson, Neyman |
+| Minimization (Pocock-Simon) | 17 | ✅&nbsp;Pass | Imbalance reduction, pure random benchmark |
+| Basket Trial | 21 | ✅&nbsp;Pass | Independent, BHM, EXNEX; Beta-Binomial conjugate |
+| Umbrella Trial | 21 | ✅&nbsp;Pass | Frequentist/Bayesian; binary, continuous, survival |
+| Platform Trial (MAMS) | 24 | ✅&nbsp;Pass | Boundaries, staggered entry, control modes |
+| I-SPY 2 Replication | 10 | ✅&nbsp;Pass | Barker et al. (2009), published pCR rates |
+| STAMPEDE Replication | 9 | ✅&nbsp;Pass | Sydes et al. (2012), MAMS boundaries, OS/FFS |
+| REMAP-CAP Replication | 8 | ✅&nbsp;Pass | Angus et al. (2020), Bayesian platform |
+| Offline References | 23 | ✅&nbsp;Pass | Pure math (no API) |
 
 **Total: 629 tests across 33 scripts, all passing.**
 
