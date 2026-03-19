@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18879839.svg)](https://doi.org/10.5281/zenodo.18879839)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18880066.svg)](https://doi.org/10.5281/zenodo.18880066)
-![Tests](https://img.shields.io/badge/tests-602%20passed-success)
+![Tests](https://img.shields.io/badge/tests-629%20passed-success)
 ![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20RAR%20%7C%20Master%20Protocol-blue)
 ![Accuracy](https://img.shields.io/badge/max%20deviation-0.034%20z--score-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -39,9 +39,12 @@ Independent validation of Zetyra statistical calculators against reference imple
 | Basket Trial | 21 | ✅ Pass | Independent, BHM, EXNEX; Beta-Binomial conjugate |
 | Umbrella Trial | 21 | ✅ Pass | Frequentist/Bayesian; binary, continuous, survival |
 | Platform Trial (MAMS) | 24 | ✅ Pass | Boundaries, staggered entry, control modes |
+| I-SPY 2 Replication | 10 | ✅ Pass | Barker et al. (2009), published pCR rates |
+| STAMPEDE Replication | 9 | ✅ Pass | Sydes et al. (2012), MAMS boundaries, OS/FFS |
+| REMAP-CAP Replication | 8 | ✅ Pass | Angus et al. (2020), Bayesian platform |
 | Offline References | 23 | ✅ Pass | Pure math (no API) |
 
-**Total: 602 tests across 30 scripts, all passing.**
+**Total: 629 tests across 33 scripts, all passing.**
 
 ## Repository Structure
 
@@ -92,7 +95,10 @@ zetyra-validation/
 └── master_protocol/                     # Master protocol designs
     ├── test_basket.py                   # Basket trial: independent, BHM, EXNEX
     ├── test_umbrella.py                 # Umbrella trial: frequentist/Bayesian × 3 endpoints
-    └── test_platform.py                 # Platform trial: MAMS, staggered entry, control modes
+    ├── test_platform.py                 # Platform trial: MAMS, staggered entry, control modes
+    ├── test_ispy2.py                    # I-SPY 2 replication (basket, pCR, Bayesian)
+    ├── test_stampede.py                 # STAMPEDE replication (platform, MAMS, survival)
+    └── test_remapcap.py                 # REMAP-CAP replication (platform, Bayesian, binary)
 ```
 
 ## What's Validated
@@ -162,6 +168,14 @@ Three calculators now support time-to-event outcomes via the Schoenfeld variance
 - **Basket Trial** — Independent, BHM (Berry et al. 2013), and EXNEX (Neuenschwander et al. 2016) analyses. Analytical tests verify Beta-Binomial conjugate posterior mean ((1+s)/(2+n)), BHM shrinkage property (posteriors between independent estimate and grand mean), and EXNEX convergence to BHM/independent at extreme weights. Simulation tests verify per-basket power, type I error, and FWER reporting.
 - **Umbrella Trial** — Frequentist and Bayesian analyses across binary, continuous, and survival endpoints. Tests verify Bonferroni/Holm multiplicity adjustment, shared control allocation, biomarker prevalence effects, and per-substudy power. Simulation tests cover frequentist binary, Bayesian, and survival paths.
 - **Platform Trial** — Multi-arm multi-stage with staggered arm entry and three control pooling modes. Tests verify O'Brien-Fleming and Pocock spending boundaries, per-arm power estimates, total N max formula, concurrent/pooled/naive control allocation, and input guards. Simulation tests verify power and FWER control.
+
+### Real-World Adaptive Trial Replications (v2.0)
+
+Three landmark adaptive trials are replicated against Zetyra's master protocol calculators:
+
+- **I-SPY 2** (breast cancer, Barker et al. 2009) — Bayesian basket trial with pCR endpoint across biomarker-defined signatures. Validates graduation decisions for veliparib (TNBC), pembrolizumab (TNBC, HR+/HER2-), and neratinib (HER2+/HR-) using published pCR rates. Beta-Binomial conjugate posterior verified against scipy reference values.
+- **STAMPEDE** (prostate cancer, Sydes et al. 2012) — MAMS platform trial with 5 arms, 4 stages, and survival endpoints. Validates boundary structure (OBF spending), power estimates for docetaxel-like effects (HR=0.78), futility detection for celecoxib-like null effects (HR=0.98), and total sample size calculations. Simulation confirms early stopping behavior.
+- **REMAP-CAP** (COVID-19, Angus et al. 2020) — Bayesian adaptive platform with 99% posterior probability thresholds. Validates tocilizumab superiority detection (mortality 28.0% vs 35.8%), lopinavir futility (null effect), multi-domain structure, staggered arm entry, and concurrent control handling. Simulation confirms strong effect detection.
 
 ### Bayesian Sequential Cross-Validation
 
@@ -341,6 +355,9 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 16. **EXNEX**: Neuenschwander et al. (2016) *Robust exchangeability designs*
 17. **Platform**: Saville & Berry (2016) *Efficiencies of platform clinical trials*
 18. **Master Protocol**: FDA (2022) *Master Protocols: Efficient Clinical Trial Design Strategies*
+19. **I-SPY 2**: Barker et al. (2009) *I-SPY 2: An Adaptive Breast Cancer Trial Design*
+20. **STAMPEDE**: Sydes et al. (2012) *Flexible trial design in practice — stopping arms for lack-of-benefit*
+21. **REMAP-CAP**: Angus et al. (2020) *Effect of Hydrocortisone on Mortality and Organ Support* JAMA
 
 ## Citation
 

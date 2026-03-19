@@ -1,0 +1,13 @@
+test,posterior_prob,decision,pass,n_baskets,per_basket_len,decisions,n_go_at_090,n_go_at_099,probs,n_go,expected_mean,api_mean,expected_exceedance,api_exceedance
+Veliparib TNBC graduation: posterior_prob > 0.95,1.0,go,True,,,,,,,,,,,
+Veliparib non-TNBC futility: no-go decision,0.6488,no-go,True,,,,,,,,,,,
+Pembrolizumab TNBC graduation: posterior_prob > 0.95,1.0,go,True,,,,,,,,,,,
+Pembrolizumab HR+/HER2- graduation: posterior_prob > 0.95,1.0,go,True,,,,,,,,,,,
+Neratinib HER2+/HR- graduation: posterior_prob > 0.95,1.0,go,True,,,,,,,,,,,
+Multi-basket: 4 baskets returned,,,True,4.0,4.0,,,,,,,,,
+"Multi-basket: active go, null no-go",,,True,,,"['go', 'go', 'go', 'no-go']",,,,,,,,
+Threshold sensitivity: 0.99 vs 0.90 fewer go,,,True,,,,4.0,4.0,,,,,,
+Large N: all I-SPY 2 active baskets -> go,,,True,,,,,,"[1.0, 1.0, 1.0, 1.0]",4.0,,,,
+Null scenario: no effect -> no go decisions,,,True,,,"['no-go', 'no-go', 'no-go', 'no-go']",,,,0.0,,,,
+Beta-Binomial: Veliparib TNBC posterior mean,,,True,,,,,,,,0.5135,0.5135,,
+Beta-Binomial: Veliparib TNBC exceedance vs scipy,,,True,,,,,,,,,,1.0,1.0

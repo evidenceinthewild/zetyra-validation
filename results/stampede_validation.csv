@@ -1,0 +1,10 @@
+test,n_per_arm,n_boundary_rows,pass,efficacy_z,powers,expected_events,per_arm_power,p_efficacy,expected,actual,control_type,n_arms,entry_stages,max_stages,n_boundaries,total_n_max,sim_power,analytical_power
+"1. Design structure: 5 arms, 4 stages returned",5.0,4.0,True,,,,,,,,,,,,,,,
+2. Boundary monotonicity: efficacy_z decreases (OBF),,,True,"[5.493, 3.8014, 3.057, 2.6685]",,,,,,,,,,,,,,
+3. Power for HR=0.75: substantial power or events,,,True,,"[None, None, None, None, None]","[1181.2, 1181.2, 1181.2, 1181.2, 1181.2]",,,,,,,,,,,,
+4. Futility detection: HR=0.98 rarely declares efficacy,,,True,,,,[0.034],0.034,,,,,,,,,,
+5. Total N max: (5+1) * 4 * n_per_stage,,,True,,,,,,4800.0,4800.0,,,,,,,,
+6. Concurrent control: concurrent_only with 5 arms,,,True,,,,,,,,concurrent_only,5.0,,,,,,
+"7. All arms entry_stage=1, max_stages=4",,,True,,,,,,,,,,"[1, 1, 1, 1, 1]","[4, 4, 4, 4, 4]",,,,
+8. Control allocation: equal-alloc design reasonable output,,,True,,,,,,,,,5.0,,,4.0,4800.0,,
+9. Docetaxel reference: simulated power > 0.40,,,True,,,1475.8,,,,,,,,,,,0.91,

@@ -1,0 +1,9 @@
+test,power_estimate,effect_delta,pass,toci_power,sari_power,lopi_power,total_n_max,expected_max,power,power_99pct,power_95pct,n_boundary_rows,n_per_arm,il6_entry,anticoag_entry,il6_max_stages,anticoag_max_stages,sim_power,n_simulations
+1. Tocilizumab superiority: power > 0 with 99% threshold,0.7089,0.078,True,,,,,,,,,,,,,,,,
+2. Lopinavir futility: power < 0.20 with negligible effect,0.0357,0.005,True,,,,,,,,,,,,,,,,
+3. Multi-domain: 3 arms with different powers,,,True,0.7089,0.5869,0.0357,,,,,,,,,,,,,
+4. Sample size: ~360/arm produces meaningful power,,,True,,,,720.0,720.0,0.6123,,,,,,,,,,
+5. Threshold effect: 99% threshold <= 95% threshold power,,,True,,,,,,,0.4284,0.4284,,,,,,,,
+6. Concurrent control: Bayesian boundaries + 2 arms returned,,,True,,,,,,,,,3.0,2.0,,,,,,
+7. Staggered entry: late domain has fewer stages,,,True,,,,,,,,,,,1.0,2.0,4.0,3.0,,
+8. Strong effect simulation: tocilizumab power > 0.50,,,True,,,,,,,,,,,,,,,0.652,500.0
