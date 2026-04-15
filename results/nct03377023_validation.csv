@@ -1,0 +1,14 @@
+suite,test,published,simulated,delta_pp,tolerance_pp,pass,detail,zetyra,scipy_ref,delta,threshold
+1. Arm A (ICI-naive) — design replication vs published OCs,Arm A (ICI-naive): simulated power vs published,0.85,0.742,-0.108,0.15,True,,,,,
+1. Arm A (ICI-naive) — design replication vs published OCs,Arm A (ICI-naive): simulated Type I vs published,0.06,0.057,-0.003,0.1,True,,,,,
+1. Arm A (ICI-naive) — design replication vs published OCs,Arm A (ICI-naive): P(early stop | H0) vs published,0.61,0.767,0.157,0.25,True,,,,,
+2. Arm B (ICI-treated) — design replication vs published OCs,Arm B (ICI-treated): simulated power vs published,0.81,0.827,0.017,0.15,True,,,,,
+2. Arm B (ICI-treated) — design replication vs published OCs,Arm B (ICI-treated): simulated Type I vs published,0.05,0.126,0.076,0.1,True,,,,,
+2. Arm B (ICI-treated) — design replication vs published OCs,Arm B (ICI-treated): P(early stop | H0) vs published,0.59,0.592,0.002,0.25,True,,,,,
+3. Arm B — interim decision (continued to stage 2 with ≥2 responders),(A) Arm B: Zetyra posterior formula matches scipy ref,,,,,True,r_planning=4/20,0.9867,0.9867,,
+3. Arm B — interim decision (continued to stage 2 with ≥2 responders),(B) Arm B SAP rule at r1=2: PPoS > 0.20 → continue (trial's decision),,,,,True,PPoS vs d_futility=0.20,,0.3073,,
+3. Arm B — interim decision (continued to stage 2 with ≥2 responders),(C) Arm B SAP rule at r1=1: PPoS ≤ 0.20 → stop (SAP boundary),,,,,True,PPoS vs d_futility=0.20,,0.081,,
+"4. Arm B — final decision (6/28 evaluable, 21.4% ORR)","(A) Arm B final: Zetyra posterior formula matches scipy (6/28, p0=0.07)",,,,,True,,0.9967,0.9967,5e-05,
+"4. Arm B — final decision (6/28 evaluable, 21.4% ORR)",(B) Arm B final: posterior crosses 0.95 threshold (trial success),,,,,True,,,0.9967,,0.95
+"5. Arm A — final decision (9/22 evaluable, 40.9% ORR)","(A) Arm A final: Zetyra posterior formula matches scipy (9/22, p0=0.30)",,,,,True,,0.8799,0.8799,5e-05,
+"5. Arm A — final decision (9/22 evaluable, 40.9% ORR)",(B) Arm A final: under-enrolled → posterior BELOW 0.95 threshold,,,,,True,,,0.8799,,0.95

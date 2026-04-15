@@ -161,6 +161,14 @@ class ZetyraClient:
         """Umbrella — return raw Response for error testing."""
         return self._post_raw("/umbrella", kwargs)
 
+    def ssr_single_arm(self, **kwargs) -> dict:
+        """Calculate single-arm SSR (Bayesian or conditional power)."""
+        return self._post("/ssr-single-arm", kwargs, allow_errors=kwargs.pop("allow_errors", False))
+
+    def ssr_single_arm_raw(self, **kwargs):
+        """Single-arm SSR — return raw Response for error testing."""
+        return self._post_raw("/ssr-single-arm", kwargs)
+
     def platform(self, **kwargs) -> dict:
         """Calculate platform trial design."""
         return self._post("/platform", kwargs)

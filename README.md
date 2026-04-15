@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18879839.svg)](https://doi.org/10.5281/zenodo.18879839)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18880066.svg)](https://doi.org/10.5281/zenodo.18880066)
-![Tests](https://img.shields.io/badge/tests-629%20passed-success)
+![Tests](https://img.shields.io/badge/tests-655%20passed-success)
 ![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20RAR%20%7C%20Master%20Protocol-blue)
 ![Accuracy](https://img.shields.io/badge/max%20deviation-0.034%20z--score-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -33,6 +33,8 @@ Independent validation of Zetyra statistical calculators against reference imple
 | Bayesian Sequential Survival Benchmark | 24 | ✅&nbsp;Pass | Zhou & Ji formula + Type I error + convergence |
 | SSR Blinded | 20 | ✅&nbsp;Pass | Conditional power formulas |
 | SSR Unblinded | 21 | ✅&nbsp;Pass | Zone classification, CP thresholds |
+| SSR Single-Arm (Phase II ORR) | 13 | ✅&nbsp;Pass | Beta-Binomial conjugate, Lee & Liu (2008), Saville et al. (2014) |
+| NCT03377023 Replication (Nivo+Ipi+Nintedanib NSCLC) | 13 | ✅&nbsp;Pass | Real Bayesian Phase II with published interim+final outcomes |
 | SSR gsDesign Benchmark | 14 | ✅&nbsp;Pass | gsDesign R package, reference formulas |
 | RAR (Adaptive Randomization) | 20 | ✅&nbsp;Pass | Rosenberger optimal, DBCD, Thompson, Neyman |
 | Minimization (Pocock-Simon) | 17 | ✅&nbsp;Pass | Imbalance reduction, pure random benchmark |
@@ -44,7 +46,7 @@ Independent validation of Zetyra statistical calculators against reference imple
 | REMAP-CAP Replication | 8 | ✅&nbsp;Pass | Angus et al. (2020), Bayesian platform |
 | Offline References | 23 | ✅&nbsp;Pass | Pure math (no API) |
 
-**Total: 629 tests across 33 scripts, all passing.**
+**Total: 655 tests across 35 scripts, all passing.**
 
 ## Repository Structure
 
@@ -86,9 +88,11 @@ zetyra-validation/
 │   ├── test_offline_references.py       # Pure-math tests (no API)
 │   └── results/
 ├── ssr/
-│   ├── test_ssr_blinded.py              # Blinded sample size re-estimation
-│   ├── test_ssr_unblinded.py            # Unblinded SSR with zone classification
-│   └── test_ssr_rpact_benchmark.R       # SSR cross-validation against gsDesign
+│   ├── test_ssr_blinded.py                       # Blinded sample size re-estimation
+│   ├── test_ssr_unblinded.py                     # Unblinded SSR with zone classification
+│   ├── test_ssr_single_arm.py                    # Single-Arm Phase II ORR (Bayesian + CP)
+│   ├── test_nct03377023.py                       # NCT03377023 end-to-end (Nivo+Ipi+Nintedanib NSCLC)
+│   └── test_ssr_rpact_benchmark.R                # SSR cross-validation against gsDesign
 ├── adaptive/                            # Adaptive randomization
 │   ├── test_rar.py                      # RAR: DBCD, Thompson, Neyman (binary, continuous, survival)
 │   └── test_minimization.py             # Pocock-Simon covariate-adaptive minimization
@@ -125,13 +129,14 @@ Each of the 6 Bayesian calculators has a dedicated test suite covering:
 
 ### Real-World Trial Replications
 
-Five published clinical trials are replicated against Zetyra's calculators:
+Six published clinical trials are replicated against Zetyra's calculators:
 
 - **HPTN 083** (HIV prevention) — 4-look O'Brien-Fleming GSD, z-score boundaries matched to gsDesign within 0.005
 - **HeartMate II** (LVAD) — 3-look OBF with unequal info fractions, structural properties verified
 - **PACIFIC** (durvalumab, Stage III NSCLC OS) — 3-look Lan-DeMets OBF survival GSD, reference z-scores matched within 0.022 (looks 1–2: 0.000, look 3: 0.022); trial crossing at 299 events verified
 - **MONALEESA-7** (ribociclib, HR+ breast cancer OS) — 3-look Lan-DeMets OBF survival GSD, reference z-scores matched within 0.006 (looks 1–2: 0.000, look 3: 0.006); crossing at look 2 (p=0.00973) verified
 - **REBYOTA / PUNCH CD2+CD3** (*C. difficile*) — Bayesian borrowing, prior elicitation, two-arm sample size with real Phase 2b/3 data
+- **NCT03377023** (nivolumab + ipilimumab + nintedanib in NSCLC, Moffitt Cancer Center; Chen et al. 2019, JTO 2021, JCO 2023) — Bayesian two-stage Phase II design with predictive-probability futility monitoring. End-to-end replication includes both arms' published OCs (power, Type I, P(early stop)) and **direct assertions of the SAP's actual decision rules**: (1) Arm B (ICI-treated) interim rule at r₁=2/20: `PPoS(r=2) = 0.307 > d_futility = 0.20` → continue (matches trial's published decision); rule at the SAP's stopping boundary r₁=1: `PPoS(r=1) = 0.081 ≤ 0.20` → stop (matches SAP's "≤1 responder stop" boundary). (2) Arm B final 6/28 evaluable → posterior 0.997 → crosses the SAP's 0.95 success threshold (matches trial's positive result). (3) Arm A (ICI-naïve) final 9/22 evaluable → posterior 0.880 → below the 0.95 threshold (Arm A enrolled only 22/40 planned, so even at 40.9% ORR the truncated sample doesn't reach the formal Bayesian success criterion — a real finding the design rule surfaces). Calculator-correctness checks also verify Zetyra's posterior formula matches scipy reference to 4 decimals at both the planning assumption and the actual interim/final counts.
 
 ### CUPED Simulation Benchmark
 
@@ -156,6 +161,7 @@ Three calculators now support time-to-event outcomes via the Schoenfeld variance
 
 - **Blinded SSR** — variance/rate re-estimation at interim with conditional power, supports continuous, binary, and survival endpoints
 - **Unblinded SSR** — four-zone classification (futility, unfavorable, promising, favorable) based on conditional power thresholds, with sample size inflation caps
+- **Single-Arm SSR (Phase II oncology ORR)** — Bayesian (posterior + predictive-probability) and frequentist (conditional-power promising-zone) interim decision rules against a fixed historical control rate. 13 suites cover analytical posterior matching `1 − F_Beta(p₀; α+r, β+n−r)`, initial N from the one-sample binomial normal approximation, four-zone CP classification, N_max cap enforcement, seed reproducibility (bit-identical OC tables across 9 numeric columns), Type I error calibration with Clopper-Pearson upper bounds, power monotonicity, the **γ_efficacy / γ_final decoupling regression** (raising γ_efficacy 0.95→0.99 with γ_final pinned at 0.975 reduces interim early stops without collapsing final-look success), input guards (4xx for invalid p₁≤p₀ / α=0 / γ_final out of range / prior_α≤0), required schema fields in both modes, the Bayesian SAP early-stop clause regression, the **`pp_promising_upper` regression** (raising the promising-zone upper bound does not shrink N_p90), and the **N-floor regression** (every Bayesian non-stop sensitivity row has `recalculated_n ≥ initial_n`).
 - **gsDesign cross-validation** — sample size formulas, conditional power, zone classification, and binary rate re-estimation verified against reference formulas and gsDesign R package
 
 ### Adaptive Randomization (v2.0)
@@ -163,13 +169,13 @@ Three calculators now support time-to-event outcomes via the Schoenfeld variance
 - **RAR** — Response-adaptive randomization with DBCD, Thompson sampling, and Neyman allocation. Analytical tests verify Rosenberger optimal allocation formula (√p / Σ√p), Neyman allocation (proportional to √(p(1-p))), and allocation sum invariants. Simulation tests verify power > 0 under H1, type I error controlled, arm sample size distributions, and allocation trajectories. Reference checks match closed-form Rosenberger values within machine precision. Binary, continuous, and survival endpoints covered.
 - **Minimization** — Pocock-Simon covariate-adaptive minimization. Analytical tests verify pure random imbalance benchmarks. Simulation tests verify minimization reduces imbalance vs pure random, higher p_randomization → lower imbalance, and deterministic assignment (p=1.0) achieves very low imbalance. Input guards for factor levels, prevalences, and imbalance function validated.
 
-### Master Protocol (v2.0)
+### Master Protocol (v2.1)
 
 - **Basket Trial** — Independent, BHM (Berry et al. 2013), and EXNEX (Neuenschwander et al. 2016) analyses. Analytical tests verify Beta-Binomial conjugate posterior mean ((1+s)/(2+n)), BHM shrinkage property (posteriors between independent estimate and grand mean), and EXNEX convergence to BHM/independent at extreme weights. Simulation tests verify per-basket power, type I error, and FWER reporting.
 - **Umbrella Trial** — Frequentist and Bayesian analyses across binary, continuous, and survival endpoints. Tests verify Bonferroni/Holm multiplicity adjustment, shared control allocation, biomarker prevalence effects, and per-substudy power. Simulation tests cover frequentist binary, Bayesian, and survival paths.
 - **Platform Trial** — Multi-arm multi-stage with staggered arm entry and three control pooling modes. Tests verify O'Brien-Fleming and Pocock spending boundaries, per-arm power estimates, total N max formula, concurrent/pooled/naive control allocation, and input guards. Simulation tests verify power and FWER control.
 
-### Real-World Adaptive Trial Replications (v2.0)
+### Real-World Adaptive Trial Replications (v2.2)
 
 Three landmark adaptive trials are replicated against Zetyra's master protocol calculators:
 
@@ -285,6 +291,7 @@ Endpoints:
 - `POST /bayesian/sequential/survival`
 - `POST /ssr/blinded`
 - `POST /ssr/unblinded`
+- `POST /ssr-single-arm`
 - `POST /rar`
 - `POST /minimization`
 - `POST /basket`

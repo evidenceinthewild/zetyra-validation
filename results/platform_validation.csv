@@ -22,4 +22,4 @@ test,n_per_arm,pass,powers,n_boundary_rows,expected,actual,n_rows,power,power_sm
 21. Pocock spending: more uniform than OBF,,True,,,,,,,,,,,,,,,,,,,,,,,,0.2198,1.8548,
 22. Guard: n_stages < 2 rejected,,True,,,,,,,,,,,,,,,,,,,,,,,,,,400.0
 23. Guard: n_per_stage < 1 rejected,,True,,,,,,,,,,,,,,,,,,,,,,,,,,400.0
-24. Guard: empty arms list rejected,,True,,,,,,,,,,,,,,,,,,,,,,,,,,400.0
+24. Guard: empty arms uses default fallback,2.0,True,,,,,,,,,,,,,,,,,,,,,,,,,,
