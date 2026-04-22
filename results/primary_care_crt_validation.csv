@@ -1,0 +1,7 @@
+suite,test,nIndividual,published,pass,frontend_DE,published_DE,frontend_total_N,clustersControl,clustersTreatment,total,DE_at_0.02,DE_at_0.05,clusters_0.02,clusters_0.05,DE_band,N_band,clusters_band
+1. Individual-randomization N matches 340,Leyrat CRT: individual-N matches published 340,339.0,340.0,True,,,,,,,,,,,,,
+2. Design effect = 3.25 exactly,Leyrat CRT: DE = 1 + (46-1) × 0.05 = 3.25,,,True,3.25,3.25,,,,,,,,,,,
+"3. Cluster-inflated total N ≈ 1,104","Leyrat CRT: cluster-inflated total N ≈ 1,104",,1104.0,True,,,1102.0,,,,,,,,,,
+4. 24 total clusters (12/arm),Leyrat CRT: 24 total clusters (12/arm),,24.0,True,,,,12.0,12.0,24.0,,,,,,,
+"5. ICC=0.02 contrast (smaller DE, fewer clusters)",ICC=0.02 DE=1.9 < ICC=0.05 DE=3.25; fewer clusters needed,,,True,,,,,,,1.9,3.25,14.0,24.0,,,
+6. ICC sensitivity band monotone,"Leyrat CRT: sensitivity band monotone in DE, N, clusters",,,True,,,,,,,,,,,1.90 < 3.25 < 5.50,644 < 1102 < 1864,14 < 24 < 42

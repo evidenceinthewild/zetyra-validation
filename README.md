@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18879839.svg)](https://doi.org/10.5281/zenodo.18879839)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18880066.svg)](https://doi.org/10.5281/zenodo.18880066)
-![Tests](https://img.shields.io/badge/tests-758%20passed-success)
+![Tests](https://img.shields.io/badge/tests-896%20passed-success)
 ![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20RAR%20%7C%20Master%20Protocol-blue)
 ![Accuracy](https://img.shields.io/badge/max%20deviation-0.034%20z--score-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -13,8 +13,13 @@ Independent validation of Zetyra statistical calculators against reference imple
 
 | Calculator | Tests | Status | Reference |
 |------------|-------|--------|-----------|
-| Sample Size (continuous / binary / survival) | 48 | ✅&nbsp;Pass | Cohen (1988) textbook, Schoenfeld (1981), scipy |
-| Chi-Square (client-side math) | 55 | ✅&nbsp;Pass | scipy.stats.chi2, chi2_contingency, fisher_exact |
+| Sample Size (continuous / binary / survival) | 50 | ✅&nbsp;Pass | Cohen (1988) textbook, Schoenfeld (1981), scipy |
+| Chi-Square (client-side math via Node bridge) | 55 | ✅&nbsp;Pass | scipy.stats.chi2, chi2_contingency, fisher_exact |
+| Cluster-Randomized Trial | 61 | ✅&nbsp;Pass | Donner &amp; Klar (2000), small-cluster t-correction, live MC simulations |
+| Longitudinal / Repeated Measures | 50 | ✅&nbsp;Pass | Diggle et al. (2002), Frison &amp; Pocock (1992), exact AR(1)/CS slope + live MC |
+| Salk 1954 Polio Trial Replication | 8 | ✅&nbsp;Pass | Francis Report (1955): 200,745 vaccine vs 201,229 placebo, 33 vs 115 paralytic cases |
+| DAPA-HF Replication | 11 | ✅&nbsp;Pass | McMurray et al. (2019) *Eur J Heart Fail*: HR=0.80, α=0.025 (1-sided), 90% power, 844 events |
+| Leyrat 2024 Primary-Care CRT | 6 | ✅&nbsp;Pass | Leyrat, Eldridge, Taljaard, Hemming (2024) *J Epidemiol Popul Health* 72(1):202198: p0=0.50 → p1=0.65, ICC=0.05, m=46, 24 clusters |
 | GSD | 30 | ✅&nbsp;Pass | gsDesign R package |
 | GSD PACIFIC OS | 17 | ✅&nbsp;Pass | Antonia et al. (2018) NEJM, Lan-DeMets OBF |
 | GSD MONALEESA-7 OS | 20 | ✅&nbsp;Pass | Im et al. (2019) NEJM, Lan-DeMets OBF |
@@ -48,7 +53,7 @@ Independent validation of Zetyra statistical calculators against reference imple
 | REMAP-CAP Replication | 8 | ✅&nbsp;Pass | Angus et al. (2020), Bayesian platform |
 | Offline References | 23 | ✅&nbsp;Pass | Pure math (no API) |
 
-**Total: 758 tests across 37 scripts, all passing.**
+**Total: 896 tests across 42 scripts, all passing.**
 
 ## Repository Structure
 
@@ -61,10 +66,18 @@ zetyra-validation/
 │   ├── __init__.py
 │   ├── zetyra_client.py                 # API client (25 endpoints)
 │   ├── assertions.py                    # Binomial CI, schema contracts
-│   └── chi_square_frontend_math.py      # Python port of client-side χ² math
+│   └── frontend_bridge.py               # Python ↔ Node subprocess bridge to shipped TS
 ├── free/                                # Free-tier calculators
-│   ├── test_sample_size.py              # Two-sample continuous/binary/survival
-│   └── test_chi_square.py               # χ² p-value, critical, Pearson, McNemar, Fisher
+│   ├── ts_loader.mjs                    # Node resolve hook (.ts → .ts for strip-types)
+│   ├── chi_square_driver.mjs            # Node RPC driver → frontend/src/lib/stats/chi_square.ts
+│   ├── sample_size_driver.mjs           # Node RPC driver → frontend/src/lib/stats/sample_size.ts
+│   ├── test_sample_size.py              # Two-sample continuous/binary/survival (50 tests)
+│   ├── test_chi_square.py               # χ² via Node bridge: p-value, critical, Pearson, McNemar, Fisher (55)
+│   ├── test_cluster_rct.py              # CRT via bridge: DE, t-correction, ICC band, live MC sims (61)
+│   ├── test_longitudinal.py             # Slope AR(1)/CS, ANCOVA, change-from-baseline + MC (50)
+│   ├── test_salk_polio.py               # 1954 Francis Report replication: χ² + binary sample size (8)
+│   ├── test_dapa_hf.py                  # McMurray 2019 DAPA-HF Schoenfeld events replication (11)
+│   └── test_primary_care_crt.py         # Leyrat 2024 worked CRT example replication (6)
 ├── gsd/
 │   ├── test_gsdesign_benchmark.R        # 23 gsDesign comparisons
 │   ├── test_hptn083.py                  # HPTN 083 replication
@@ -115,8 +128,10 @@ zetyra-validation/
 
 ### Free-Tier Calculators (v2.3)
 
-- **Sample Size (continuous / binary / survival)** — 48 tests covering the public `/validation/sample-size/{continuous,binary,survival}` endpoints. Continuous: closed-form two-sample normal-approx, Cohen's d={0.2, 0.5, 0.8} textbook benchmarks, one-sided vs two-sided, unequal allocation, monotonicity in α/power/effect, input guards. Binary: Cohen's h arcsine formula, canonical p₁=0.30 p₂=0.50 → ~93/arm reference, rate-swap symmetry, rare-event penalty, allocation, guards. Survival: Schoenfeld required events vs closed-form, HR=0.7 median=12mo reference, HR/power monotonicity, unequal-allocation penalty, guards.
-- **Chi-Square Calculator (client-side math)** — 55 tests. The calculator runs entirely in the browser, so the Python port in `common/chi_square_frontend_math.py` mirrors the frontend's numerical functions and validates them against `scipy.stats.chi2`, `chi2_contingency`, and `fisher_exact`. Covers the p-value survival function (df ∈ {1, 2, 5, 10, 20}, Abramowitz erf fast path + Numerical Recipes Lentz continued fraction), Wilson-Hilferty critical values, Pearson 2×2 with Yates correction, r×c tables without correction, φ and Cramér's V effect sizes, classical McNemar, two-sided Fisher's exact, and underflow edge cases.
+- **Sample Size (continuous / binary / survival)** — 50 tests covering the public `/validation/sample-size/{continuous,binary,survival}` endpoints. Continuous: closed-form two-sample normal-approx, Cohen's d={0.2, 0.5, 0.8} textbook benchmarks, one-sided vs two-sided, unequal allocation, monotonicity in α/power/effect, input guards. Binary: Cohen's h arcsine formula, canonical p₁=0.30 p₂=0.50 → ~93/arm reference, rate-swap symmetry, rare-event penalty, allocation, guards. Survival: Schoenfeld required events vs closed-form, exact integer-match reference cases (HR=0.7 median=12mo; HR=0.7 with 10% dropout; HR=0.5 α=0.025 power=0.9), HR/power monotonicity, unequal-allocation penalty, guards.
+- **Chi-Square Calculator (client-side math)** — 55 tests. The calculator runs entirely in the browser. The Node bridge at `common/frontend_bridge.py` spawns a subprocess that imports the shipped TypeScript module directly (`frontend/src/lib/stats/chi_square.ts`), so validation exercises the exact code users run — no Python mirror to drift from. Validates against `scipy.stats.chi2`, `chi2_contingency`, and `fisher_exact`. Covers the p-value survival function (df ∈ {1, 2, 5, 10, 20}, Abramowitz erf fast path + Numerical Recipes Lentz continued fraction), Wilson-Hilferty critical values, Pearson 2×2 with Yates correction, r×c tables without correction, φ and Cramér's V effect sizes, classical McNemar, two-sided Fisher's exact, and underflow edge cases.
+- **Cluster-Randomized Trial** — 61 tests covering design effect DE = 1 + (m-1)·ICC, small-cluster t-correction (anti-conservative z formula fixed), ICC sensitivity band, live random-intercept MC simulations (power + Type I error), cycle-safe iterator at tiny k, input guards, Donner & Klar (2000) dichotomous reference, and the Leyrat et al. (2024) primary-care worked example.
+- **Longitudinal / Repeated Measures** — 50 tests covering exact AR(1) and CS slope variance formulas (the m→∞ asymptotic previously shipped was off by 2–14× in typical (m, ρ) regimes), endpoint/ANCOVA variance, change-from-baseline AR(1) and CS, Frison & Pocock (1992) Table 2 benchmark, monotonicity in m and ρ, and live AR(1)/CS MC simulations of empirical power.
 
 ### Bayesian Toolkit (v1.2)
 
@@ -140,14 +155,20 @@ Each of the 6 Bayesian calculators has a dedicated test suite covering:
 
 ### Real-World Trial Replications
 
-Six published clinical trials are replicated against Zetyra's calculators:
+Eight published clinical trials + one methodological worked example are replicated against Zetyra's calculators:
 
+- **Salk (1954)** — Francis Report placebo-controlled field trial; 200,745 vaccine vs 201,229 placebo; 33 vs 115 paralytic polio cases. Yates-corrected χ² = 44.15, p = 3.1×10⁻¹¹; Fisher's exact p = 7.8×10⁻¹²; vaccine efficacy 71.2%; a-priori required N (34,837/arm) far below actual 200k → decisively over-powered, matching the published conclusion. (Francis T Jr., 1955, U. Michigan Poliomyelitis Vaccine Evaluation Center.)
+- **DAPA-HF (2019)** — Event-driven Schoenfeld log-rank sample size for dapagliflozin vs placebo on CV death or worsening HF. Published design: HR=0.80, one-sided α=0.025, power=0.90 → 844 primary events. Zetyra Schoenfeld = 845 (ceiling of raw 844.09; textbook rounds to 844). HR/power/allocation sensitivity all monotone. McMurray JJV et al., *Eur J Heart Fail* 21(5):665–675 (PMID 30895697; doi:10.1002/ejhf.1432).
 - **HPTN 083** (HIV prevention) — 4-look O'Brien-Fleming GSD, z-score boundaries matched to gsDesign within 0.005
 - **HeartMate II** (LVAD) — 3-look OBF with unequal info fractions, structural properties verified
-- **PACIFIC** (durvalumab, Stage III NSCLC OS) — 3-look Lan-DeMets OBF survival GSD, reference z-scores matched within 0.022 (looks 1–2: 0.000, look 3: 0.022); trial crossing at 299 events verified
-- **MONALEESA-7** (ribociclib, HR+ breast cancer OS) — 3-look Lan-DeMets OBF survival GSD, reference z-scores matched within 0.006 (looks 1–2: 0.000, look 3: 0.006); crossing at look 2 (p=0.00973) verified
+- **PACIFIC** (durvalumab, Stage III NSCLC OS) — 3-look Lan-DeMets OBF survival GSD, reference z-scores matched within 0.022 (looks 1–2: 0.000, look 3: 0.022); trial crossing at 299 events verified. Antonia SJ et al., NEJM 379:2342–2350.
+- **MONALEESA-7** (ribociclib, HR+ breast cancer OS) — 3-look Lan-DeMets OBF survival GSD, reference z-scores matched within 0.006 (looks 1–2: 0.000, look 3: 0.006); crossing at look 2 (p=0.00973) verified. Im SA et al., NEJM 381:307–316.
 - **REBYOTA / PUNCH CD2+CD3** (*C. difficile*) — Bayesian borrowing, prior elicitation, two-arm sample size with real Phase 2b/3 data
-- **NCT03377023** (nivolumab + ipilimumab + nintedanib in NSCLC, Moffitt Cancer Center; Chen et al. 2019, JTO 2021, JCO 2023) — Bayesian two-stage Phase II design with predictive-probability futility monitoring. End-to-end replication includes both arms' published OCs (power, Type I, P(early stop)) and **direct assertions of the SAP's actual decision rules**: (1) Arm B (ICI-treated) interim rule at r₁=2/20: `PPoS(r=2) = 0.307 > d_futility = 0.20` → continue (matches trial's published decision); rule at the SAP's stopping boundary r₁=1: `PPoS(r=1) = 0.081 ≤ 0.20` → stop (matches SAP's "≤1 responder stop" boundary). (2) Arm B final 6/28 evaluable → posterior 0.997 → crosses the SAP's 0.95 success threshold (matches trial's positive result). (3) Arm A (ICI-naïve) final 9/22 evaluable → posterior 0.880 → below the 0.95 threshold (Arm A enrolled only 22/40 planned, so even at 40.9% ORR the truncated sample doesn't reach the formal Bayesian success criterion — a real finding the design rule surfaces). Calculator-correctness checks also verify Zetyra's posterior formula matches scipy reference to 4 decimals at both the planning assumption and the actual interim/final counts.
+- **NCT03377023** (nivolumab + ipilimumab + nintedanib in NSCLC, Moffitt Cancer Center; Chen et al. 2019, JTO 2021, JCO 2023) — Bayesian two-stage Phase II design with predictive-probability futility monitoring. End-to-end replication includes both arms' published OCs (power, Type I, P(early stop)) and **direct assertions of the SAP's actual decision rules**: (1) Arm B (ICI-treated) interim rule at r₁=2/20: `PPoS(r=2) = 0.307 > d_futility = 0.20` → continue (matches trial's published decision); rule at the SAP's stopping boundary r₁=1: `PPoS(r=1) = 0.081 ≤ 0.20` → stop (matches SAP's "≤1 responder stop" boundary). (2) Arm B final 6/28 evaluable → posterior 0.997 → crosses the SAP's 0.95 success threshold (matches trial's positive result). (3) Arm A (ICI-naïve) final 9/22 evaluable → posterior 0.880 → below the 0.95 threshold (Arm A enrolled only 22/40 planned, so even at 40.9% ORR the truncated sample doesn't reach the formal Bayesian success criterion — a real finding the design rule surfaces). Chen DT, Schell MJ, Fulp WJ et al., *Transl Cancer Res* 8(Suppl 4):S404–S420 (PMID 31456910).
+
+Methodological worked example (not a trial):
+
+- **Leyrat et al. (2024) primary-care CRT** — behavior-change counseling at GP practices: p₀=0.50 → p₁=0.65, ICC=0.05, m=46. Design effect **3.25 exact**; total clusters **24 exact**; cluster-inflated total N **1,102 vs 1,104 published** (2-patient gap from ceiling order: Zetyra applies 2 × ⌈n_ind × DE⌉; the paper ceils individual N first then multiplies by DE). ICC sensitivity band at [0.02, 0.10]: 14 < 24 < 42 clusters, monotone. Leyrat C, Eldridge S, Taljaard M, Hemming K. *J Epidemiol Popul Health* 72(1):202198 (PMID 38477482; doi:10.1016/j.jeph.2024.202198).
 
 ### CUPED Simulation Benchmark
 
@@ -356,27 +377,37 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 
 ## References
 
-1. **GSD**: Jennison & Turnbull (2000) *Group Sequential Methods*
-2. **CUPED**: Deng et al. (2013) *Improving Online Controlled Experiments* (WSDM)
-3. **Bayesian**: Gelman et al. (2013) *Bayesian Data Analysis*
+1. **GSD**: Jennison & Turnbull (2000) *Group Sequential Methods with Applications to Clinical Trials*
+2. **CUPED**: Deng A, Xu Y, Kohavi R, Walker T (2013) *Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment Data* (WSDM)
+3. **Bayesian**: Gelman et al. (2013) *Bayesian Data Analysis*, 3rd ed.
 4. **gsDesign**: Anderson (2022) *gsDesign R package*
-5. **Bayesian Sequential**: Zhou & Ji (2024) *Bayesian sequential monitoring*
-6. **Prior Elicitation**: Morita, Thall & Müller (2008) *Determining ESS of a parametric prior*
-7. **Survival**: Schoenfeld (1983) *Sample-size formula for the proportional-hazards regression model*
-8. **SSR**: Cui, Hung & Wang (1999) *Modification of sample size in group sequential clinical trials*
-9. **PACIFIC**: Antonia et al. (2018) NEJM 379:2342-2350 *Overall Survival with Durvalumab*
-10. **MONALEESA-7**: Im et al. (2019) NEJM 381:307-316 *Overall Survival with Ribociclib*
-11. **Mehta & Pocock**: Mehta & Pocock (2011) *Adaptive increase in sample size when interim results are promising*
-12. **Bayesian PP**: Spiegelhalter, Abrams & Myles (2004) *Bayesian Approaches to Clinical Trials*
-13. **RAR**: Rosenberger et al. (2001) *Optimal adaptive designs for binary response trials*
-14. **RAR**: Hu & Zhang (2004) *Asymptotic properties of doubly adaptive biased coin designs*
-15. **Basket**: Berry et al. (2013) *Bayesian Hierarchical Models for Basket Trials*
-16. **EXNEX**: Neuenschwander et al. (2016) *Robust exchangeability designs*
-17. **Platform**: Saville & Berry (2016) *Efficiencies of platform clinical trials*
-18. **Master Protocol**: FDA (2022) *Master Protocols: Efficient Clinical Trial Design Strategies*
-19. **I-SPY 2**: Barker et al. (2009) *I-SPY 2: An Adaptive Breast Cancer Trial Design*
-20. **STAMPEDE**: Sydes et al. (2012) *Flexible trial design in practice — stopping arms for lack-of-benefit*
-21. **REMAP-CAP**: Angus et al. (2020) *Effect of Hydrocortisone on Mortality and Organ Support* JAMA
+5. **Bayesian Sequential**: Zhou T & Ji Y (2024) *On Bayesian Sequential Clinical Trial Designs* (New England J Statistics in Data Science 2(1))
+6. **Prior Elicitation**: Morita S, Thall PF, Müller P (2008) *Determining the Effective Sample Size of a Parametric Prior* (Biometrics 64(2):595–602)
+7. **Survival**: Schoenfeld DA (1983) *Sample-size formula for the proportional-hazards regression model* (Biometrics 39(2):499–503)
+8. **SSR**: Cui L, Hung HMJ, Wang SJ (1999) *Modification of Sample Size in Group Sequential Clinical Trials* (Biometrics 55(3):853–857)
+9. **PACIFIC**: Antonia SJ et al. (2018) *Overall Survival with Durvalumab after Chemoradiotherapy in Stage III NSCLC* (NEJM 379:2342–2350)
+10. **MONALEESA-7**: Im SA et al. (2019) *Overall Survival with Ribociclib plus Endocrine Therapy in Breast Cancer* (NEJM 381:307–316)
+11. **Mehta & Pocock**: Mehta CR & Pocock SJ (2011) *Adaptive increase in sample size when interim results are promising: a practical guide with examples* (Stat Med 30:3267–3284)
+12. **Bayesian PP**: Spiegelhalter, Abrams & Myles (2004) *Bayesian Approaches to Clinical Trials and Health-Care Evaluation*
+13. **RAR**: Rosenberger WF, Stallard N, Ivanova A, Harper CN, Ricks ML (2001) *Optimal Adaptive Designs for Binary Response Trials* (Biometrics 57(3):909–913)
+14. **RAR (DBCD)**: Hu F & Zhang LX (2004) *Asymptotic properties of doubly adaptive biased coin designs for multitreatment clinical trials* (Ann Stat 32(1):268–301)
+15. **Basket**: Berry SM, Broglio KR, Groshen S, Berry DA (2013) *Bayesian hierarchical modeling of patient subpopulations: Efficient designs of Phase II oncology clinical trials* (Clin Trials 10(5):720–734)
+16. **EXNEX**: Neuenschwander B, Wandel S, Roychoudhury S, Bailey S (2016) *Robust exchangeability designs for early phase clinical trials with multiple strata* (Pharm Stat 15(2):123–134)
+17. **Platform**: Saville BR & Berry SM (2016) *Efficiencies of platform clinical trials: A vision of the future* (Clin Trials 13(3):358–366)
+18. **Master Protocol**: FDA (2022) *Master Protocols: Efficient Clinical Trial Design Strategies to Expedite Development of Oncology Drugs and Biologics* (Guidance for Industry)
+19. **I-SPY 2**: Barker AD, Sigman CC, Kelloff GJ, Hylton NM, Berry DA, Esserman LJ (2009) *I-SPY 2: an adaptive breast cancer trial design in the setting of neoadjuvant chemotherapy* (Clin Pharmacol Ther 86(1):97–100)
+20. **STAMPEDE**: Sydes MR et al. (2012) *Flexible trial design in practice — stopping arms for lack-of-benefit and adding research arms mid-trial in STAMPEDE: a multi-arm multi-stage randomized controlled trial* (Trials 13:168)
+21. **REMAP-CAP**: Angus DC et al. (2020) *Effect of Hydrocortisone on Mortality and Organ Support in Patients With Severe COVID-19: The REMAP-CAP COVID-19 Corticosteroid Domain Randomized Clinical Trial* (JAMA 324(13):1317–1329)
+22. **Salk polio trial**: Francis T Jr. (1955) *Evaluation of the 1954 Field Trial of Poliomyelitis Vaccine: Final Report* (U. Michigan Poliomyelitis Vaccine Evaluation Center)
+23. **DAPA-HF**: McMurray JJV et al. (2019) *A trial to evaluate the effect of the sodium–glucose co-transporter 2 inhibitor dapagliflozin on morbidity and mortality in patients with heart failure and reduced left ventricular ejection fraction* (Eur J Heart Fail 21(5):665–675; PMID 30895697; doi:10.1002/ejhf.1432)
+24. **Sample size textbook**: Cohen J (1988) *Statistical Power Analysis for the Behavioral Sciences*, 2nd ed.
+25. **2×2 continuity correction**: Yates F (1934) *Contingency tables involving small numbers and the χ² test* (JRSS Suppl 1:217–235)
+26. **Cluster RCT**: Donner A & Klar N (2000) *Design and Analysis of Cluster Randomization Trials in Health Research*
+27. **Longitudinal methods**: Diggle PJ, Heagerty P, Liang KY, Zeger SL (2002) *Analysis of Longitudinal Data*, 2nd ed.
+28. **Repeated measures**: Frison L & Pocock SJ (1992) *Repeated measures in clinical trials: analysis using mean summary statistics and its implications for design* (Stat Med 11(13):1685–1704)
+29. **Single-Arm SSR (PPoS)**: Lee JJ & Liu DD (2008) *A predictive probability design for phase II cancer clinical trials* (Clin Trials 5(2):93–106)
+30. **CRT worked example**: Leyrat C, Eldridge S, Taljaard M, Hemming K (2024) *Practical considerations for sample size calculation for cluster randomized trials* (J Epidemiol Popul Health 72(1):202198; PMID 38477482; doi:10.1016/j.jeph.2024.202198)
+31. **NCT03377023 Bayesian design**: Chen DT, Schell MJ, Fulp WJ, et al. (2019) *Application of Bayesian predictive probability for interim futility analysis in single-arm phase II trial* (Transl Cancer Res 8(Suppl 4):S404–S420; PMID 31456910)
 
 ## Citation
 

@@ -1,0 +1,9 @@
+suite,test,frontend_chi,scipy_chi,frontend_p,scipy_p,df,pass,p_value,chi_sq,frontend_phi,hand_phi,frontend_V,p_vaccine,p_placebo,relative_risk,efficacy,required_per_arm,actual_per_arm,required_per_arm_99
+1. Pearson χ² (Yates) on Salk table vs scipy,Salk χ² (Yates) matches scipy,44.1526,44.1526,3.0538238604549406e-11,3.0375452398844494e-11,1.0,True,,,,,,,,,,,,
+2. Decisive positive: p < 1e-10,Salk χ² p-value decisively small (< 1e-10),,,,,,True,3.0538238604549406e-11,44.15,,,,,,,,,,
+3. Fisher's exact two-sided vs scipy,Salk Fisher's exact matches scipy,,,7.811324831224938e-12,7.81132483198815e-12,,True,,,,,,,,,,,,
+"4. Effect sizes (φ, Cramér's V)",Salk φ = √(χ²/N),,,,,,True,,,0.01048,0.01048,,,,,,,,
+"4. Effect sizes (φ, Cramér's V)",Salk Cramér's V = φ (2×2),,,,,,True,,,,,0.01048,,,,,,,
+5. Vaccine efficacy direction (~70%),Salk vaccine efficacy on paralytic cases ≈ 70%,,,,,,True,,,,,,0.00016,0.00057,0.288,0.712,,,
+6. Sample size (binary): N comfortably under 200k/arm,"Salk: required N per arm far smaller than 200,745 actual",,,,,,True,,,,,,0.00016,0.00057,,,34837.0,200745.0,
+6. Sample size (binary): N comfortably under 200k/arm,"Salk: even at 99% power, required per-arm N < actual",,,,,,True,,,,,,,,,,,200745.0,81543.0

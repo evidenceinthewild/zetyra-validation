@@ -1,0 +1,12 @@
+suite,test,api_events,ref_events,published_target,pass,events,events_r1,events_r2,events_r3,events_required,n_total,design_target
+1. Schoenfeld events matches 844 target,DAPA-HF: Schoenfeld events match published 844 target (±2),845.0,845.0,844.0,True,,,,,,,
+2. HR sensitivity monotonicity,Events required at HR=0.75,,,,True,508.0,,,,,,
+2. HR sensitivity monotonicity,Events required at HR=0.8,,,,True,845.0,,,,,,
+2. HR sensitivity monotonicity,Events required at HR=0.85,,,,True,1592.0,,,,,,
+2. HR sensitivity monotonicity,Monotone: events(0.85) > events(0.80) > events(0.75),,,,True,,,,,,,
+3. Power sensitivity monotonicity,Events at power=0.8,,,,True,631.0,,,,,,
+3. Power sensitivity monotonicity,Events at power=0.9,,,,True,845.0,,,,,,
+3. Power sensitivity monotonicity,Events at power=0.95,,,,True,1044.0,,,,,,
+3. Power sensitivity monotonicity,Monotone: events(0.80) < events(0.90) < events(0.95),,,,True,,,,,,,
+4. Allocation ratio penalty,Allocation penalty: events(r=3) > events(r=2) > events(r=1),,,,True,,845.0,950.0,1126.0,,,
+5. Total N in 4500-design band,DAPA-HF total N consistent with 4500-design band,,,,True,,,,,845.0,3568.0,4500.0
