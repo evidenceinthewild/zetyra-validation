@@ -356,20 +356,62 @@ def validate_survival_schoenfeld(client) -> pd.DataFrame:
 
 
 def validate_survival_reference_case(client) -> pd.DataFrame:
-    """HR=0.7, median=12mo, 12mo accrual + 12mo follow-up reference case."""
-    resp = client.sample_size_survival(
-        hazard_ratio=0.7, median_control=12.0, accrual_time=12.0,
-        follow_up_time=12.0, dropout_rate=0.0, alpha=0.05, power=0.80,
-        allocation_ratio=1.0,
-    )
-    # Schoenfeld events ~247, N depends on event probability under exponential
-    return pd.DataFrame([{
-        "test": "HR=0.7 reference: events in [240, 255], N_total in [300, 600]",
-        "events_required": resp["events_required"],
-        "n_total": resp["n_total"],
-        "pass": (240 <= resp["events_required"] <= 255
-                 and 300 <= resp["n_total"] <= 600),
-    }])
+    """Exact reference cases: both events_required and n_total must match.
+
+    Recomputes the full backend pipeline against scipy: Schoenfeld ->
+    events_int; exponential survival with avg_follow = follow_up + accrual/2
+    -> p_event; dropout discount (1 - dropout)^(avg_follow/12) per arm;
+    n_total_float = events_int / p_avg; per-arm ceilings summed. Must match
+    to the integer.
+    """
+    def exact_reference(hr, median_c, accrual, follow, dropout, alpha, power, r):
+        z_a = sp_stats.norm.ppf(1 - alpha / 2)
+        z_b = sp_stats.norm.ppf(power)
+        log_hr = np.log(hr)
+        events = int(np.ceil(((z_a + z_b) / log_hr) ** 2 * (1 + r) ** 2 / r))
+        lam_c = np.log(2) / median_c
+        lam_t = lam_c * hr
+        avg_follow = follow + accrual / 2
+        disc = (1 - dropout) ** (avg_follow / 12)
+        p_c = (1 - np.exp(-lam_c * avg_follow)) * disc
+        p_t = (1 - np.exp(-lam_t * avg_follow)) * disc
+        p_avg = (p_c + r * p_t) / (1 + r)
+        n_total_f = events / p_avg
+        n1 = int(np.ceil(n_total_f / (1 + r)))
+        n2 = int(np.ceil(r * n_total_f / (1 + r)))
+        return events, n1 + n2
+
+    cases = [
+        dict(hazard_ratio=0.7, median_control=12.0, accrual_time=12.0,
+             follow_up_time=12.0, dropout_rate=0.0, alpha=0.05, power=0.80,
+             allocation_ratio=1.0),
+        dict(hazard_ratio=0.7, median_control=12.0, accrual_time=24.0,
+             follow_up_time=18.0, dropout_rate=0.10, alpha=0.05, power=0.80,
+             allocation_ratio=1.0),
+        dict(hazard_ratio=0.5, median_control=6.0, accrual_time=12.0,
+             follow_up_time=12.0, dropout_rate=0.0, alpha=0.025, power=0.90,
+             allocation_ratio=1.0),
+    ]
+    rows = []
+    for c in cases:
+        resp = client.sample_size_survival(**c)
+        events_ref, n_total_ref = exact_reference(
+            c["hazard_ratio"], c["median_control"], c["accrual_time"],
+            c["follow_up_time"], c["dropout_rate"], c["alpha"], c["power"],
+            c["allocation_ratio"],
+        )
+        rows.append({
+            "test": f"HR={c['hazard_ratio']} median={c['median_control']} "
+                    f"accrual={c['accrual_time']} follow={c['follow_up_time']} "
+                    f"dropout={c['dropout_rate']}: events={events_ref}, "
+                    f"n_total={n_total_ref}",
+            "events_required": resp["events_required"],
+            "events_ref": events_ref,
+            "n_total": resp["n_total"],
+            "n_total_ref": n_total_ref,
+            "pass": resp["events_required"] == events_ref and resp["n_total"] == n_total_ref,
+        })
+    return pd.DataFrame(rows)
 
 
 def validate_survival_hr_monotonicity(client) -> pd.DataFrame:

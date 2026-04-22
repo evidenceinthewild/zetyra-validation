@@ -3,41 +3,39 @@
 Validate the Chi-Square Calculator math shipped in the frontend (Free Tier).
 
 The Zetyra Chi-Square Calculator runs entirely client-side — there is no
-backend endpoint. This script does NOT hit a live API; instead it validates
-the numerical functions shipped in
-    frontend/src/app/calculators/chi-square/page.tsx
-by running the Python port in
-    common/chi_square_frontend_math.py
-against scipy / reference implementations.
+backend endpoint. This script exercises the actual TypeScript module that
+ships to users (via a Node.js subprocess bridge), NOT a hand-maintained
+Python mirror. If page.tsx regresses, these tests will catch it.
 
-If the React code changes, update the Python port in lockstep and re-run.
+The TS module under test is:
+    frontend/src/lib/stats/chi_square.ts
+imported directly by:
+    frontend/src/app/calculators/chi-square/page.tsx
+
+Requires Node.js 22+ (native TypeScript strip-types support).
 
 This script validates:
    1. Chi-square survival function (p-value) vs scipy.stats.chi2.sf
    2. Chi-square critical value (inverse CDF) vs scipy.stats.chi2.ppf
    3. Pearson 2x2 with Yates correction vs scipy.stats.chi2_contingency
-   4. Pearson r×c without correction vs scipy (3x3 and 2x4 tables)
+   4. Pearson r×c without correction vs scipy (3x3, 2x4, 3x5 tables)
    5. Cramér's V and φ vs hand-calculated reference
-   6. Effect size buckets (Cohen small/medium/large) correctness
-   7. McNemar classical chi-square statistic and p-value
-   8. Fisher's exact 2x2 two-sided vs scipy.stats.fisher_exact
-   9. Edge cases (observed ≈ expected -> p near 1; extreme deviation -> p near 0)
+   6. McNemar classical chi-square statistic and p-value
+   7. Fisher's exact 2x2 two-sided vs scipy.stats.fisher_exact
+   8. Edge cases (Yates null, proportional r×c null, extreme deviation underflow)
 
 References:
-  * Yates, F. (1934) "Contingency tables involving small numbers and the χ²
-    test." JRSS Supplement, 1, 217-235.
-  * McNemar, Q. (1947) "Note on the sampling error of the difference between
-    correlated proportions or percentages." Psychometrika, 12, 153-157.
-  * Cohen, J. (1988) "Statistical Power Analysis for the Behavioral Sciences"
-    (effect-size buckets for Cramér's V).
-  * Abramowitz & Stegun (1965) 7.1.26 (erf approximation used in the df=1 fast
-    path).
-  * Press, Teukolsky, Vetterling, Flannery (2007) "Numerical Recipes" §6.2
-    (modified Lentz continued fraction for the incomplete gamma function).
+  * Yates (1934) "Contingency tables involving small numbers and the χ² test."
+  * McNemar (1947) "Note on the sampling error of the difference between
+    correlated proportions or percentages."
+  * Cohen (1988) "Statistical Power Analysis for the Behavioral Sciences."
+  * Abramowitz & Stegun (1965) 7.1.26 (erf approx, df=1 fast path).
+  * Press et al. (2007) Numerical Recipes §6.2 (Lentz continued fraction).
 """
 
-import sys
+import argparse
 import os
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -46,24 +44,13 @@ import pandas as pd
 from scipy import stats as sp_stats
 from scipy.stats import chi2, fisher_exact
 
-from common.chi_square_frontend_math import (
-    chi_square_p_value,
-    chi_square_critical,
-    pearson_chi_square,
-    mcnemar_classical,
-    fisher_exact_2x2,
-)
+from common.frontend_bridge import FrontendBridge, resolve_frontend_path
 
 
-# ─── p-value (survival function) ──────────────────────────────────────
+# ─── p-value ──────────────────────────────────────────────────────────
 
-def validate_p_value(_client=None) -> pd.DataFrame:
-    """Chi-square p-value matches scipy.stats.chi2.sf to ≤ 1.5e-7.
-
-    The df=1 fast path uses Abramowitz 7.1.26 (erf approximation, ~1.5e-7
-    accuracy). Higher df uses the Numerical Recipes Lentz continued fraction
-    for regularized upper incomplete gamma and matches scipy to ~1e-14.
-    """
+def validate_p_value(bridge: FrontendBridge) -> pd.DataFrame:
+    """Chi-square p-value matches scipy.stats.chi2.sf."""
     cases = [
         (1, 0.5), (1, 1.0), (1, 3.841), (1, 5.0), (1, 10.0), (1, 30.0),
         (2, 0.5), (2, 3.0), (2, 5.99), (2, 10.0),
@@ -73,7 +60,7 @@ def validate_p_value(_client=None) -> pd.DataFrame:
     ]
     rows = []
     for df, x in cases:
-        p_fe = chi_square_p_value(x, df)
+        p_fe = bridge.call("chi_square_p_value", x=x, df=df)
         p_sp = float(chi2.sf(x, df))
         dev = abs(p_fe - p_sp)
         rows.append({
@@ -88,21 +75,15 @@ def validate_p_value(_client=None) -> pd.DataFrame:
 
 # ─── critical values ──────────────────────────────────────────────────
 
-def validate_critical_value(_client=None) -> pd.DataFrame:
-    """Chi-square critical values match scipy.stats.chi2.ppf to ≤ 5e-4.
-
-    The Wilson-Hilferty + Newton-refinement approach used in the frontend
-    converges to ~2e-4 in the worst case. That's precise enough that
-    displayed critical values round identically at the 3-decimal level the
-    UI uses.
-    """
+def validate_critical_value(bridge: FrontendBridge) -> pd.DataFrame:
+    """Chi-square critical values match scipy.stats.chi2.ppf to ≤ 5e-4."""
     cases = [(0.001, 1), (0.01, 1), (0.05, 1), (0.10, 1),
              (0.01, 2), (0.05, 2), (0.10, 2),
              (0.01, 5), (0.05, 5), (0.10, 5),
              (0.05, 10), (0.05, 20)]
     rows = []
     for alpha, df in cases:
-        cv_fe = chi_square_critical(alpha, df)
+        cv_fe = bridge.call("chi_square_critical", alpha=alpha, df=df)
         cv_sp = float(chi2.ppf(1 - alpha, df))
         dev = abs(cv_fe - cv_sp)
         rows.append({
@@ -117,7 +98,7 @@ def validate_critical_value(_client=None) -> pd.DataFrame:
 
 # ─── Pearson 2x2 with Yates ───────────────────────────────────────────
 
-def validate_pearson_2x2_yates(_client=None) -> pd.DataFrame:
+def validate_pearson_2x2_yates(bridge: FrontendBridge) -> pd.DataFrame:
     """2x2 Pearson chi-square with Yates correction matches scipy."""
     cases = [
         [[50, 50], [30, 70]],
@@ -128,15 +109,15 @@ def validate_pearson_2x2_yates(_client=None) -> pd.DataFrame:
     ]
     rows = []
     for tbl in cases:
-        r = pearson_chi_square(tbl)
+        r = bridge.call("pearson_chi_square", table=tbl)
         sp_chi, sp_p, _, _ = sp_stats.chi2_contingency(tbl, correction=True)
-        chi_dev = abs(r["chi_sq"] - sp_chi)
-        p_dev = abs(r["p_value"] - sp_p)
+        chi_dev = abs(r["chiSq"] - sp_chi)
+        p_dev = abs(r["pValue"] - sp_p)
         rows.append({
             "test": f"2x2 Yates {tbl}",
-            "frontend_chi": round(r["chi_sq"], 6),
+            "frontend_chi": round(r["chiSq"], 6),
             "scipy_chi": round(sp_chi, 6),
-            "frontend_p": round(r["p_value"], 8),
+            "frontend_p": round(r["pValue"], 8),
             "scipy_p": round(sp_p, 8),
             "pass": chi_dev < 1e-6 and p_dev < 1e-5,
         })
@@ -145,22 +126,22 @@ def validate_pearson_2x2_yates(_client=None) -> pd.DataFrame:
 
 # ─── Pearson r×c ──────────────────────────────────────────────────────
 
-def validate_pearson_rxc(_client=None) -> pd.DataFrame:
+def validate_pearson_rxc(bridge: FrontendBridge) -> pd.DataFrame:
     """r×c Pearson chi-square (no correction — only 2x2 uses Yates)."""
     cases = [
-        [[10, 20, 30], [15, 25, 35], [20, 30, 40]],          # 3x3
-        [[25, 30, 45, 10], [15, 25, 20, 40]],                # 2x4
-        [[100, 50, 50, 50, 50], [50, 100, 50, 50, 50], [50, 50, 100, 50, 50]],  # 3x5
+        [[10, 20, 30], [15, 25, 35], [20, 30, 40]],
+        [[25, 30, 45, 10], [15, 25, 20, 40]],
+        [[100, 50, 50, 50, 50], [50, 100, 50, 50, 50], [50, 50, 100, 50, 50]],
     ]
     rows = []
     for tbl in cases:
-        r = pearson_chi_square(tbl)
+        r = bridge.call("pearson_chi_square", table=tbl)
         sp_chi, sp_p, sp_df, _ = sp_stats.chi2_contingency(tbl, correction=False)
-        chi_dev = abs(r["chi_sq"] - sp_chi)
-        p_dev = abs(r["p_value"] - sp_p)
+        chi_dev = abs(r["chiSq"] - sp_chi)
+        p_dev = abs(r["pValue"] - sp_p)
         rows.append({
             "test": f"{len(tbl)}x{len(tbl[0])} no-correction",
-            "frontend_chi": round(r["chi_sq"], 6),
+            "frontend_chi": round(r["chiSq"], 6),
             "scipy_chi": round(sp_chi, 6),
             "frontend_df": r["df"], "scipy_df": sp_df,
             "pass": chi_dev < 1e-6 and p_dev < 1e-5 and r["df"] == sp_df,
@@ -170,61 +151,50 @@ def validate_pearson_rxc(_client=None) -> pd.DataFrame:
 
 # ─── Cramér's V and φ ─────────────────────────────────────────────────
 
-def validate_effect_sizes(_client=None) -> pd.DataFrame:
+def validate_effect_sizes(bridge: FrontendBridge) -> pd.DataFrame:
     """Cramér's V and φ match hand calculation."""
-    # Known case: 2x2 table [[90,10],[10,90]] has chi^2 = 124.82 (Yates), N=200
-    r = pearson_chi_square([[90, 10], [10, 90]])
-    # Hand calc: phi = sqrt(chi^2 / N)
-    phi_hand = math.sqrt(r["chi_sq"] / r["N"])
-    # V = phi for 2x2 (min(R-1, C-1) = 1)
-    v_hand = phi_hand
+    r = bridge.call("pearson_chi_square", table=[[90, 10], [10, 90]])
+    phi_hand = math.sqrt(r["chiSq"] / r["N"])
+    v_hand = phi_hand  # V = phi for 2x2
     rows = [
         {"test": "φ = √(χ²/N) for 2×2 [[90,10],[10,90]]",
          "frontend_phi": round(r["phi"], 6),
          "hand_phi": round(phi_hand, 6),
          "pass": abs(r["phi"] - phi_hand) < 1e-6},
         {"test": "Cramér's V = φ for 2×2",
-         "frontend_V": round(r["cramers_v"], 6),
+         "frontend_V": round(r["cramersV"], 6),
          "hand_V": round(v_hand, 6),
-         "pass": abs(r["cramers_v"] - v_hand) < 1e-6},
+         "pass": abs(r["cramersV"] - v_hand) < 1e-6},
     ]
 
-    # 3x3 case: V = sqrt(chi^2 / (N * min(R-1, C-1))) = sqrt(chi^2 / (N*2))
-    r2 = pearson_chi_square([[10, 20, 30], [15, 25, 35], [20, 30, 40]])
-    v_hand_3x3 = math.sqrt(r2["chi_sq"] / (r2["N"] * 2))
+    r2 = bridge.call("pearson_chi_square", table=[[10, 20, 30], [15, 25, 35], [20, 30, 40]])
+    v_hand_3x3 = math.sqrt(r2["chiSq"] / (r2["N"] * 2))
     rows.append({
         "test": "Cramér's V = √(χ²/(N·(k-1))) for 3×3",
-        "frontend_V": round(r2["cramers_v"], 6),
+        "frontend_V": round(r2["cramersV"], 6),
         "hand_V": round(v_hand_3x3, 6),
-        "pass": abs(r2["cramers_v"] - v_hand_3x3) < 1e-6,
+        "pass": abs(r2["cramersV"] - v_hand_3x3) < 1e-6,
     })
     return pd.DataFrame(rows)
 
 
 # ─── McNemar ──────────────────────────────────────────────────────────
 
-def validate_mcnemar(_client=None) -> pd.DataFrame:
+def validate_mcnemar(bridge: FrontendBridge) -> pd.DataFrame:
     """McNemar classical: χ² = (b-c)²/(b+c), df=1."""
-    # (a, b, c, d): a and d are concordant, b and c are discordant
-    cases = [
-        (80, 12, 25, 83),   # significant
-        (100, 10, 10, 100), # null (b == c)
-        (50, 30, 5, 15),    # large discordance, small N
-        (200, 4, 16, 180),  # moderate discordance
-    ]
+    cases = [(80, 12, 25, 83), (100, 10, 10, 100), (50, 30, 5, 15), (200, 4, 16, 180)]
     rows = []
     for a, b, c, d in cases:
-        r = mcnemar_classical(a, b, c, d)
-        # Reference
+        r = bridge.call("mcnemar_classical", a=a, b=b, c=c, d=d)
         ref_chi = (b - c) ** 2 / (b + c)
         ref_p = float(chi2.sf(ref_chi, 1))
-        chi_dev = abs(r["chi_sq"] - ref_chi)
-        p_dev = abs(r["p_value"] - ref_p)
+        chi_dev = abs(r["chiSq"] - ref_chi)
+        p_dev = abs(r["pValue"] - ref_p)
         rows.append({
             "test": f"McNemar ({a},{b},{c},{d})",
-            "frontend_chi": round(r["chi_sq"], 6),
+            "frontend_chi": round(r["chiSq"], 6),
             "ref_chi": round(ref_chi, 6),
-            "frontend_p": round(r["p_value"], 8),
+            "frontend_p": round(r["pValue"], 8),
             "ref_p": round(ref_p, 8),
             "discordant": r["discordant"],
             "pass": chi_dev < 1e-10 and p_dev < 1.5e-6,
@@ -234,13 +204,13 @@ def validate_mcnemar(_client=None) -> pd.DataFrame:
 
 # ─── Fisher's exact ───────────────────────────────────────────────────
 
-def validate_fisher_exact(_client=None) -> pd.DataFrame:
+def validate_fisher_exact(bridge: FrontendBridge) -> pd.DataFrame:
     """Fisher's 2x2 two-sided p-value vs scipy.stats.fisher_exact."""
     cases = [(7, 3, 1, 9), (10, 0, 0, 10), (5, 5, 4, 6), (20, 5, 3, 22),
              (1, 9, 8, 2)]
     rows = []
     for a, b, c, d in cases:
-        p_fe = fisher_exact_2x2(a, b, c, d)
+        p_fe = bridge.call("fisher_exact_2x2", a=a, b=b, c=c, d=d)
         _, p_sp = fisher_exact([[a, b], [c, d]], alternative="two-sided")
         dev = abs(p_fe - p_sp)
         rows.append({
@@ -255,38 +225,42 @@ def validate_fisher_exact(_client=None) -> pd.DataFrame:
 
 # ─── Edge cases ───────────────────────────────────────────────────────
 
-def validate_edge_cases(_client=None) -> pd.DataFrame:
-    """Sanity: Yates-adjusted null case yields tiny χ²; extreme deviation underflows p."""
-    # Perfectly independent 2x2 — Yates correction adds (|0|-0.5)^2/e per cell.
-    # Expected chi^2 = 4 * 0.25 / 25 = 0.04, p ≈ 0.84.
-    r_null = pearson_chi_square([[25, 25], [25, 25]])
-    # r×c (≥ 3 rows or cols) uses no correction, so null gives exactly 0.
-    r_null_3x3 = pearson_chi_square([[10, 20, 30], [10, 20, 30], [10, 20, 30]])
-    # Extreme 2x2 with large N — p-value should underflow (< 1e-100).
-    r_extreme = pearson_chi_square([[1000, 10], [10, 1000]])
+def validate_edge_cases(bridge: FrontendBridge) -> pd.DataFrame:
+    """Yates null case, r×c null, extreme-deviation underflow."""
+    r_null = bridge.call("pearson_chi_square", table=[[25, 25], [25, 25]])
+    r_null_3x3 = bridge.call("pearson_chi_square",
+                             table=[[10, 20, 30], [10, 20, 30], [10, 20, 30]])
+    r_extreme = bridge.call("pearson_chi_square",
+                            table=[[1000, 10], [10, 1000]])
     rows = [
         {"test": "Balanced 2×2 [[25,25],[25,25]] -> Yates-adjusted χ²=0.04, p≈0.84",
-         "chi_sq": round(r_null["chi_sq"], 4),
-         "p_value": round(r_null["p_value"], 4),
-         "pass": abs(r_null["chi_sq"] - 0.04) < 1e-10 and 0.80 < r_null["p_value"] < 0.90},
+         "chi_sq": round(r_null["chiSq"], 4),
+         "p_value": round(r_null["pValue"], 4),
+         "pass": abs(r_null["chiSq"] - 0.04) < 1e-10 and 0.80 < r_null["pValue"] < 0.90},
         {"test": "Proportional 3×3 (no correction) -> χ²=0, p=1",
-         "chi_sq": round(r_null_3x3["chi_sq"], 6),
-         "p_value": round(r_null_3x3["p_value"], 6),
-         "pass": r_null_3x3["chi_sq"] < 1e-10 and r_null_3x3["p_value"] > 0.99},
+         "chi_sq": round(r_null_3x3["chiSq"], 6),
+         "p_value": round(r_null_3x3["pValue"], 6),
+         "pass": r_null_3x3["chiSq"] < 1e-10 and r_null_3x3["pValue"] > 0.99},
         {"test": "Extreme deviation [[1000,10],[10,1000]] -> p underflows to ≈ 0",
-         "chi_sq": round(r_extreme["chi_sq"], 2),
-         "p_value": r_extreme["p_value"],
-         "pass": r_extreme["p_value"] < 1e-100},
+         "chi_sq": round(r_extreme["chiSq"], 2),
+         "p_value": r_extreme["pValue"],
+         "pass": r_extreme["pValue"] < 1e-100},
     ]
     return pd.DataFrame(rows)
 
 
 # ─── Main ─────────────────────────────────────────────────────────────
 
-def main(base_url: str = None) -> int:
-    # This script has no network dependency — base_url is accepted for CI
-    # symmetry with the other validation scripts but is not used.
-    _ = base_url
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("base_url", nargs="?", default=None,
+                        help="unused; kept for CI symmetry with other scripts")
+    parser.add_argument("--frontend-path", default=None,
+                        help="path to Zetyra/frontend (env ZETYRA_FRONTEND_PATH also works)")
+    args = parser.parse_args()
+    _ = args.base_url
+
+    frontend_path = resolve_frontend_path(args.frontend_path)
 
     suites = [
         ("1. Chi-square p-value (survival function)", validate_p_value),
@@ -300,26 +274,28 @@ def main(base_url: str = None) -> int:
     ]
 
     print("=" * 70)
-    print("CHI-SQUARE CALCULATOR VALIDATION (frontend client-side math)")
+    print("CHI-SQUARE CALCULATOR VALIDATION (frontend TS module via Node bridge)")
+    print(f"frontend: {frontend_path}")
     print("=" * 70)
 
     all_pass = True
     all_frames: list[pd.DataFrame] = []
-    for name, fn in suites:
-        print(f"\n{name}")
-        print("-" * 70)
-        try:
-            df = fn(None)
-        except Exception as e:
-            print(f"  ERROR: {e}")
-            all_pass = False
-            continue
-        print(df.to_string(index=False))
-        df_out = df.copy()
-        df_out.insert(0, "suite", name)
-        all_frames.append(df_out)
-        if not df["pass"].all():
-            all_pass = False
+    with FrontendBridge("chi_square", frontend_path) as bridge:
+        for name, fn in suites:
+            print(f"\n{name}")
+            print("-" * 70)
+            try:
+                df = fn(bridge)
+            except Exception as e:
+                print(f"  ERROR: {e}")
+                all_pass = False
+                continue
+            print(df.to_string(index=False))
+            df_out = df.copy()
+            df_out.insert(0, "suite", name)
+            all_frames.append(df_out)
+            if not df["pass"].all():
+                all_pass = False
 
     if all_frames:
         os.makedirs("results", exist_ok=True)
@@ -335,5 +311,4 @@ def main(base_url: str = None) -> int:
 
 
 if __name__ == "__main__":
-    base_url = sys.argv[1] if len(sys.argv) > 1 else None
-    sys.exit(main(base_url))
+    sys.exit(main())
