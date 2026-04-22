@@ -33,13 +33,25 @@ class ZetyraClient:
         """Calculate sample size for continuous outcomes."""
         return self._post("/sample-size/continuous", kwargs)
 
+    def sample_size_continuous_raw(self, **kwargs):
+        """Continuous sample size — return raw Response for error testing."""
+        return self._post_raw("/sample-size/continuous", kwargs)
+
     def sample_size_binary(self, **kwargs) -> dict:
         """Calculate sample size for binary outcomes."""
         return self._post("/sample-size/binary", kwargs)
 
+    def sample_size_binary_raw(self, **kwargs):
+        """Binary sample size — return raw Response for error testing."""
+        return self._post_raw("/sample-size/binary", kwargs)
+
     def sample_size_survival(self, **kwargs) -> dict:
         """Calculate sample size for survival outcomes."""
         return self._post("/sample-size/survival", kwargs, allow_errors=kwargs.pop("allow_errors", False))
+
+    def sample_size_survival_raw(self, **kwargs):
+        """Survival sample size — return raw Response for error testing."""
+        return self._post_raw("/sample-size/survival", kwargs)
 
     def cuped(self, **kwargs) -> dict:
         """Calculate CUPED variance reduction."""

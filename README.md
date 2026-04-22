@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18879839.svg)](https://doi.org/10.5281/zenodo.18879839)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18880066.svg)](https://doi.org/10.5281/zenodo.18880066)
-![Tests](https://img.shields.io/badge/tests-655%20passed-success)
+![Tests](https://img.shields.io/badge/tests-758%20passed-success)
 ![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20RAR%20%7C%20Master%20Protocol-blue)
 ![Accuracy](https://img.shields.io/badge/max%20deviation-0.034%20z--score-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -13,6 +13,8 @@ Independent validation of Zetyra statistical calculators against reference imple
 
 | Calculator | Tests | Status | Reference |
 |------------|-------|--------|-----------|
+| Sample Size (continuous / binary / survival) | 48 | ✅&nbsp;Pass | Cohen (1988) textbook, Schoenfeld (1981), scipy |
+| Chi-Square (client-side math) | 55 | ✅&nbsp;Pass | scipy.stats.chi2, chi2_contingency, fisher_exact |
 | GSD | 30 | ✅&nbsp;Pass | gsDesign R package |
 | GSD PACIFIC OS | 17 | ✅&nbsp;Pass | Antonia et al. (2018) NEJM, Lan-DeMets OBF |
 | GSD MONALEESA-7 OS | 20 | ✅&nbsp;Pass | Im et al. (2019) NEJM, Lan-DeMets OBF |
@@ -46,7 +48,7 @@ Independent validation of Zetyra statistical calculators against reference imple
 | REMAP-CAP Replication | 8 | ✅&nbsp;Pass | Angus et al. (2020), Bayesian platform |
 | Offline References | 23 | ✅&nbsp;Pass | Pure math (no API) |
 
-**Total: 655 tests across 35 scripts, all passing.**
+**Total: 758 tests across 37 scripts, all passing.**
 
 ## Repository Structure
 
@@ -58,7 +60,11 @@ zetyra-validation/
 ├── common/                              # Shared utilities
 │   ├── __init__.py
 │   ├── zetyra_client.py                 # API client (25 endpoints)
-│   └── assertions.py                    # Binomial CI, schema contracts
+│   ├── assertions.py                    # Binomial CI, schema contracts
+│   └── chi_square_frontend_math.py      # Python port of client-side χ² math
+├── free/                                # Free-tier calculators
+│   ├── test_sample_size.py              # Two-sample continuous/binary/survival
+│   └── test_chi_square.py               # χ² p-value, critical, Pearson, McNemar, Fisher
 ├── gsd/
 │   ├── test_gsdesign_benchmark.R        # 23 gsDesign comparisons
 │   ├── test_hptn083.py                  # HPTN 083 replication
@@ -106,6 +112,11 @@ zetyra-validation/
 ```
 
 ## What's Validated
+
+### Free-Tier Calculators (v2.3)
+
+- **Sample Size (continuous / binary / survival)** — 48 tests covering the public `/validation/sample-size/{continuous,binary,survival}` endpoints. Continuous: closed-form two-sample normal-approx, Cohen's d={0.2, 0.5, 0.8} textbook benchmarks, one-sided vs two-sided, unequal allocation, monotonicity in α/power/effect, input guards. Binary: Cohen's h arcsine formula, canonical p₁=0.30 p₂=0.50 → ~93/arm reference, rate-swap symmetry, rare-event penalty, allocation, guards. Survival: Schoenfeld required events vs closed-form, HR=0.7 median=12mo reference, HR/power monotonicity, unequal-allocation penalty, guards.
+- **Chi-Square Calculator (client-side math)** — 55 tests. The calculator runs entirely in the browser, so the Python port in `common/chi_square_frontend_math.py` mirrors the frontend's numerical functions and validates them against `scipy.stats.chi2`, `chi2_contingency`, and `fisher_exact`. Covers the p-value survival function (df ∈ {1, 2, 5, 10, 20}, Abramowitz erf fast path + Numerical Recipes Lentz continued fraction), Wilson-Hilferty critical values, Pearson 2×2 with Yates correction, r×c tables without correction, φ and Cramér's V effect sizes, classical McNemar, two-sided Fisher's exact, and underflow edge cases.
 
 ### Bayesian Toolkit (v1.2)
 
@@ -216,12 +227,13 @@ install.packages(c("gsDesign", "httr", "jsonlite"))
 
 ```bash
 # All Python tests (against local server)
-for f in bayesian/test_*.py gsd/test_*.py cuped/test_*.py ssr/test_*.py adaptive/test_*.py master_protocol/test_*.py; do
+for f in free/test_*.py bayesian/test_*.py gsd/test_*.py cuped/test_*.py ssr/test_*.py adaptive/test_*.py master_protocol/test_*.py; do
   python "$f" http://localhost:8000
 done
 
 # Offline tests (no server needed)
 python bayesian/test_offline_references.py
+python free/test_chi_square.py  # validates the client-side frontend math
 
 # R-based GSD benchmarks
 cd gsd && Rscript test_gsdesign_benchmark.R
