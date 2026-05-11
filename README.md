@@ -325,6 +325,8 @@ Endpoints:
 - `POST /ssr/blinded`
 - `POST /ssr/unblinded`
 - `POST /ssr-single-arm`
+- `POST /ssr-single-arm/calibrate-gamma-final` *(no external test suite yet)*
+- `POST /composed-pipeline` *(no external test suite yet)*
 - `POST /rar`
 - `POST /minimization`
 - `POST /basket`
@@ -408,6 +410,8 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 29. **Single-Arm SSR (PPoS)**: Lee JJ & Liu DD (2008) *A predictive probability design for phase II cancer clinical trials* (Clin Trials 5(2):93–106)
 30. **CRT worked example**: Leyrat C, Eldridge S, Taljaard M, Hemming K (2024) *Practical considerations for sample size calculation for cluster randomized trials* (J Epidemiol Popul Health 72(1):202198; PMID 38477482; doi:10.1016/j.jeph.2024.202198)
 31. **NCT03377023 Bayesian design**: Chen DT, Schell MJ, Fulp WJ, et al. (2019) *Application of Bayesian predictive probability for interim futility analysis in single-arm phase II trial* (Transl Cancer Res 8(Suppl 4):S404–S420; PMID 31456910)
+32. **CP Promising-Zone Type I Error**: Qian L (2026) *Conditional-Power Promising-Zone Sample-Size Re-estimation in Single-Arm Binary Trials Inflates Type I Error: An Exact Enumeration Study* (working paper; reference implementation: [github.com/evidenceinthewild/CP-SSR-Binary-Trials](https://github.com/evidenceinthewild/CP-SSR-Binary-Trials))
+33. **Composed Adaptive Designs**: Qian L (2026) *Pipeline-Level Type I Error in Composed Adaptive Designs: Super-Additive Interactions Among Historical Borrowing, Sequential Monitoring, Sample-Size Re-estimation, and Response-Adaptive Randomization* (Joint Statistical Meetings 2026)
 
 ## Citation
 
