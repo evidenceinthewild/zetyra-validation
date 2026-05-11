@@ -45,6 +45,14 @@ jobs:
     runs-on: ubuntu-latest
     name: R Validation Tests (gsDesign)
 
+    env:
+      # Pin the user library path before setup-r runs so the cache key
+      # and install target resolve consistently. Previously this was
+      # left implicit and the cache path expanded to empty string at
+      # YAML-expansion time, leaving install.packages() and library()
+      # operating on different directories.
+      R_LIBS_USER: ${{ github.workspace }}/.r-libs
+
     steps:
       - uses: actions/checkout@v4
 
@@ -59,6 +67,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev
 
+      - name: Create R library directory
+        run: mkdir -p "$R_LIBS_USER"
+
       - name: Cache R packages
         uses: actions/cache@v4
         with:
@@ -68,11 +79,26 @@ jobs:
 
       - name: Install R packages
         run: |
-          Rscript -e 'install.packages(c("gsDesign", "httr", "jsonlite"), repos="https://cloud.r-project.org")'
+          Rscript -e '
+            .libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()));
+            for (pkg in c("gsDesign", "httr", "jsonlite")) {
+              if (!requireNamespace(pkg, quietly = TRUE)) {
+                install.packages(pkg, lib = Sys.getenv("R_LIBS_USER"))
+              } else {
+                cat(sprintf("%s already installed\n", pkg))
+              }
+            }
+          '
 
       - name: Verify R packages
         run: |
-          Rscript -e 'library(gsDesign); library(httr); library(jsonlite); cat("All packages loaded successfully\n")'
+          Rscript -e '
+            .libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()));
+            library(gsDesign);
+            library(httr);
+            library(jsonlite);
+            cat("All packages loaded successfully\n")
+          '
 
       - name: Run GSD R benchmark
         run: |
