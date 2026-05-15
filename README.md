@@ -1,6 +1,6 @@
 # Zetyra Validation Suite
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18879839.svg)](https://doi.org/10.5281/zenodo.18879839)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20218751.svg)](https://doi.org/10.5281/zenodo.20218751)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18880066.svg)](https://doi.org/10.5281/zenodo.18880066)
 ![Tests](https://img.shields.io/badge/tests-896%20passed-success)
 ![Coverage](https://img.shields.io/badge/coverage-GSD%20%7C%20CUPED%20%7C%20Bayesian%20%7C%20SSR%20%7C%20RAR%20%7C%20Master%20Protocol-blue)
@@ -421,11 +421,11 @@ If you use this validation suite in your work, please cite the accompanying whit
 @software{qian2026zetyra,
   author    = {Qian, Lu},
   title     = {Zetyra: A Validated Suite of Statistical Calculators for Efficient Clinical Trial Design},
-  version   = {2.0},
+  version   = {2.3},
   year      = {2026},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.18879839},
-  url       = {https://doi.org/10.5281/zenodo.18879839}
+  doi       = {10.5281/zenodo.20218751},
+  url       = {https://doi.org/10.5281/zenodo.20218751}
 }
 
 @software{qian2026zetyra_bayesian,
