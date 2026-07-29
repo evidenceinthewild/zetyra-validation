@@ -21,10 +21,33 @@ Independent validation of Zetyra statistical calculators against reference imple
 | DAPA-HF Replication | 11 | ✅&nbsp;Pass | McMurray et al. (2019) *Eur J Heart Fail*: HR=0.80, α=0.025 (1-sided), 90% power, 844 events |
 | Leyrat 2024 Primary-Care CRT | 6 | ✅&nbsp;Pass | Leyrat, Eldridge, Taljaard, Hemming (2024) *J Epidemiol Popul Health* 72(1):202198: p0=0.50 → p1=0.65, ICC=0.05, m=46, 24 clusters |
 | GSD | 30 | ✅&nbsp;Pass | gsDesign R package |
+| GSD Futility (test.type=4) | 46 | ✅&nbsp;Pass | gsDesign R package: futility bounds, max-N inflation, E[N\|H₀], efficacy-only design |
 | GSD PACIFIC OS | 17 | ✅&nbsp;Pass | Antonia et al. (2018) NEJM, Lan-DeMets OBF |
 | GSD MONALEESA-7 OS | 20 | ✅&nbsp;Pass | Im et al. (2019) NEJM, Lan-DeMets OBF |
 | GSD Survival/TTE | 15 | ✅&nbsp;Pass | Schoenfeld (1983), gsDesign |
 | GSD Survival gsDesign Benchmark | 36 | ✅&nbsp;Pass | gsDesign R package (boundaries, alpha spending) |
+
+> **GSD provenance.** All eight GSD suites were re-run on **2026-07-29** (twice: `00043-8mt`, then `00044-l8d` after the protocol/doc hotfix) against production revision **`zetyra-backend-00044-l8d`** and all eight passed (**8/8**). Scripts executed, so the count is unambiguous:
+>
+> | Script | Result |
+> |---|---|
+> | `gsd/test_gsd_futility.py` | 46/46 |
+> | `gsd/test_gsd_survival.py` | pass |
+> | `gsd/test_gsd_survival_benchmark.R` | 47/47 |
+> | `gsd/test_pacific.py` | pass |
+> | `gsd/test_monaleesa7.py` | pass |
+> | `gsd/test_hptn083.py` | pass |
+> | `gsd/test_heartmate.py` | pass |
+> | `gsd/test_gsd_hsd_gamma.py` | 226/226 |
+>
+> `gsd/test_gsd_hsd_gamma.py` validates the user-selectable Hwang-Shih-DeCani
+> shape parameter γ, which shipped in revision **`zetyra-backend-00043-8mt`**
+> (2026-07-29). It was verified to discriminate rather than merely pass: with
+> the endpoint deliberately patched to accept γ and drop it, it falls to
+> **74/226**. That control matters because boundary agreement alone cannot
+> detect a dropped γ — the design still matches gsDesign, just at the wrong γ.
+>
+> `00043-8mt` adds the selectable HSD γ; defaults are unchanged, so every design produced before it is reproduced exactly (omitting γ is identical to the historical fixed −4) and `methodology_version` stays 2. Its predecessor `00042-7dx` was the first carrying the corrected futility derivation (β spent under the alternative, solved jointly with sample size) and deterministic multivariate-normal integration. CSVs in `results/` and `gsd/results/` are the artifacts of this run. These suites exercise the deployed API, so the status describes that revision — re-run after any backend deploy. Note the R benchmark takes a base URL that already includes `/api/v1/validation`; passing a bare host yields 404.
 | CUPED | 12 | ✅&nbsp;Pass | Analytical formulas |
 | CUPED Simulation Benchmark | 43 | ✅&nbsp;Pass | MC simulation, Deng et al. (2013) |
 | Bayesian Predictive Power | 17 | ✅&nbsp;Pass | Conjugate priors |

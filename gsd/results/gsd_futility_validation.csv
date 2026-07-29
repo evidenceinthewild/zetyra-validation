@@ -1,0 +1,47 @@
+test,zetyra,gsdesign,deviation,pass
+"[k=2, 90% power] efficacy look 1",2.9626,2.9626,0.0,True
+"[k=2, 90% power] efficacy look 2",1.9686,1.9686,0.0,True
+"[k=2, 90% power] futility look 1",0.9244,0.9231,0.0013,True
+"[k=2, 90% power] futility look 2",1.9686,1.9686,0.0,True
+"[k=2, 90% power] futility < efficacy at interims","[0.924, 1.969]",strict at interims,,True
+"[k=2, 90% power] futility meets efficacy at final look",1.9686,1.9686,,True
+"[k=2, 90% power] max-N inflation ratio",1.15418,1.15304,0.00114,True
+"[k=2, 90% power] E[N|H0] / max N",0.5881,0.5882,7e-05,True
+"[k=3, 90% power] efficacy look 1",3.7103,3.7103,0.0,True
+"[k=3, 90% power] efficacy look 2",2.5114,2.5114,0.0,True
+"[k=3, 90% power] efficacy look 3",1.993,1.993,0.0,True
+"[k=3, 90% power] futility look 1",0.377,0.3767,0.0003,True
+"[k=3, 90% power] futility look 2",1.2789,1.2785,0.0004,True
+"[k=3, 90% power] futility look 3",1.993,1.993,0.0,True
+"[k=3, 90% power] futility < efficacy at interims","[0.377, 1.279, 1.993]",strict at interims,,True
+"[k=3, 90% power] futility meets efficacy at final look",1.993,1.993,,True
+"[k=3, 90% power] max-N inflation ratio",1.2227,1.22232,0.00038,True
+"[k=3, 90% power] E[N|H0] / max N",0.4799,0.4783,0.00156,True
+"[k=4, 90% power] efficacy look 1",4.3326,4.3326,0.0,True
+"[k=4, 90% power] efficacy look 2",2.9631,2.9631,0.0,True
+"[k=4, 90% power] efficacy look 3",2.359,2.359,0.0,True
+"[k=4, 90% power] efficacy look 4",2.0141,2.0141,0.0,True
+"[k=4, 90% power] futility look 1",0.0193,0.0182,0.0011,True
+"[k=4, 90% power] futility look 2",0.8307,0.8292,0.0015,True
+"[k=4, 90% power] futility look 3",1.4555,1.4537,0.0018,True
+"[k=4, 90% power] futility look 4",2.0141,2.0141,0.0,True
+"[k=4, 90% power] futility < efficacy at interims","[0.019, 0.831, 1.456, 2.014]",strict at interims,,True
+"[k=4, 90% power] futility meets efficacy at final look",2.0141,2.0141,,True
+"[k=4, 90% power] max-N inflation ratio",1.26338,1.26192,0.00146,True
+"[k=4, 90% power] E[N|H0] / max N",0.4305,0.4307,0.00019,True
+"[k=5, 90% power] efficacy look 1  [EXPECTED REJECTION]",HTTP 422,"422 less_than_equal on k, le=4",,True
+"[k=5, 90% power] efficacy look 2  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+"[k=5, 90% power] efficacy look 3  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+"[k=5, 90% power] efficacy look 4  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+"[k=5, 90% power] efficacy look 5  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+"[k=5, 90% power] futility look 1  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+"[k=5, 90% power] futility look 2  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+"[k=5, 90% power] futility look 3  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+"[k=5, 90% power] futility look 4  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+"[k=5, 90% power] futility look 5  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+"[k=5, 90% power] futility < efficacy at interims  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+"[k=5, 90% power] futility meets efficacy at final look  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+"[k=5, 90% power] max-N inflation ratio  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+"[k=5, 90% power] E[N|H0] / max N  [NOT PRODUCED]",absent,no numerical output for an uncertified design,,True
+[efficacy-only] no futility boundaries returned,"[None, None, None]",all null,,True
+[efficacy-only] inflation matches test.type=1,1.01285,1.01185,0.001,True

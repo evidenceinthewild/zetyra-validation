@@ -45,3 +45,4 @@ Thumbs.db
 # Generated files
 *.log
 .DS_Store
+results/gate_artifacts/

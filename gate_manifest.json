@@ -1,0 +1,44 @@
+{
+  "_comment": [
+    "Every protected validation suite, its stable suite_id, and how to run it.",
+    "CI invokes common/run_gate.py against THIS FILE and nothing else, so a",
+    "suite cannot be dropped from the pipeline by editing a workflow step --",
+    "the runner fails when the set of suite_ids it observes differs from the",
+    "set declared here."
+  ],
+  "base_url_default": "https://api.zetyra.com",
+  "suites": [
+    {
+      "suite_id": "gsd-hsd-gamma",
+      "script": "gsd/test_gsd_hsd_gamma.py",
+      "url_suffix": "",
+      "timeout_s": 900,
+      "expected_exit": 0,
+      "min_assertions": 226
+    },
+    {
+      "suite_id": "gsd-futility",
+      "script": "gsd/test_gsd_futility.py",
+      "url_suffix": "",
+      "timeout_s": 900,
+      "expected_exit": 0,
+      "min_assertions": 46
+    },
+    {
+      "suite_id": "gsdesign-benchmark",
+      "script": "gsd/test_gsdesign_benchmark.R",
+      "url_suffix": "/api/v1/validation",
+      "timeout_s": 900,
+      "expected_exit": 0,
+      "min_assertions": 32
+    },
+    {
+      "suite_id": "gsd-survival-benchmark",
+      "script": "gsd/test_gsd_survival_benchmark.R",
+      "url_suffix": "/api/v1/validation",
+      "timeout_s": 900,
+      "expected_exit": 0,
+      "min_assertions": 47
+    }
+  ]
+}

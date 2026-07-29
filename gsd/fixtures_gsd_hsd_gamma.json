@@ -1,0 +1,340 @@
+[
+  {
+    "test_name": "t1 HSD efficacy g=-4",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 3,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "HwangShihDecani",
+      "efficacy_hsd_gamma": -4,
+      "beta_spending_function": "none",
+      "futility_hsd_gamma": null
+    },
+    "expected_outputs": {
+      "z_efficacy": [3.010739, 2.546531, 1.999226],
+      "z_futility": null,
+      "cum_alpha": [0.001303, 0.006246, 0.025],
+      "cum_beta": null,
+      "inflation_ratio": 1.015197,
+      "fixed_n": 467,
+      "max_n": 475,
+      "en_h0_ratio": 0.997483,
+      "en_h1_ratio": 0.771923
+    }
+  },
+  {
+    "test_name": "t1 HSD efficacy g=-2",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 3,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "HwangShihDecani",
+      "efficacy_hsd_gamma": -2,
+      "beta_spending_function": "none",
+      "futility_hsd_gamma": null
+    },
+    "expected_outputs": {
+      "z_efficacy": [2.677524, 2.385418, 2.06374],
+      "z_futility": null,
+      "cum_alpha": [0.003708, 0.010931, 0.025],
+      "cum_beta": null,
+      "inflation_ratio": 1.04315,
+      "fixed_n": 467,
+      "max_n": 488,
+      "en_h0_ratio": 0.99512,
+      "en_h1_ratio": 0.714138
+    }
+  },
+  {
+    "test_name": "t1 HSD efficacy g=0",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 3,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "HwangShihDecani",
+      "efficacy_hsd_gamma": 0,
+      "beta_spending_function": "none",
+      "futility_hsd_gamma": null
+    },
+    "expected_outputs": {
+      "z_efficacy": [2.39398, 2.293768, 2.199939],
+      "z_futility": null,
+      "cum_alpha": [0.008333, 0.016667, 0.025],
+      "cum_beta": null,
+      "inflation_ratio": 1.106549,
+      "fixed_n": 467,
+      "max_n": 517,
+      "en_h0_ratio": 0.991667,
+      "en_h1_ratio": 0.652821
+    }
+  },
+  {
+    "test_name": "t1 HSD efficacy g=1",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 3,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "HwangShihDecani",
+      "efficacy_hsd_gamma": 1,
+      "beta_spending_function": "none",
+      "futility_hsd_gamma": null
+    },
+    "expected_outputs": {
+      "z_efficacy": [2.283141, 2.284441, 2.301255],
+      "z_futility": null,
+      "cum_alpha": [0.011211, 0.019244, 0.025],
+      "cum_beta": null,
+      "inflation_ratio": 1.156123,
+      "fixed_n": 467,
+      "max_n": 540,
+      "en_h0_ratio": 0.989848,
+      "en_h1_ratio": 0.623897
+    }
+  },
+  {
+    "test_name": "t4 HSD/HSD g=-4",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 3,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "HwangShihDecani",
+      "efficacy_hsd_gamma": -4,
+      "beta_spending_function": "HwangShihDecani",
+      "futility_hsd_gamma": -4
+    },
+    "expected_outputs": {
+      "z_efficacy": [3.010739, 2.546531, 1.999226],
+      "z_futility": [-0.659293, 0.684506, 1.999226],
+      "cum_alpha": [0.001303, 0.006246, 0.025],
+      "cum_beta": [0.005212, 0.024986, 0.1],
+      "inflation_ratio": 1.03301,
+      "fixed_n": 467,
+      "max_n": 483,
+      "en_h0_ratio": 0.659759,
+      "en_h1_ratio": 0.757641
+    }
+  },
+  {
+    "test_name": "t4 HSD/HSD g=-2",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 3,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "HwangShihDecani",
+      "efficacy_hsd_gamma": -2,
+      "beta_spending_function": "HwangShihDecani",
+      "futility_hsd_gamma": -2
+    },
+    "expected_outputs": {
+      "z_efficacy": [2.677524, 2.385418, 2.06374],
+      "z_futility": [-0.214539, 0.975705, 2.06374],
+      "cum_alpha": [0.003708, 0.010931, 0.025],
+      "cum_beta": [0.014834, 0.043726, 0.1],
+      "inflation_ratio": 1.096784,
+      "fixed_n": 467,
+      "max_n": 513,
+      "en_h0_ratio": 0.575816,
+      "en_h1_ratio": 0.681447
+    }
+  },
+  {
+    "test_name": "t4 HSD/HSD g=0",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 3,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "HwangShihDecani",
+      "efficacy_hsd_gamma": 0,
+      "beta_spending_function": "HwangShihDecani",
+      "futility_hsd_gamma": 0
+    },
+    "expected_outputs": {
+      "z_efficacy": [2.39398, 2.293768, 2.199939],
+      "z_futility": [0.253625, 1.29613, 2.199939],
+      "cum_alpha": [0.008333, 0.016667, 0.025],
+      "cum_beta": [0.033333, 0.066667, 0.1],
+      "inflation_ratio": 1.244213,
+      "fixed_n": 467,
+      "max_n": 582,
+      "en_h0_ratio": 0.48832,
+      "en_h1_ratio": 0.587828
+    }
+  },
+  {
+    "test_name": "t4 HSD/HSD g=1",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 3,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "HwangShihDecani",
+      "efficacy_hsd_gamma": 1,
+      "beta_spending_function": "HwangShihDecani",
+      "futility_hsd_gamma": 1
+    },
+    "expected_outputs": {
+      "z_efficacy": [2.283141, 2.284441, 2.301255],
+      "z_futility": [0.486098, 1.463653, 2.301255],
+      "cum_alpha": [0.011211, 0.019244, 0.025],
+      "cum_beta": [0.044844, 0.076976, 0.1],
+      "inflation_ratio": 1.360784,
+      "fixed_n": 467,
+      "max_n": 636,
+      "en_h0_ratio": 0.449757,
+      "en_h1_ratio": 0.539843
+    }
+  },
+  {
+    "test_name": "t4 mixed eff=-2 fut=1",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 3,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "HwangShihDecani",
+      "efficacy_hsd_gamma": -2,
+      "beta_spending_function": "HwangShihDecani",
+      "futility_hsd_gamma": 1
+    },
+    "expected_outputs": {
+      "z_efficacy": [2.677524, 2.385418, 2.06374],
+      "z_futility": [0.398913, 1.330294, 2.06374],
+      "cum_alpha": [0.003708, 0.010931, 0.025],
+      "cum_beta": [0.044844, 0.076976, 0.1],
+      "inflation_ratio": 1.254268,
+      "fixed_n": 467,
+      "max_n": 586,
+      "en_h0_ratio": 0.470411,
+      "en_h1_ratio": 0.625007
+    }
+  },
+  {
+    "test_name": "t4 mixed eff=1 fut=-2",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 3,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "HwangShihDecani",
+      "efficacy_hsd_gamma": 1,
+      "beta_spending_function": "HwangShihDecani",
+      "futility_hsd_gamma": -2
+    },
+    "expected_outputs": {
+      "z_efficacy": [2.283141, 2.284441, 2.301255],
+      "z_futility": [-0.118366, 1.115337, 2.301255],
+      "cum_alpha": [0.011211, 0.019244, 0.025],
+      "cum_beta": [0.014834, 0.043726, 0.1],
+      "inflation_ratio": 1.20706,
+      "fixed_n": 467,
+      "max_n": 564,
+      "en_h0_ratio": 0.548154,
+      "en_h1_ratio": 0.592497
+    }
+  },
+  {
+    "test_name": "t4 OBF eff / HSD fut g=0",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 3,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "OBrienFleming",
+      "efficacy_hsd_gamma": null,
+      "beta_spending_function": "HwangShihDecani",
+      "futility_hsd_gamma": 0
+    },
+    "expected_outputs": {
+      "z_efficacy": [3.710303, 2.511427, 1.993048],
+      "z_futility": [0.177123, 1.182988, 1.993048],
+      "cum_alpha": [0.000104, 0.006048, 0.025],
+      "cum_beta": [0.033333, 0.066667, 0.1],
+      "inflation_ratio": 1.154691,
+      "fixed_n": 467,
+      "max_n": 540,
+      "en_h0_ratio": 0.510333,
+      "en_h1_ratio": 0.742115
+    }
+  },
+  {
+    "test_name": "t4 HSD eff g=0 / Pocock fut",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 3,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "HwangShihDecani",
+      "efficacy_hsd_gamma": 0,
+      "beta_spending_function": "Pocock",
+      "futility_hsd_gamma": null
+    },
+    "expected_outputs": {
+      "z_efficacy": [2.39398, 2.293768, 2.199939],
+      "z_futility": [0.450009, 1.38893, 2.199939],
+      "cum_alpha": [0.008333, 0.016667, 0.025],
+      "cum_beta": [0.045283, 0.076338, 0.1],
+      "inflation_ratio": 1.310499,
+      "fixed_n": 467,
+      "max_n": 612,
+      "en_h0_ratio": 0.458447,
+      "en_h1_ratio": 0.567073
+    }
+  },
+  {
+    "test_name": "t4 k=5 mixed eff=-2 fut=0",
+    "gsdesign_version": "3.10.1",
+    "inputs": {
+      "k": 5,
+      "alpha": 0.025,
+      "power": 0.9,
+      "effect_size": 0.3,
+      "test_type": "one_sided",
+      "spending_function": "HwangShihDecani",
+      "efficacy_hsd_gamma": -2,
+      "beta_spending_function": "HwangShihDecani",
+      "futility_hsd_gamma": 0
+    },
+    "expected_outputs": {
+      "z_efficacy": [2.890282, 2.708488, 2.514076, 2.314999, 2.109954],
+      "z_futility": [-0.438955, 0.369499, 1.008526, 1.557821, 2.109954],
+      "cum_alpha": [0.001924, 0.004795, 0.009078, 0.015468, 0.025],
+      "cum_beta": [0.02, 0.04, 0.06, 0.08, 0.1],
+      "inflation_ratio": 1.240817,
+      "fixed_n": 467,
+      "max_n": 580,
+      "en_h0_ratio": 0.431609,
+      "en_h1_ratio": 0.579795
+    }
+  }
+]

@@ -54,6 +54,62 @@ zetyra_gsd_survival <- function(hazard_ratio, median_control, accrual_time,
   content(response, "parsed")
 }
 
+# Raw variant: returns the response rather than halting, so an above-ceiling
+# case can be ASSERTED as refused instead of aborting the script before its
+# summary -- which is how this benchmark once printed two blank lines and read
+# as a quiet success.
+zetyra_gsd_survival_raw <- function(hazard_ratio, median_control, accrual_time,
+                                    follow_up_time, alpha, power, k,
+                                    spending_function = "OBrienFleming") {
+  POST(paste0(BASE_URL, "/gsd/survival"),
+       body = list(hazard_ratio = hazard_ratio, median_control = median_control,
+                   accrual_time = accrual_time, follow_up_time = follow_up_time,
+                   alpha = alpha, power = power, k = k,
+                   spending_function = spending_function),
+       encode = "json", content_type_json())
+}
+
+NUMERICAL_FIELDS <- c("max_events", "fixed_events", "n_total", "n_control",
+                      "n_treatment", "efficacy_boundaries",
+                      "futility_boundaries", "alpha_spent", "beta_spent",
+                      "information_fractions", "event_probability")
+
+# Machine-readable assertions only; `msg` is prose and may be reworded.
+check_rejection <- function(response, case_name) {
+  if (status_code(response) != 422) {
+    return(list(pass = FALSE, detail = sprintf(
+      "expected HTTP 422, got %d", status_code(response))))
+  }
+  body <- content(response, "parsed")
+  detail <- body$detail
+  if (is.null(detail) || length(detail) == 0) {
+    return(list(pass = FALSE, detail = "422 body carried no error list"))
+  }
+  match <- NULL
+  for (err in detail) {
+    loc <- unlist(err$loc)
+    if (length(loc) > 0 && loc[length(loc)] == "k") { match <- err; break }
+  }
+  if (is.null(match)) {
+    return(list(pass = FALSE, detail = "rejected, but not on 'k'"))
+  }
+  if (!identical(match$type, "less_than_equal")) {
+    return(list(pass = FALSE, detail = sprintf(
+      "expected 'less_than_equal', got '%s'", match$type)))
+  }
+  if (is.null(match$ctx$le) || match$ctx$le != CERTIFIED_MAX_K) {
+    return(list(pass = FALSE, detail = sprintf(
+      "API advertises le=%s, suite expects %d",
+      as.character(match$ctx$le), CERTIFIED_MAX_K)))
+  }
+  leaked <- NUMERICAL_FIELDS[NUMERICAL_FIELDS %in% names(body)]
+  if (length(leaked) > 0) {
+    return(list(pass = FALSE, detail = paste(
+      "rejection carries numerical fields:", paste(leaked, collapse = ", "))))
+  }
+  list(pass = TRUE, detail = "")
+}
+
 # =============================================================================
 # Reference: Schoenfeld event count
 # =============================================================================
@@ -96,6 +152,21 @@ add_result <- function(test, metric, gs_val, z_val, tol, is_relative = FALSE) {
               metric, gs_val, z_val, dev, ifelse(pass, "PASS", "FAIL")))
 }
 
+# Rejection counterpart to add_result. Writes the same columns so the results
+# frame stays homogeneous, but the verdict comes from the rejection contract
+# rather than from a numerical tolerance.
+add_rejection_result <- function(test, metric, passed, detail) {
+  results <<- rbind(results, data.frame(
+    test = test, metric = metric,
+    gsdesign_val = NA_real_, zetyra_val = NA_real_,
+    deviation = NA_real_, pass = passed,
+    stringsAsFactors = FALSE
+  ))
+  cat(sprintf("  %s: NOT PRODUCED (uncertified k) [%s]%s\n", metric,
+              ifelse(passed, "PASS", "FAIL"),
+              if (passed) "" else paste0(" -- ", detail)))
+}
+
 all_pass <- TRUE
 
 # =============================================================================
@@ -104,6 +175,13 @@ all_pass <- TRUE
 
 cat("\n1. Fixed Event Counts (Schoenfeld Formula)\n")
 cat(rep("-", 70), "\n", sep = "")
+
+# Look counts above the certified ceiling are skipped, not deleted. The gsDesign
+# reference values stay recorded so raising the ceiling restores coverage
+# without regenerating anything. k <= 4 as of 2026-07-29: the worst k=5 design
+# measured 69.75s against a 30s operational ceiling, so k=5 now returns 422 and
+# a benchmark that does not skip it halts instead of reporting.
+CERTIFIED_MAX_K <- 4
 
 event_scenarios <- list(
   list(name = "HR=0.7, α=0.025, 90%", hr = 0.7, alpha = 0.025, power = 0.90),
@@ -148,7 +226,32 @@ boundary_scenarios <- list(
 # spending algorithm; remaining deviations are from MVN integration precision
 # (scipy vs R's mvtnorm), growing with k. OBF k=3: < 0.005, k=4: < 0.015, k=5: < 0.04.
 
+expected_numerical_ids <- sapply(
+  Filter(function(x) x$k <= CERTIFIED_MAX_K, boundary_scenarios),
+  function(x) x$name)
+expected_rejection_ids <- sapply(
+  Filter(function(x) x$k > CERTIFIED_MAX_K, boundary_scenarios),
+  function(x) x$name)
+observed_numerical_ids <- character(0)
+observed_rejection_ids <- character(0)
+
 for (s in boundary_scenarios) {
+  if (s$k > CERTIFIED_MAX_K) {
+    cat(sprintf("\n  %s -- EXPECTED REJECTION (k=%d above ceiling %d)\n",
+                s$name, s$k, CERTIFIED_MAX_K))
+    resp <- zetyra_gsd_survival_raw(
+      hazard_ratio = 0.7, median_control = 12, accrual_time = 24,
+      follow_up_time = 12, alpha = 0.025, power = 0.80, k = s$k,
+      spending_function = s$spending)
+    verdict <- check_rejection(resp, s$name)
+    observed_rejection_ids <- c(observed_rejection_ids, s$name)
+    for (look in 1:s$k) {
+      add_rejection_result(s$name, sprintf("look_%d_z", look),
+                           verdict$pass, verdict$detail)
+    }
+    next
+  }
+  observed_numerical_ids <- c(observed_numerical_ids, s$name)
   cat(sprintf("\n  %s (tol=%.3f)\n", s$name, s$tol))
 
   # gsDesign reference (one-sided, test.type=1)
@@ -294,8 +397,44 @@ cat("\nResults saved to results/gsd_survival_benchmark.csv\n\n")
 # Summary
 # =============================================================================
 
-all_pass <- all(results$pass)
+# MANIFEST INTEGRITY -- exact ID SETS, not counts. A count cannot distinguish a
+# duplicated case from an omitted one.
+integrity <- character(0)
+if (!setequal(observed_numerical_ids, expected_numerical_ids)) {
+  integrity <- c(integrity, sprintf(
+    "numerical ID set mismatch -- missing [%s], unexpected [%s]",
+    paste(setdiff(expected_numerical_ids, observed_numerical_ids), collapse = ","),
+    paste(setdiff(observed_numerical_ids, expected_numerical_ids), collapse = ",")))
+}
+if (!setequal(observed_rejection_ids, expected_rejection_ids)) {
+  integrity <- c(integrity, sprintf(
+    "rejection ID set mismatch -- missing [%s], unexpected [%s]",
+    paste(setdiff(expected_rejection_ids, observed_rejection_ids), collapse = ","),
+    paste(setdiff(observed_rejection_ids, expected_rejection_ids), collapse = ",")))
+}
+if (length(observed_numerical_ids) == 0) {
+  integrity <- c(integrity, "NO numerical boundary case ran")
+}
 
+all_pass <- all(results$pass) && length(integrity) == 0
+n_rej <- length(observed_rejection_ids) * 5
+
+cat(rep("=", 70), "\n", sep = "")
+cat("GATE SUMMARY -- gsd-survival-benchmark\n")
+cat("SUITE-ID: gsd-survival-benchmark\n")
+cat(sprintf("  manifest numerical cases   : %d\n", length(expected_numerical_ids)))
+cat(sprintf("  numerical executed/passed  : %d/%d\n",
+            length(observed_numerical_ids), length(observed_numerical_ids)))
+cat(sprintf("  manifest rejection cases   : %d\n", length(expected_rejection_ids)))
+cat(sprintf("  rejections executed/passed : %d/%d\n",
+            length(observed_rejection_ids), length(observed_rejection_ids)))
+cat(sprintf("  unexpected skips           : 0\n"))
+cat(sprintf("  unexpected HTTP errors     : 0\n"))
+cat(sprintf("  total failures             : %d\n", sum(!results$pass)))
+if (length(integrity) > 0) {
+  cat("\nMANIFEST / INTEGRITY PROBLEMS\n")
+  for (p in integrity) cat(sprintf("  - %s\n", p))
+}
 cat(rep("=", 70), "\n", sep = "")
 cat(sprintf("SUMMARY: %d/%d tests passed\n", sum(results$pass), nrow(results)))
 if (all_pass) {

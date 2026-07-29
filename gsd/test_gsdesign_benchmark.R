@@ -50,6 +50,64 @@ zetyra_gsd <- function(effect_size, alpha, power, k, spending_function, timing =
   content(response, "parsed")
 }
 
+# Raw variant: returns the response instead of halting. An above-ceiling case
+# is EXPECTED to be refused, so a helper that stops on non-200 cannot assert
+# it -- and stopping is exactly how this script printed two blank lines and
+# read as a quiet success when the ceiling first dropped.
+zetyra_gsd_raw <- function(effect_size, alpha, power, k, spending_function) {
+  POST(paste0(BASE_URL, "/gsd"),
+       body = list(effect_size = effect_size, alpha = alpha, power = power,
+                   k = k, spending_function = spending_function),
+       encode = "json", content_type_json())
+}
+
+# Numerical result fields. Any of these in a rejection body would mean a design
+# was produced for an uncertified input.
+NUMERICAL_FIELDS <- c("n_max", "n_fixed", "efficacy_boundaries",
+                      "futility_boundaries", "alpha_spent", "beta_spent",
+                      "information_fractions", "expected_n_h0", "expected_n_h1")
+
+# Assert one above-ceiling case is refused, and refused for the right reason.
+# Machine-readable fields only: `msg` is prose and may be reworded at any time.
+check_rejection <- function(response, case_name) {
+  if (status_code(response) != 422) {
+    return(list(pass = FALSE, detail = sprintf(
+      "expected HTTP 422, got %d -- uncertified k was not refused",
+      status_code(response))))
+  }
+  body <- content(response, "parsed")
+  detail <- body$detail
+  if (is.null(detail) || length(detail) == 0) {
+    return(list(pass = FALSE, detail = "422 body carried no error list"))
+  }
+  match <- NULL
+  for (err in detail) {
+    loc <- unlist(err$loc)
+    if (length(loc) > 0 && loc[length(loc)] == "k") { match <- err; break }
+  }
+  if (is.null(match)) {
+    return(list(pass = FALSE, detail = paste(
+      "rejected, but not on 'k' -- refusing for the wrong reason passes a",
+      "naive status check while the real bound is unenforced")))
+  }
+  if (!identical(match$type, "less_than_equal")) {
+    return(list(pass = FALSE, detail = sprintf(
+      "expected error type 'less_than_equal', got '%s'", match$type)))
+  }
+  ceiling_val <- match$ctx$le
+  if (is.null(ceiling_val) || ceiling_val != CERTIFIED_MAX_K) {
+    return(list(pass = FALSE, detail = sprintf(
+      "API advertises ceiling le=%s, suite expects %d",
+      as.character(ceiling_val), CERTIFIED_MAX_K)))
+  }
+  leaked <- NUMERICAL_FIELDS[NUMERICAL_FIELDS %in% names(body)]
+  if (length(leaked) > 0) {
+    return(list(pass = FALSE, detail = paste(
+      "rejection body carries numerical fields:", paste(leaked, collapse = ", "))))
+  }
+  list(pass = TRUE, detail = "")
+}
+
 # =============================================================================
 # Benchmark Tests
 # =============================================================================
@@ -69,6 +127,13 @@ results <- data.frame(
 all_pass <- TRUE
 
 # Test configurations matching gsd_reference_boundaries.csv
+# Look counts above the certified ceiling are skipped, not deleted. The gsDesign
+# reference values stay recorded so raising the ceiling restores coverage
+# without regenerating anything. k <= 4 as of 2026-07-29: the worst k=5 design
+# measured 69.75s against a 30s operational ceiling, so k=5 now returns 422 and
+# a benchmark that does not skip it halts instead of reporting.
+CERTIFIED_MAX_K <- 4
+
 test_configs <- list(
   list(name = "OF_2", k = 2, sfu = sfLDOF, spending = "OBrienFleming"),
   list(name = "OF_3", k = 3, sfu = sfLDOF, spending = "OBrienFleming"),
@@ -85,7 +150,44 @@ test_configs <- list(
 
 cat("Testing", length(test_configs), "design configurations...\n\n")
 
+# Manifest, declared up front so the run is measured against an expectation
+# rather than against whatever it happened to do.
+expected_numerical_ids <- sapply(
+  Filter(function(c) c$k <= CERTIFIED_MAX_K, test_configs), function(c) c$name)
+expected_rejection_ids <- sapply(
+  Filter(function(c) c$k > CERTIFIED_MAX_K, test_configs), function(c) c$name)
+observed_numerical_ids <- character(0)
+observed_rejection_ids <- character(0)
+
 for (config in test_configs) {
+  if (config$k > CERTIFIED_MAX_K) {
+    # EXPECTED REJECTION. Emits the same per-look labels the case would have
+    # emitted numerically, so the assertion count is unchanged and only the
+    # meaning differs: each row now asserts the value is NOT produced.
+    cat(sprintf("Testing %s (k=%d) -- EXPECTED REJECTION...\n",
+                config$name, config$k))
+    resp <- zetyra_gsd_raw(effect_size = 0.3, alpha = 0.025, power = 0.80,
+                           k = config$k, spending_function = config$spending)
+    verdict <- check_rejection(resp, config$name)
+    observed_rejection_ids <- c(observed_rejection_ids, config$name)
+
+    for (look in 1:config$k) {
+      results <- rbind(results, data.frame(
+        design = config$name, look = look,
+        gsdesign_z = NA_real_, zetyra_z = NA_real_, deviation = NA_real_,
+        pass = verdict$pass,
+        note = if (verdict$pass)
+          sprintf("rejected 422 less_than_equal on k, le=%d", CERTIFIED_MAX_K)
+          else verdict$detail,
+        stringsAsFactors = FALSE))
+      cat(sprintf("  Look %d: NOT PRODUCED (uncertified k) [%s]\n",
+                  look, if (verdict$pass) "PASS" else "FAIL"))
+    }
+    if (!verdict$pass) { all_pass <- FALSE; cat(sprintf("  -> %s\n", verdict$detail)) }
+    cat("\n")
+    next
+  }
+  observed_numerical_ids <- c(observed_numerical_ids, config$name)
   cat(sprintf("Testing %s (k=%d)...\n", config$name, config$k))
 
   # gsDesign reference
@@ -122,6 +224,7 @@ for (config in test_configs) {
       zetyra_z = round(z_z, 4),
       deviation = round(deviation, 4),
       pass = pass,
+      note = "",
       stringsAsFactors = FALSE
     ))
 
@@ -147,9 +250,58 @@ cat("Results saved to results/gsd_validation_results.csv\n\n")
 # Summary
 # =============================================================================
 
+# MANIFEST INTEGRITY. Compared as exact ID SETS, not counts: a count cannot
+# distinguish a duplicated case from an omitted one, since dropping one and
+# duplicating another leaves the total unchanged.
+integrity <- character(0)
+if (length(unique(expected_numerical_ids)) != length(expected_numerical_ids) ||
+    length(unique(expected_rejection_ids)) != length(expected_rejection_ids)) {
+  integrity <- c(integrity, "manifest contains duplicate case IDs")
+}
+if (!setequal(observed_numerical_ids, expected_numerical_ids)) {
+  integrity <- c(integrity, sprintf(
+    "numerical ID set mismatch -- missing [%s], unexpected [%s]",
+    paste(setdiff(expected_numerical_ids, observed_numerical_ids), collapse = ","),
+    paste(setdiff(observed_numerical_ids, expected_numerical_ids), collapse = ",")))
+}
+if (!setequal(observed_rejection_ids, expected_rejection_ids)) {
+  integrity <- c(integrity, sprintf(
+    "rejection ID set mismatch -- missing [%s], unexpected [%s]",
+    paste(setdiff(expected_rejection_ids, observed_rejection_ids), collapse = ","),
+    paste(setdiff(observed_rejection_ids, expected_rejection_ids), collapse = ",")))
+}
+if (length(observed_numerical_ids) == 0) {
+  integrity <- c(integrity, paste(
+    "NO numerical case ran. A suite that asserts only rejections proves the",
+    "API refuses work, not that it computes correctly."))
+}
+if (length(integrity) > 0) all_pass <- FALSE
+
+n_rejection_rows <- sum(!is.na(results$note) & nzchar(results$note))
 cat(rep("=", 70), "\n", sep = "")
-cat(sprintf("SUMMARY: %d/%d boundary comparisons passed\n",
-            sum(results$pass), nrow(results)))
+cat("GATE SUMMARY -- gsdesign-benchmark\n")
+cat("SUITE-ID: gsdesign-benchmark\n")
+cat(sprintf("  manifest numerical cases   : %d\n", length(expected_numerical_ids)))
+cat(sprintf("  numerical executed/passed  : %d/%d\n",
+            length(observed_numerical_ids),
+            length(observed_numerical_ids) - length(unique(
+              results$design[!results$pass & !nzchar(results$note)]))))
+cat(sprintf("  manifest rejection cases   : %d\n", length(expected_rejection_ids)))
+cat(sprintf("  rejections executed/passed : %d/%d\n",
+            length(observed_rejection_ids),
+            length(observed_rejection_ids) - length(unique(
+              results$design[!results$pass & nzchar(results$note)]))))
+cat(sprintf("  unexpected skips           : 0\n"))
+cat(sprintf("  unexpected HTTP errors     : 0\n"))
+cat(sprintf("  total failures             : %d\n", sum(!results$pass)))
+if (length(integrity) > 0) {
+  cat("\nMANIFEST / INTEGRITY PROBLEMS\n")
+  for (p in integrity) cat(sprintf("  - %s\n", p))
+}
+cat(rep("=", 70), "\n", sep = "")
+cat(sprintf("SUMMARY: %d/%d assertions passed (%d numerical, %d rejection)\n",
+            sum(results$pass), nrow(results),
+            nrow(results) - n_rejection_rows, n_rejection_rows))
 if (all_pass) {
   cat("✓ ALL VALIDATIONS PASSED\n")
 } else {
