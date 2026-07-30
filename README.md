@@ -26,7 +26,6 @@ Independent validation of Zetyra statistical calculators against reference imple
 | GSD MONALEESA-7 OS | 20 | ✅&nbsp;Pass | Im et al. (2019) NEJM, Lan-DeMets OBF |
 | GSD Survival/TTE | 15 | ✅&nbsp;Pass | Schoenfeld (1983), gsDesign |
 | GSD Survival gsDesign Benchmark | 47 | ✅&nbsp;Pass | gsDesign R package (boundaries, alpha spending) |
-
 | CUPED | 12 | ✅&nbsp;Pass | Analytical formulas |
 | CUPED Simulation Benchmark | 43 | ✅&nbsp;Pass | MC simulation, Deng et al. (2013) |
 | Bayesian Predictive Power | 17 | ✅&nbsp;Pass | Conjugate priors |
@@ -64,7 +63,6 @@ Independent validation of Zetyra statistical calculators against reference imple
 > [docs/gsd_provenance.md](docs/gsd_provenance.md) — that file changes on every
 > backend deploy, this table does not. These suites exercise the deployed API,
 > so any GSD status here describes a revision; re-run after any backend deploy.
-
 
 ## Repository Structure
 
