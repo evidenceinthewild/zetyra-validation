@@ -8,24 +8,35 @@ Detailed breakdown of validation results comparing Zetyra calculators against re
 
 ## GSD Validation Against gsDesign
 
-**Maximum deviation: 0.034 z-score** (target: 0.04)
-**Mean deviation: 0.004 z-score**
+**Maximum deviation: 0.0000 z-score** (tolerance: 0.0005)
+**Mean deviation: 0.0000 z-score**
 
-Note: OBF uses Lan-DeMets spending (sfLDOF), matching gsDesign's `sfu=sfLDOF`. Residual deviations at later looks of k≥4 designs are from MVN integration precision differences between scipy and R's mvtnorm.
+Re-run 2026-07-30 against production revision `zetyra-backend-00046-szb`:
+32 assertions, 27 numerical and 5 rejection, all passing. OBF uses Lan-DeMets
+spending (`sfLDOF`), matching gsDesign's `sfu=sfLDOF`; Pocock and `OFparam` use
+the classical Wang-Tsiatis constructions. Full provenance, including the
+discrimination controls, is in [gsd_provenance.md](gsd_provenance.md).
 
 ### Boundary Comparisons by Design
 
 | Design | Looks | Boundaries Tested | Max Dev | Status |
 |--------|-------|-------------------|---------|--------|
 | OF_2   | 2     | 2                 | 0.0000  | ✅ Pass |
-| OF_3   | 3     | 3                 | 0.0015  | ✅ Pass |
-| OF_4   | 4     | 4                 | 0.0117  | ✅ Pass |
-| OF_5   | 5     | 5                 | 0.0332  | ✅ Pass |
+| OF_3   | 3     | 3                 | 0.0000  | ✅ Pass |
+| OF_4   | 4     | 4                 | 0.0000  | ✅ Pass |
+| OF_5   | 5     | —                 | —       | ✅ Rejected (HTTP 422, `k ≤ 4`) |
 | Pocock_2 | 2   | 2                 | 0.0000  | ✅ Pass |
-| Pocock_3 | 3   | 3                 | 0.0010  | ✅ Pass |
-| Pocock_4 | 4   | 4                 | 0.0033  | ✅ Pass |
+| Pocock_3 | 3   | 3                 | 0.0000  | ✅ Pass |
+| Pocock_4 | 4   | 4                 | 0.0000  | ✅ Pass |
+| OFparam_2 | 2  | 2                 | 0.0000  | ✅ Pass |
+| OFparam_3 | 3  | 3                 | 0.0000  | ✅ Pass |
+| OFparam_4 | 4  | 4                 | 0.0000  | ✅ Pass |
 
-[See detailed results →](../gsd/results/gsd_validation_results.csv)
+`OF_5` is a rejection case, not a gap: k=5 is outside the certified domain
+because the worst measured five-look solve took 69.75s against a 30s
+operational budget. The benchmark asserts the 422 rather than skipping it.
+
+[See detailed results →](../results/gsd_validation_results.csv)
 
 ### Published Trial Replications
 

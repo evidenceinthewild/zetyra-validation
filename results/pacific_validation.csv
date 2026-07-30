@@ -15,4 +15,4 @@ Final boundary near z_alpha,,,,,True,,,,,,,,,,,,,,,,,2.0302,1.96,,,,,,
 Fixed events match Schoenfeld formula,,,,,True,,,,,,,,,,,,,,,,,,,242.0,242.0,0.0,,,
 Max events >= fixed events,,,,,True,,,,,,,,,,,,,,,,,,,,,,298.0,242.0,
 N_total >= max_events,,,,,True,,,,,,,,,,,,,,,,,,,,,,298.0,,440.0
-Efficacy boundaries decrease (OBF),,,,,True,,,,,,,,,,,,,"[3.7103, 2.5114, 1.9931]",,,,,,,,,,,
+Efficacy boundaries decrease (OBF),,,,,True,,,,,,,,,,,,,"[3.7103, 2.5114, 1.993]",,,,,,,,,,,

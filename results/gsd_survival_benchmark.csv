@@ -45,4 +45,4 @@
 "OBF k=3","info_frac_look_3",1,1,0,TRUE
 "HR consistency","look_1: HR=0.7 vs HR=0.8",3.7103,3.7103,0,TRUE
 "HR consistency","look_2: HR=0.7 vs HR=0.8",2.5114,2.5114,0,TRUE
-"HR consistency","look_3: HR=0.7 vs HR=0.8",1.993,1.993,0,TRUE
+"HR consistency","look_3: HR=0.7 vs HR=0.8",1.9931,1.993,1e-04,TRUE

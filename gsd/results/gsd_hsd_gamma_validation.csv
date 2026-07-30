@@ -1,227 +1,227 @@
 test,zetyra,gsdesign,deviation,pass
-[t1 HSD efficacy g=-4] efficacy look 1,3.0,3.010739,0.010739,False
-[t1 HSD efficacy g=-4] efficacy look 2,3.0,2.546531,0.453469,False
-[t1 HSD efficacy g=-4] efficacy look 3,3.0,1.999226,1.000774,False
-[t1 HSD efficacy g=-4] no futility boundaries,"[0.5, 0.5, 0.5]",all null,,False
-[t1 HSD efficacy g=-4] cumulative alpha look 1,0.025,0.001303,0.023697,False
-[t1 HSD efficacy g=-4] cumulative alpha look 2,0.025,0.006246,0.018754,False
+[t1 HSD efficacy g=-4] efficacy look 1,3.0107,3.010739,3.9e-05,True
+[t1 HSD efficacy g=-4] efficacy look 2,2.5465,2.546531,3.1e-05,True
+[t1 HSD efficacy g=-4] efficacy look 3,1.9992,1.999226,2.6e-05,True
+[t1 HSD efficacy g=-4] no futility boundaries,"[None, None, None]",all null,,True
+[t1 HSD efficacy g=-4] cumulative alpha look 1,0.001303,0.001303,0.0,True
+[t1 HSD efficacy g=-4] cumulative alpha look 2,0.006246,0.006246,0.0,True
 [t1 HSD efficacy g=-4] cumulative alpha look 3,0.025,0.025,0.0,True
 [t1 HSD efficacy g=-4] fixed N,467.0,467.0,0.0,True
-[t1 HSD efficacy g=-4] max N,483.0,475.0,8.0,False
-[t1 HSD efficacy g=-4] inflation ratio,1.034261,1.015197,0.019064,False
-[t1 HSD efficacy g=-4] E[N|H0] / max N,0.828157,0.997483,0.169326,False
-[t1 HSD efficacy g=-4] E[N|H1] / max N,0.890269,0.771923,0.118346,False
+[t1 HSD efficacy g=-4] max N,475.0,475.0,0.0,True
+[t1 HSD efficacy g=-4] inflation ratio,1.017131,1.015197,0.001934,True
+[t1 HSD efficacy g=-4] E[N|H0] / max N,0.997895,0.997483,0.000412,True
+[t1 HSD efficacy g=-4] E[N|H1] / max N,0.772632,0.771923,0.000709,True
 [t1 HSD efficacy g=-4] resolved efficacy gamma echoes request,-4.0,-4,,True
-[t1 HSD efficacy g=-2] efficacy look 1,3.0,2.677524,0.322476,False
-[t1 HSD efficacy g=-2] efficacy look 2,3.0,2.385418,0.614582,False
-[t1 HSD efficacy g=-2] efficacy look 3,3.0,2.06374,0.93626,False
-[t1 HSD efficacy g=-2] no futility boundaries,"[0.5, 0.5, 0.5]",all null,,False
-[t1 HSD efficacy g=-2] cumulative alpha look 1,0.025,0.003708,0.021292,False
-[t1 HSD efficacy g=-2] cumulative alpha look 2,0.025,0.010931,0.014069,False
+[t1 HSD efficacy g=-2] efficacy look 1,2.6775,2.677524,2.4e-05,True
+[t1 HSD efficacy g=-2] efficacy look 2,2.3854,2.385418,1.8e-05,True
+[t1 HSD efficacy g=-2] efficacy look 3,2.0637,2.06374,4e-05,True
+[t1 HSD efficacy g=-2] no futility boundaries,"[None, None, None]",all null,,True
+[t1 HSD efficacy g=-2] cumulative alpha look 1,0.003708,0.003708,0.0,True
+[t1 HSD efficacy g=-2] cumulative alpha look 2,0.010931,0.010931,0.0,True
 [t1 HSD efficacy g=-2] cumulative alpha look 3,0.025,0.025,0.0,True
 [t1 HSD efficacy g=-2] fixed N,467.0,467.0,0.0,True
-[t1 HSD efficacy g=-2] max N,483.0,488.0,5.0,False
-[t1 HSD efficacy g=-2] inflation ratio,1.034261,1.04315,0.008889,False
-[t1 HSD efficacy g=-2] E[N|H0] / max N,0.828157,0.99512,0.166963,False
-[t1 HSD efficacy g=-2] E[N|H1] / max N,0.890269,0.714138,0.176131,False
-[t1 HSD efficacy g=-2] resolved efficacy gamma echoes request,-4.0,-2,,False
-[t1 HSD efficacy g=0] efficacy look 1,3.0,2.39398,0.60602,False
-[t1 HSD efficacy g=0] efficacy look 2,3.0,2.293768,0.706232,False
-[t1 HSD efficacy g=0] efficacy look 3,3.0,2.199939,0.800061,False
-[t1 HSD efficacy g=0] no futility boundaries,"[0.5, 0.5, 0.5]",all null,,False
-[t1 HSD efficacy g=0] cumulative alpha look 1,0.025,0.008333,0.016667,False
-[t1 HSD efficacy g=0] cumulative alpha look 2,0.025,0.016667,0.008333,False
+[t1 HSD efficacy g=-2] max N,488.0,488.0,0.0,True
+[t1 HSD efficacy g=-2] inflation ratio,1.044968,1.04315,0.001818,True
+[t1 HSD efficacy g=-2] E[N|H0] / max N,0.995902,0.99512,0.000782,True
+[t1 HSD efficacy g=-2] E[N|H1] / max N,0.715164,0.714138,0.001026,True
+[t1 HSD efficacy g=-2] resolved efficacy gamma echoes request,-2.0,-2,,True
+[t1 HSD efficacy g=0] efficacy look 1,2.394,2.39398,2e-05,True
+[t1 HSD efficacy g=0] efficacy look 2,2.2938,2.293768,3.2e-05,True
+[t1 HSD efficacy g=0] efficacy look 3,2.1999,2.199939,3.9e-05,True
+[t1 HSD efficacy g=0] no futility boundaries,"[None, None, None]",all null,,True
+[t1 HSD efficacy g=0] cumulative alpha look 1,0.008333,0.008333,0.0,True
+[t1 HSD efficacy g=0] cumulative alpha look 2,0.016667,0.016667,0.0,True
 [t1 HSD efficacy g=0] cumulative alpha look 3,0.025,0.025,0.0,True
 [t1 HSD efficacy g=0] fixed N,467.0,467.0,0.0,True
-[t1 HSD efficacy g=0] max N,483.0,517.0,34.0,False
-[t1 HSD efficacy g=0] inflation ratio,1.034261,1.106549,0.072288,False
-[t1 HSD efficacy g=0] E[N|H0] / max N,0.828157,0.991667,0.16351,False
-[t1 HSD efficacy g=0] E[N|H1] / max N,0.890269,0.652821,0.237448,False
-[t1 HSD efficacy g=0] resolved efficacy gamma echoes request,-4.0,0,,False
-[t1 HSD efficacy g=1] efficacy look 1,3.0,2.283141,0.716859,False
-[t1 HSD efficacy g=1] efficacy look 2,3.0,2.284441,0.715559,False
-[t1 HSD efficacy g=1] efficacy look 3,3.0,2.301255,0.698745,False
-[t1 HSD efficacy g=1] no futility boundaries,"[0.5, 0.5, 0.5]",all null,,False
-[t1 HSD efficacy g=1] cumulative alpha look 1,0.025,0.011211,0.013789,False
-[t1 HSD efficacy g=1] cumulative alpha look 2,0.025,0.019244,0.005756,False
+[t1 HSD efficacy g=0] max N,517.0,517.0,0.0,True
+[t1 HSD efficacy g=0] inflation ratio,1.107066,1.106549,0.000517,True
+[t1 HSD efficacy g=0] E[N|H0] / max N,0.992263,0.991667,0.000596,True
+[t1 HSD efficacy g=0] E[N|H1] / max N,0.653772,0.652821,0.000951,True
+[t1 HSD efficacy g=0] resolved efficacy gamma echoes request,0.0,0,,True
+[t1 HSD efficacy g=1] efficacy look 1,2.2831,2.283141,4.1e-05,True
+[t1 HSD efficacy g=1] efficacy look 2,2.2844,2.284441,4.1e-05,True
+[t1 HSD efficacy g=1] efficacy look 3,2.3013,2.301255,4.5e-05,True
+[t1 HSD efficacy g=1] no futility boundaries,"[None, None, None]",all null,,True
+[t1 HSD efficacy g=1] cumulative alpha look 1,0.011211,0.011211,0.0,True
+[t1 HSD efficacy g=1] cumulative alpha look 2,0.019244,0.019244,0.0,True
 [t1 HSD efficacy g=1] cumulative alpha look 3,0.025,0.025,0.0,True
 [t1 HSD efficacy g=1] fixed N,467.0,467.0,0.0,True
-[t1 HSD efficacy g=1] max N,483.0,540.0,57.0,False
-[t1 HSD efficacy g=1] inflation ratio,1.034261,1.156123,0.121862,False
-[t1 HSD efficacy g=1] E[N|H0] / max N,0.828157,0.989848,0.161691,False
-[t1 HSD efficacy g=1] E[N|H1] / max N,0.890269,0.623897,0.266372,False
-[t1 HSD efficacy g=1] resolved efficacy gamma echoes request,-4.0,1,,False
-[t4 HSD/HSD g=-4] efficacy look 1,3.0,3.010739,0.010739,False
-[t4 HSD/HSD g=-4] efficacy look 2,3.0,2.546531,0.453469,False
-[t4 HSD/HSD g=-4] efficacy look 3,3.0,1.999226,1.000774,False
-[t4 HSD/HSD g=-4] futility look 1,0.5,-0.659293,1.159293,False
-[t4 HSD/HSD g=-4] futility look 2,0.5,0.684506,0.184506,False
-[t4 HSD/HSD g=-4] futility look 3,0.5,1.999226,1.499226,False
-[t4 HSD/HSD g=-4] cumulative alpha look 1,0.025,0.001303,0.023697,False
-[t4 HSD/HSD g=-4] cumulative alpha look 2,0.025,0.006246,0.018754,False
+[t1 HSD efficacy g=1] max N,540.0,540.0,0.0,True
+[t1 HSD efficacy g=1] inflation ratio,1.156317,1.156123,0.000194,True
+[t1 HSD efficacy g=1] E[N|H0] / max N,0.990741,0.989848,0.000893,True
+[t1 HSD efficacy g=1] E[N|H1] / max N,0.624074,0.623897,0.000177,True
+[t1 HSD efficacy g=1] resolved efficacy gamma echoes request,1.0,1,,True
+[t4 HSD/HSD g=-4] efficacy look 1,3.0107,3.010739,3.9e-05,True
+[t4 HSD/HSD g=-4] efficacy look 2,2.5465,2.546531,3.1e-05,True
+[t4 HSD/HSD g=-4] efficacy look 3,1.9992,1.999226,2.6e-05,True
+[t4 HSD/HSD g=-4] futility look 1,-0.6581,-0.659293,0.001193,True
+[t4 HSD/HSD g=-4] futility look 2,0.6861,0.684506,0.001594,True
+[t4 HSD/HSD g=-4] futility look 3,1.9992,1.999226,2.6e-05,True
+[t4 HSD/HSD g=-4] cumulative alpha look 1,0.001303,0.001303,0.0,True
+[t4 HSD/HSD g=-4] cumulative alpha look 2,0.006246,0.006246,0.0,True
 [t4 HSD/HSD g=-4] cumulative alpha look 3,0.025,0.025,0.0,True
-[t4 HSD/HSD g=-4] cumulative beta look 1,0.1,0.005212,0.094788,False
-[t4 HSD/HSD g=-4] cumulative beta look 2,0.1,0.024986,0.075014,False
+[t4 HSD/HSD g=-4] cumulative beta look 1,0.005212,0.005212,0.0,True
+[t4 HSD/HSD g=-4] cumulative beta look 2,0.024986,0.024986,0.0,True
 [t4 HSD/HSD g=-4] cumulative beta look 3,0.1,0.1,0.0,True
 [t4 HSD/HSD g=-4] fixed N,467.0,467.0,0.0,True
 [t4 HSD/HSD g=-4] max N,483.0,483.0,0.0,True
 [t4 HSD/HSD g=-4] inflation ratio,1.034261,1.03301,0.001251,True
-[t4 HSD/HSD g=-4] E[N|H0] / max N,0.828157,0.659759,0.168398,False
-[t4 HSD/HSD g=-4] E[N|H1] / max N,0.890269,0.757641,0.132628,False
+[t4 HSD/HSD g=-4] E[N|H0] / max N,0.660455,0.659759,0.000696,True
+[t4 HSD/HSD g=-4] E[N|H1] / max N,0.757764,0.757641,0.000123,True
 [t4 HSD/HSD g=-4] resolved efficacy gamma echoes request,-4.0,-4,,True
-[t4 HSD/HSD g=-2] efficacy look 1,3.0,2.677524,0.322476,False
-[t4 HSD/HSD g=-2] efficacy look 2,3.0,2.385418,0.614582,False
-[t4 HSD/HSD g=-2] efficacy look 3,3.0,2.06374,0.93626,False
-[t4 HSD/HSD g=-2] futility look 1,0.5,-0.214539,0.714539,False
-[t4 HSD/HSD g=-2] futility look 2,0.5,0.975705,0.475705,False
-[t4 HSD/HSD g=-2] futility look 3,0.5,2.06374,1.56374,False
-[t4 HSD/HSD g=-2] cumulative alpha look 1,0.025,0.003708,0.021292,False
-[t4 HSD/HSD g=-2] cumulative alpha look 2,0.025,0.010931,0.014069,False
+[t4 HSD/HSD g=-2] efficacy look 1,2.6775,2.677524,2.4e-05,True
+[t4 HSD/HSD g=-2] efficacy look 2,2.3854,2.385418,1.8e-05,True
+[t4 HSD/HSD g=-2] efficacy look 3,2.0637,2.06374,4e-05,True
+[t4 HSD/HSD g=-2] futility look 1,-0.213,-0.214539,0.001539,True
+[t4 HSD/HSD g=-2] futility look 2,0.9779,0.975705,0.002195,True
+[t4 HSD/HSD g=-2] futility look 3,2.0637,2.06374,4e-05,True
+[t4 HSD/HSD g=-2] cumulative alpha look 1,0.003708,0.003708,0.0,True
+[t4 HSD/HSD g=-2] cumulative alpha look 2,0.010931,0.010931,0.0,True
 [t4 HSD/HSD g=-2] cumulative alpha look 3,0.025,0.025,0.0,True
-[t4 HSD/HSD g=-2] cumulative beta look 1,0.1,0.014834,0.085166,False
-[t4 HSD/HSD g=-2] cumulative beta look 2,0.1,0.043726,0.056274,False
+[t4 HSD/HSD g=-2] cumulative beta look 1,0.014834,0.014834,0.0,True
+[t4 HSD/HSD g=-2] cumulative beta look 2,0.043726,0.043726,0.0,True
 [t4 HSD/HSD g=-2] cumulative beta look 3,0.1,0.1,0.0,True
 [t4 HSD/HSD g=-2] fixed N,467.0,467.0,0.0,True
-[t4 HSD/HSD g=-2] max N,483.0,513.0,30.0,False
-[t4 HSD/HSD g=-2] inflation ratio,1.034261,1.096784,0.062523,False
-[t4 HSD/HSD g=-2] E[N|H0] / max N,0.828157,0.575816,0.252341,False
-[t4 HSD/HSD g=-2] E[N|H1] / max N,0.890269,0.681447,0.208822,False
-[t4 HSD/HSD g=-2] resolved efficacy gamma echoes request,-4.0,-2,,False
-[t4 HSD/HSD g=0] efficacy look 1,3.0,2.39398,0.60602,False
-[t4 HSD/HSD g=0] efficacy look 2,3.0,2.293768,0.706232,False
-[t4 HSD/HSD g=0] efficacy look 3,3.0,2.199939,0.800061,False
-[t4 HSD/HSD g=0] futility look 1,0.5,0.253625,0.246375,False
-[t4 HSD/HSD g=0] futility look 2,0.5,1.29613,0.79613,False
-[t4 HSD/HSD g=0] futility look 3,0.5,2.199939,1.699939,False
-[t4 HSD/HSD g=0] cumulative alpha look 1,0.025,0.008333,0.016667,False
-[t4 HSD/HSD g=0] cumulative alpha look 2,0.025,0.016667,0.008333,False
+[t4 HSD/HSD g=-2] max N,513.0,513.0,0.0,True
+[t4 HSD/HSD g=-2] inflation ratio,1.098501,1.096784,0.001717,True
+[t4 HSD/HSD g=-2] E[N|H0] / max N,0.575049,0.575816,0.000767,True
+[t4 HSD/HSD g=-2] E[N|H1] / max N,0.680312,0.681447,0.001135,True
+[t4 HSD/HSD g=-2] resolved efficacy gamma echoes request,-2.0,-2,,True
+[t4 HSD/HSD g=0] efficacy look 1,2.394,2.39398,2e-05,True
+[t4 HSD/HSD g=0] efficacy look 2,2.2938,2.293768,3.2e-05,True
+[t4 HSD/HSD g=0] efficacy look 3,2.1999,2.199939,3.9e-05,True
+[t4 HSD/HSD g=0] futility look 1,0.2553,0.253625,0.001675,True
+[t4 HSD/HSD g=0] futility look 2,1.2986,1.29613,0.00247,True
+[t4 HSD/HSD g=0] futility look 3,2.1999,2.199939,3.9e-05,True
+[t4 HSD/HSD g=0] cumulative alpha look 1,0.008333,0.008333,0.0,True
+[t4 HSD/HSD g=0] cumulative alpha look 2,0.016667,0.016667,0.0,True
 [t4 HSD/HSD g=0] cumulative alpha look 3,0.025,0.025,0.0,True
-[t4 HSD/HSD g=0] cumulative beta look 1,0.1,0.033333,0.066667,False
-[t4 HSD/HSD g=0] cumulative beta look 2,0.1,0.066667,0.033333,False
+[t4 HSD/HSD g=0] cumulative beta look 1,0.033333,0.033333,0.0,True
+[t4 HSD/HSD g=0] cumulative beta look 2,0.066667,0.066667,0.0,True
 [t4 HSD/HSD g=0] cumulative beta look 3,0.1,0.1,0.0,True
 [t4 HSD/HSD g=0] fixed N,467.0,467.0,0.0,True
-[t4 HSD/HSD g=0] max N,483.0,582.0,99.0,False
-[t4 HSD/HSD g=0] inflation ratio,1.034261,1.244213,0.209952,False
-[t4 HSD/HSD g=0] E[N|H0] / max N,0.828157,0.48832,0.339837,False
-[t4 HSD/HSD g=0] E[N|H1] / max N,0.890269,0.587828,0.302441,False
-[t4 HSD/HSD g=0] resolved efficacy gamma echoes request,-4.0,0,,False
-[t4 HSD/HSD g=1] efficacy look 1,3.0,2.283141,0.716859,False
-[t4 HSD/HSD g=1] efficacy look 2,3.0,2.284441,0.715559,False
-[t4 HSD/HSD g=1] efficacy look 3,3.0,2.301255,0.698745,False
-[t4 HSD/HSD g=1] futility look 1,0.5,0.486098,0.013902,False
-[t4 HSD/HSD g=1] futility look 2,0.5,1.463653,0.963653,False
-[t4 HSD/HSD g=1] futility look 3,0.5,2.301255,1.801255,False
-[t4 HSD/HSD g=1] cumulative alpha look 1,0.025,0.011211,0.013789,False
-[t4 HSD/HSD g=1] cumulative alpha look 2,0.025,0.019244,0.005756,False
+[t4 HSD/HSD g=0] max N,582.0,582.0,0.0,True
+[t4 HSD/HSD g=0] inflation ratio,1.246253,1.244213,0.00204,True
+[t4 HSD/HSD g=0] E[N|H0] / max N,0.487973,0.48832,0.000347,True
+[t4 HSD/HSD g=0] E[N|H1] / max N,0.587629,0.587828,0.000199,True
+[t4 HSD/HSD g=0] resolved efficacy gamma echoes request,0.0,0,,True
+[t4 HSD/HSD g=1] efficacy look 1,2.2831,2.283141,4.1e-05,True
+[t4 HSD/HSD g=1] efficacy look 2,2.2844,2.284441,4.1e-05,True
+[t4 HSD/HSD g=1] efficacy look 3,2.3013,2.301255,4.5e-05,True
+[t4 HSD/HSD g=1] futility look 1,0.487,0.486098,0.000902,True
+[t4 HSD/HSD g=1] futility look 2,1.465,1.463653,0.001347,True
+[t4 HSD/HSD g=1] futility look 3,2.3013,2.301255,4.5e-05,True
+[t4 HSD/HSD g=1] cumulative alpha look 1,0.011211,0.011211,0.0,True
+[t4 HSD/HSD g=1] cumulative alpha look 2,0.019244,0.019244,0.0,True
 [t4 HSD/HSD g=1] cumulative alpha look 3,0.025,0.025,0.0,True
-[t4 HSD/HSD g=1] cumulative beta look 1,0.1,0.044844,0.055156,False
-[t4 HSD/HSD g=1] cumulative beta look 2,0.1,0.076976,0.023024,False
+[t4 HSD/HSD g=1] cumulative beta look 1,0.044844,0.044844,0.0,True
+[t4 HSD/HSD g=1] cumulative beta look 2,0.076976,0.076976,0.0,True
 [t4 HSD/HSD g=1] cumulative beta look 3,0.1,0.1,0.0,True
 [t4 HSD/HSD g=1] fixed N,467.0,467.0,0.0,True
-[t4 HSD/HSD g=1] max N,483.0,636.0,153.0,False
-[t4 HSD/HSD g=1] inflation ratio,1.034261,1.360784,0.326523,False
-[t4 HSD/HSD g=1] E[N|H0] / max N,0.828157,0.449757,0.3784,False
-[t4 HSD/HSD g=1] E[N|H1] / max N,0.890269,0.539843,0.350426,False
-[t4 HSD/HSD g=1] resolved efficacy gamma echoes request,-4.0,1,,False
-[t4 mixed eff=-2 fut=1] efficacy look 1,3.0,2.677524,0.322476,False
-[t4 mixed eff=-2 fut=1] efficacy look 2,3.0,2.385418,0.614582,False
-[t4 mixed eff=-2 fut=1] efficacy look 3,3.0,2.06374,0.93626,False
-[t4 mixed eff=-2 fut=1] futility look 1,0.5,0.398913,0.101087,False
-[t4 mixed eff=-2 fut=1] futility look 2,0.5,1.330294,0.830294,False
-[t4 mixed eff=-2 fut=1] futility look 3,0.5,2.06374,1.56374,False
-[t4 mixed eff=-2 fut=1] cumulative alpha look 1,0.025,0.003708,0.021292,False
-[t4 mixed eff=-2 fut=1] cumulative alpha look 2,0.025,0.010931,0.014069,False
+[t4 HSD/HSD g=1] max N,636.0,636.0,0.0,True
+[t4 HSD/HSD g=1] inflation ratio,1.361884,1.360784,0.0011,True
+[t4 HSD/HSD g=1] E[N|H0] / max N,0.449686,0.449757,7.1e-05,True
+[t4 HSD/HSD g=1] E[N|H1] / max N,0.539308,0.539843,0.000535,True
+[t4 HSD/HSD g=1] resolved efficacy gamma echoes request,1.0,1,,True
+[t4 mixed eff=-2 fut=1] efficacy look 1,2.6775,2.677524,2.4e-05,True
+[t4 mixed eff=-2 fut=1] efficacy look 2,2.3854,2.385418,1.8e-05,True
+[t4 mixed eff=-2 fut=1] efficacy look 3,2.0637,2.06374,4e-05,True
+[t4 mixed eff=-2 fut=1] futility look 1,0.3994,0.398913,0.000487,True
+[t4 mixed eff=-2 fut=1] futility look 2,1.331,1.330294,0.000706,True
+[t4 mixed eff=-2 fut=1] futility look 3,2.0637,2.06374,4e-05,True
+[t4 mixed eff=-2 fut=1] cumulative alpha look 1,0.003708,0.003708,0.0,True
+[t4 mixed eff=-2 fut=1] cumulative alpha look 2,0.010931,0.010931,0.0,True
 [t4 mixed eff=-2 fut=1] cumulative alpha look 3,0.025,0.025,0.0,True
-[t4 mixed eff=-2 fut=1] cumulative beta look 1,0.1,0.044844,0.055156,False
-[t4 mixed eff=-2 fut=1] cumulative beta look 2,0.1,0.076976,0.023024,False
+[t4 mixed eff=-2 fut=1] cumulative beta look 1,0.044844,0.044844,0.0,True
+[t4 mixed eff=-2 fut=1] cumulative beta look 2,0.076976,0.076976,0.0,True
 [t4 mixed eff=-2 fut=1] cumulative beta look 3,0.1,0.1,0.0,True
 [t4 mixed eff=-2 fut=1] fixed N,467.0,467.0,0.0,True
-[t4 mixed eff=-2 fut=1] max N,483.0,586.0,103.0,False
-[t4 mixed eff=-2 fut=1] inflation ratio,1.034261,1.254268,0.220007,False
-[t4 mixed eff=-2 fut=1] E[N|H0] / max N,0.828157,0.470411,0.357746,False
-[t4 mixed eff=-2 fut=1] E[N|H1] / max N,0.890269,0.625007,0.265262,False
-[t4 mixed eff=-2 fut=1] resolved efficacy gamma echoes request,-4.0,-2,,False
-[t4 mixed eff=1 fut=-2] efficacy look 1,3.0,2.283141,0.716859,False
-[t4 mixed eff=1 fut=-2] efficacy look 2,3.0,2.284441,0.715559,False
-[t4 mixed eff=1 fut=-2] efficacy look 3,3.0,2.301255,0.698745,False
-[t4 mixed eff=1 fut=-2] futility look 1,0.5,-0.118366,0.618366,False
-[t4 mixed eff=1 fut=-2] futility look 2,0.5,1.115337,0.615337,False
-[t4 mixed eff=1 fut=-2] futility look 3,0.5,2.301255,1.801255,False
-[t4 mixed eff=1 fut=-2] cumulative alpha look 1,0.025,0.011211,0.013789,False
-[t4 mixed eff=1 fut=-2] cumulative alpha look 2,0.025,0.019244,0.005756,False
+[t4 mixed eff=-2 fut=1] max N,586.0,586.0,0.0,True
+[t4 mixed eff=-2 fut=1] inflation ratio,1.254818,1.254268,0.00055,True
+[t4 mixed eff=-2 fut=1] E[N|H0] / max N,0.47099,0.470411,0.000579,True
+[t4 mixed eff=-2 fut=1] E[N|H1] / max N,0.62628,0.625007,0.001273,True
+[t4 mixed eff=-2 fut=1] resolved efficacy gamma echoes request,-2.0,-2,,True
+[t4 mixed eff=1 fut=-2] efficacy look 1,2.2831,2.283141,4.1e-05,True
+[t4 mixed eff=1 fut=-2] efficacy look 2,2.2844,2.284441,4.1e-05,True
+[t4 mixed eff=1 fut=-2] efficacy look 3,2.3013,2.301255,4.5e-05,True
+[t4 mixed eff=1 fut=-2] futility look 1,-0.1178,-0.118366,0.000566,True
+[t4 mixed eff=1 fut=-2] futility look 2,1.1161,1.115337,0.000763,True
+[t4 mixed eff=1 fut=-2] futility look 3,2.3013,2.301255,4.5e-05,True
+[t4 mixed eff=1 fut=-2] cumulative alpha look 1,0.011211,0.011211,0.0,True
+[t4 mixed eff=1 fut=-2] cumulative alpha look 2,0.019244,0.019244,0.0,True
 [t4 mixed eff=1 fut=-2] cumulative alpha look 3,0.025,0.025,0.0,True
-[t4 mixed eff=1 fut=-2] cumulative beta look 1,0.1,0.014834,0.085166,False
-[t4 mixed eff=1 fut=-2] cumulative beta look 2,0.1,0.043726,0.056274,False
+[t4 mixed eff=1 fut=-2] cumulative beta look 1,0.014834,0.014834,0.0,True
+[t4 mixed eff=1 fut=-2] cumulative beta look 2,0.043726,0.043726,0.0,True
 [t4 mixed eff=1 fut=-2] cumulative beta look 3,0.1,0.1,0.0,True
 [t4 mixed eff=1 fut=-2] fixed N,467.0,467.0,0.0,True
-[t4 mixed eff=1 fut=-2] max N,483.0,564.0,81.0,False
-[t4 mixed eff=1 fut=-2] inflation ratio,1.034261,1.20706,0.172799,False
-[t4 mixed eff=1 fut=-2] E[N|H0] / max N,0.828157,0.548154,0.280003,False
-[t4 mixed eff=1 fut=-2] E[N|H1] / max N,0.890269,0.592497,0.297772,False
-[t4 mixed eff=1 fut=-2] resolved efficacy gamma echoes request,-4.0,1,,False
-[t4 OBF eff / HSD fut g=0] efficacy look 1,3.0,3.710303,0.710303,False
-[t4 OBF eff / HSD fut g=0] efficacy look 2,3.0,2.511427,0.488573,False
-[t4 OBF eff / HSD fut g=0] efficacy look 3,3.0,1.993048,1.006952,False
-[t4 OBF eff / HSD fut g=0] futility look 1,0.5,0.177123,0.322877,False
-[t4 OBF eff / HSD fut g=0] futility look 2,0.5,1.182988,0.682988,False
-[t4 OBF eff / HSD fut g=0] futility look 3,0.5,1.993048,1.493048,False
-[t4 OBF eff / HSD fut g=0] cumulative alpha look 1,0.025,0.000104,0.024896,False
-[t4 OBF eff / HSD fut g=0] cumulative alpha look 2,0.025,0.006048,0.018952,False
+[t4 mixed eff=1 fut=-2] max N,564.0,564.0,0.0,True
+[t4 mixed eff=1 fut=-2] inflation ratio,1.207709,1.20706,0.000649,True
+[t4 mixed eff=1 fut=-2] E[N|H0] / max N,0.547872,0.548154,0.000282,True
+[t4 mixed eff=1 fut=-2] E[N|H1] / max N,0.592199,0.592497,0.000298,True
+[t4 mixed eff=1 fut=-2] resolved efficacy gamma echoes request,1.0,1,,True
+[t4 OBF eff / HSD fut g=0] efficacy look 1,3.7103,3.710303,3e-06,True
+[t4 OBF eff / HSD fut g=0] efficacy look 2,2.5114,2.511427,2.7e-05,True
+[t4 OBF eff / HSD fut g=0] efficacy look 3,1.993,1.993048,4.8e-05,True
+[t4 OBF eff / HSD fut g=0] futility look 1,0.1785,0.177123,0.001377,True
+[t4 OBF eff / HSD fut g=0] futility look 2,1.185,1.182988,0.002012,True
+[t4 OBF eff / HSD fut g=0] futility look 3,1.993,1.993048,4.8e-05,True
+[t4 OBF eff / HSD fut g=0] cumulative alpha look 1,0.000104,0.000104,0.0,True
+[t4 OBF eff / HSD fut g=0] cumulative alpha look 2,0.006048,0.006048,0.0,True
 [t4 OBF eff / HSD fut g=0] cumulative alpha look 3,0.025,0.025,0.0,True
-[t4 OBF eff / HSD fut g=0] cumulative beta look 1,0.1,0.033333,0.066667,False
-[t4 OBF eff / HSD fut g=0] cumulative beta look 2,0.1,0.066667,0.033333,False
+[t4 OBF eff / HSD fut g=0] cumulative beta look 1,0.033333,0.033333,0.0,True
+[t4 OBF eff / HSD fut g=0] cumulative beta look 2,0.066667,0.066667,0.0,True
 [t4 OBF eff / HSD fut g=0] cumulative beta look 3,0.1,0.1,0.0,True
 [t4 OBF eff / HSD fut g=0] fixed N,467.0,467.0,0.0,True
-[t4 OBF eff / HSD fut g=0] max N,483.0,540.0,57.0,False
-[t4 OBF eff / HSD fut g=0] inflation ratio,1.034261,1.154691,0.12043,False
-[t4 OBF eff / HSD fut g=0] E[N|H0] / max N,0.828157,0.510333,0.317824,False
-[t4 OBF eff / HSD fut g=0] E[N|H1] / max N,0.890269,0.742115,0.148154,False
-[t4 HSD eff g=0 / Pocock fut] efficacy look 1,3.0,2.39398,0.60602,False
-[t4 HSD eff g=0 / Pocock fut] efficacy look 2,3.0,2.293768,0.706232,False
-[t4 HSD eff g=0 / Pocock fut] efficacy look 3,3.0,2.199939,0.800061,False
-[t4 HSD eff g=0 / Pocock fut] futility look 1,0.5,0.450009,0.049991,False
-[t4 HSD eff g=0 / Pocock fut] futility look 2,0.5,1.38893,0.88893,False
-[t4 HSD eff g=0 / Pocock fut] futility look 3,0.5,2.199939,1.699939,False
-[t4 HSD eff g=0 / Pocock fut] cumulative alpha look 1,0.025,0.008333,0.016667,False
-[t4 HSD eff g=0 / Pocock fut] cumulative alpha look 2,0.025,0.016667,0.008333,False
+[t4 OBF eff / HSD fut g=0] max N,540.0,540.0,0.0,True
+[t4 OBF eff / HSD fut g=0] inflation ratio,1.156317,1.154691,0.001626,True
+[t4 OBF eff / HSD fut g=0] E[N|H0] / max N,0.509259,0.510333,0.001074,True
+[t4 OBF eff / HSD fut g=0] E[N|H1] / max N,0.742593,0.742115,0.000478,True
+[t4 HSD eff g=0 / Pocock fut] efficacy look 1,2.394,2.39398,2e-05,True
+[t4 HSD eff g=0 / Pocock fut] efficacy look 2,2.2938,2.293768,3.2e-05,True
+[t4 HSD eff g=0 / Pocock fut] efficacy look 3,2.1999,2.199939,3.9e-05,True
+[t4 HSD eff g=0 / Pocock fut] futility look 1,0.45,0.450009,9e-06,True
+[t4 HSD eff g=0 / Pocock fut] futility look 2,1.3889,1.38893,3e-05,True
+[t4 HSD eff g=0 / Pocock fut] futility look 3,2.1999,2.199939,3.9e-05,True
+[t4 HSD eff g=0 / Pocock fut] cumulative alpha look 1,0.008333,0.008333,0.0,True
+[t4 HSD eff g=0 / Pocock fut] cumulative alpha look 2,0.016667,0.016667,0.0,True
 [t4 HSD eff g=0 / Pocock fut] cumulative alpha look 3,0.025,0.025,0.0,True
-[t4 HSD eff g=0 / Pocock fut] cumulative beta look 1,0.1,0.045283,0.054717,False
-[t4 HSD eff g=0 / Pocock fut] cumulative beta look 2,0.1,0.076338,0.023662,False
+[t4 HSD eff g=0 / Pocock fut] cumulative beta look 1,0.045283,0.045283,0.0,True
+[t4 HSD eff g=0 / Pocock fut] cumulative beta look 2,0.076338,0.076338,0.0,True
 [t4 HSD eff g=0 / Pocock fut] cumulative beta look 3,0.1,0.1,0.0,True
 [t4 HSD eff g=0 / Pocock fut] fixed N,467.0,467.0,0.0,True
-[t4 HSD eff g=0 / Pocock fut] max N,483.0,612.0,129.0,False
-[t4 HSD eff g=0 / Pocock fut] inflation ratio,1.034261,1.310499,0.276238,False
-[t4 HSD eff g=0 / Pocock fut] E[N|H0] / max N,0.828157,0.458447,0.36971,False
-[t4 HSD eff g=0 / Pocock fut] E[N|H1] / max N,0.890269,0.567073,0.323196,False
-[t4 HSD eff g=0 / Pocock fut] resolved efficacy gamma echoes request,-4.0,0,,False
-[t4 k=5 mixed eff=-2 fut=0] efficacy look 1  [EXPECTED REJECTION],HTTP 422,"rejected, but not on 'k' -- error locations were [['body', '",,False
-[t4 k=5 mixed eff=-2 fut=0] efficacy look 2  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] efficacy look 3  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] efficacy look 4  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] efficacy look 5  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] futility look 1  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] futility look 2  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] futility look 3  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] futility look 4  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] futility look 5  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] cumulative alpha look 1  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] cumulative alpha look 2  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] cumulative alpha look 3  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] cumulative alpha look 4  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] cumulative alpha look 5  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] cumulative beta look 1  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] cumulative beta look 2  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] cumulative beta look 3  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] cumulative beta look 4  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] cumulative beta look 5  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] fixed N  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] max N  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] inflation ratio  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] E[N|H0] / max N  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] E[N|H1] / max N  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[t4 k=5 mixed eff=-2 fut=0] resolved efficacy gamma echoes request  [NOT PRODUCED],absent,no numerical output for an uncertified design,,False
-[discrimination] distinct gammas give distinct max N,"{-4.0: 483, -2.0: 483, 0.0: 483, 1.0: 483}",4 distinct values,,False
-[discrimination] auto-inherit: gamma -4 -> +1 moves max N 483 -> 636,483 -> 483,483 -> 636,,False
-[discrimination] explicit futility gamma=0 overrides inheritance,auto=483 explicit0=483,different,,False
+[t4 HSD eff g=0 / Pocock fut] max N,612.0,612.0,0.0,True
+[t4 HSD eff g=0 / Pocock fut] inflation ratio,1.310493,1.310499,6e-06,True
+[t4 HSD eff g=0 / Pocock fut] E[N|H0] / max N,0.45915,0.458447,0.000703,True
+[t4 HSD eff g=0 / Pocock fut] E[N|H1] / max N,0.566993,0.567073,8e-05,True
+[t4 HSD eff g=0 / Pocock fut] resolved efficacy gamma echoes request,0.0,0,,True
+[t4 k=5 mixed eff=-2 fut=0] efficacy look 1  [EXPECTED REJECTION],HTTP 422,"422 less_than_equal on k, le=4",,True
+[t4 k=5 mixed eff=-2 fut=0] efficacy look 2  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] efficacy look 3  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] efficacy look 4  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] efficacy look 5  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] futility look 1  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] futility look 2  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] futility look 3  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] futility look 4  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] futility look 5  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] cumulative alpha look 1  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] cumulative alpha look 2  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] cumulative alpha look 3  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] cumulative alpha look 4  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] cumulative alpha look 5  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] cumulative beta look 1  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] cumulative beta look 2  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] cumulative beta look 3  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] cumulative beta look 4  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] cumulative beta look 5  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] fixed N  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] max N  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] inflation ratio  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] E[N|H0] / max N  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] E[N|H1] / max N  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[t4 k=5 mixed eff=-2 fut=0] resolved efficacy gamma echoes request  [NOT PRODUCED],absent,no numerical output for an uncertified design,,True
+[discrimination] distinct gammas give distinct max N,"{-4.0: 483, -2.0: 513, 0.0: 582, 1.0: 636}",4 distinct values,,True
+[discrimination] auto-inherit: gamma -4 -> +1 moves max N 483 -> 636,483 -> 636,483 -> 636,,True
+[discrimination] explicit futility gamma=0 overrides inheritance,auto=636 explicit0=604,different,,True
 [back-compat] omitted gamma == explicit -4,483,483,,True
-[contract] inactive gamma reported as null under Pocock,-4.0,None,,False
+[contract] inactive gamma reported as null under Pocock,None,None,,True
