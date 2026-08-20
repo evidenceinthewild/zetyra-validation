@@ -4,7 +4,7 @@ Group sequential design is the FDA-facing calculator, so its validation state
 is recorded here in full rather than summarised in the README. This file
 changes on every backend deploy; the README does not.
 
-**Last run: 2026-07-30 against production revision `zetyra-backend-00046-szb`
+**Last run: 2026-08-20 against production revision `zetyra-backend-00052-fvn`
 (`https://api.zetyra.com`). 9 of 9 suites passed.**
 
 These suites exercise the deployed API, not a local checkout, so the status
@@ -44,18 +44,23 @@ raising the ceiling restores coverage without regenerating anything.
 
 ## Boundary agreement
 
-Current, from `gsd/test_gsdesign_benchmark.R` against `00046-szb`, written to
+Current, from `gsd/test_gsdesign_benchmark.R` against `00052-fvn`, written to
 `results/gsd_validation_results.csv`:
 
 | | |
 |---|---|
 | Assertions | 32 (27 numerical, 5 rejection) |
 | Numerical cases | 9 executed, 9 passed |
-| Max deviation | **0.0000** z-score |
+| Max deviation | **0.0001** z-score |
 | Tolerance | 0.0005 |
 
-Every boundary in the certified domain reproduces gsDesign exactly at the 4 dp
-gsDesign reports. References are computed by gsDesign in R at run time, not
+26 of the 27 numerical boundaries reproduce gsDesign exactly at the 4 dp
+gsDesign reports. One does not: **OF_4 look 3**, gsDesign 2.3590 against the
+engine's 2.3591. The underlying value sits near 2.35905, so a difference far
+below the tolerance flips the fourth decimal on rounding. It is recorded
+rather than described as 0.0000, because a headline that says "exactly" while
+one cell disagrees is the kind of small inaccuracy this document exists to
+prevent. References are computed by gsDesign in R at run time, not
 read from a stored copy.
 
 ### The 0.034 figure, and where it came from
@@ -106,9 +111,28 @@ itself.
 
 | Revision | Date | Change |
 |---|---|---|
-| `00046-szb` | current | Production tip |
+| `00052-fvn` | 2026-08-20 | Production tip. Finalized-manuscript composed-pipeline artifact (45-cell fixture, constant-rate vs trend-active estimand split). GSD engine unchanged |
+| `00051-47g` | 2026-08-10 | Stripe configuration moved to Secret Manager after a CI-built promotion dropped the image-baked `.env` |
+| `00049-sgn` | 2026-08-10 | `min-instances=1`; cold starts were running 10-24s against Stripe's ~10s budget |
+| `00048-jrr` | 2026-08-01 | Rule B blinded nuisance-parameter SSR |
+| `00047-m92` | 2026-07-30 | First promotion of a CI-gated runtime artifact rather than a source deploy |
+| `00046-szb` | 2026-07-29 | Previous provenance baseline |
 | `00044-l8d` | 2026-07-29 | Protocol/doc hotfix |
 | `00043-8mt` | 2026-07-29 | Selectable HSD γ. Defaults unchanged, so every design produced before it reproduces exactly — omitting γ is identical to the historical fixed −4, and `methodology_version` stays 2 |
 | `00042-7dx` | 2026-07-28 | First with the corrected futility derivation (β spent under the alternative, solved jointly with sample size) and deterministic MVN integration |
 
 CSVs in `results/` and `gsd/results/` are the artifacts of the latest run.
+
+## Toolchain that produced this run
+
+| | |
+|---|---|
+| R | 4.6.1 |
+| gsDesign | 3.10.1 |
+| httr / jsonlite | 1.4.8 / 2.0.0 |
+| Validation repo | `2ef9d59` |
+
+gsDesign 3.10.1 is the pinned reference and is what makes the comparison
+meaningful; the R *runtime* differs from the CI gate host, which resolves R
+4.3.3 via `r-lib/actions/setup-r`. Both produce the same boundaries, which is
+the point of pinning gsDesign rather than R.

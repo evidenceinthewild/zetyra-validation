@@ -19,7 +19,7 @@ test,zetyra_fixed,ref_fixed,rel_err,pass,max_events,fixed_events,n_total,event_p
 "HR=0.5, strong effect: n_ctrl + n_trt = n_total",,,,True,,,162.0,,,81.0,81.0,,,,,,,,,,
 OBF: first boundary > 3,,,,True,,,,,,,,3.7103,,,,,,,,,
 OBF: efficacy boundaries decrease,,,,True,,,,,,,,,"[3.71, 2.511, 1.993]",,,,,,,,
-Futility boundaries present,,,,True,,,,,,,,,"[0.377, 1.279, 1.993]",,,,,,,,
+Futility boundaries present,,,,True,,,,,,,,,"[0.377, 1.278, 1.993]",,,,,,,,
 Pocock range < OBF range,,,,True,,,,,,,,,,0.0,1.717,,,,,,
 Cumulative alpha = target alpha,,,,True,,,,,,,,,,,,0.025,0.025,,,,
 Info fractions increasing to 1.0,,,,True,,,,,,,,,,,,,,"[0.333, 0.667, 1.0]",,,
@@ -29,4 +29,4 @@ Guard (survival): HR=0,,,,True,,,,,,,,,,,,,,,422.0,,
 Guard (survival): Negative median,,,,True,,,,,,,,,,,,,,,422.0,,
 Guard (survival): binding_futility=True (unsupported),,,,True,,,,,,,,,,,,,,,400.0,,
 Guard (continuous): binding_futility=True (unsupported),,,,True,,,,,,,,,,,,,,,400.0,,
-Events increase as HR -> 1,,,,True,,,,,,,,,,,,,,,,"[0.5, 0.6, 0.7, 0.8, 0.9]","[107, 197, 404, 1032, 4628]"
+Events increase as HR -> 1,,,,True,,,,,,,,,,,,,,,,"[0.5, 0.6, 0.7, 0.8, 0.9]","[107, 197, 404, 1032, 4629]"

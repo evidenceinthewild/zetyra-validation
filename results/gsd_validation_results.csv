@@ -6,7 +6,7 @@
 "OF_3",3,1.993,1.993,0,TRUE,""
 "OF_4",1,4.3326,4.3326,0,TRUE,""
 "OF_4",2,2.9631,2.9631,0,TRUE,""
-"OF_4",3,2.359,2.359,0,TRUE,""
+"OF_4",3,2.359,2.3591,1e-04,TRUE,""
 "OF_4",4,2.0141,2.0141,0,TRUE,""
 "OF_5",1,NA,NA,NA,TRUE,"rejected 422 less_than_equal on k, le=4"
 "OF_5",2,NA,NA,NA,TRUE,"rejected 422 less_than_equal on k, le=4"

@@ -8,7 +8,7 @@
 "OBF k=3","look_3_z",1.993,1.993,0,TRUE
 "OBF k=4","look_1_z",4.3326,4.3326,0,TRUE
 "OBF k=4","look_2_z",2.9631,2.9631,0,TRUE
-"OBF k=4","look_3_z",2.359,2.359,0,TRUE
+"OBF k=4","look_3_z",2.359,2.3591,1e-04,TRUE
 "OBF k=4","look_4_z",2.0141,2.0141,0,TRUE
 "OBF k=5","look_1_z",NA,NA,NA,TRUE
 "OBF k=5","look_2_z",NA,NA,NA,TRUE
@@ -45,4 +45,4 @@
 "OBF k=3","info_frac_look_3",1,1,0,TRUE
 "HR consistency","look_1: HR=0.7 vs HR=0.8",3.7103,3.7103,0,TRUE
 "HR consistency","look_2: HR=0.7 vs HR=0.8",2.5114,2.5114,0,TRUE
-"HR consistency","look_3: HR=0.7 vs HR=0.8",1.9931,1.993,1e-04,TRUE
+"HR consistency","look_3: HR=0.7 vs HR=0.8",1.9931,1.9931,0,TRUE
